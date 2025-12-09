@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyber Terminal</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <canvas id="matrix-canvas"></canvas>
+    <canvas id="radar-canvas"></canvas>
+
+    <div id="boot-sequence" class="boot-overlay">
+      <div class="boot-content">
+        <pre id="boot-text"></pre>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="terminal-section">
+        <div class="terminal-header">
+          <span class="terminal-title">root@cyberterm:~#</span>
+          <div class="terminal-controls">
+            <button class="control-btn minimize">_</button>
+            <button class="control-btn maximize">□</button>
+            <button class="control-btn close">×</button>
+          </div>
+        </div>
+        <div class="terminal-body" id="terminal">
+          <div id="output"></div>
+          <div class="input-line">
+            <span class="prompt" id="prompt">user@cyberterm:~$</span>
+            <input
+              type="text"
+              id="input"
+              autocomplete="off"
+              spellcheck="false"
+              autofocus
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="widgets-section">
+        <div class="widget clock-widget">
+          <div class="widget-title">SYSTEM TIME</div>
+          <div class="widget-content">
+            <div id="clock-display">00:00:00</div>
+            <div id="date-display">Loading...</div>
+          </div>
+        </div>
+
+        <div class="widget weather-widget">
+          <div class="widget-title">WEATHER (GPS)</div>
+          <div class="widget-content" id="weather-content">
+            <div id="weather-display">
+              <div style="text-align: center; padding: 20px">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="widget quote-widget">
+          <div class="widget-title">DAILY QUOTE</div>
+          <div class="widget-content">
+            <div id="quote-text">Loading...</div>
+            <div id="quote-author">--</div>
+          </div>
+        </div>
+
+        <div class="widget crypto-widget">
+          <div class="widget-title">CRYPTO PRICES</div>
+          <div class="widget-content" id="crypto-display">
+            <div class="crypto-item">
+              <span>BTC:</span> <span id="btc-price">$--</span>
+            </div>
+            <div class="crypto-item">
+              <span>ETH:</span> <span id="eth-price">$--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="widget system-widget">
+          <div class="widget-title">SYSTEM MONITOR</div>
+          <div class="widget-content">
+            <div class="system-item">
+              <span>CPU:</span> <span id="cpu-usage">0%</span>
+            </div>
+            <div class="system-bar">
+              <div id="cpu-bar" class="bar-fill"></div>
+            </div>
+            <div class="system-item">
+              <span>RAM:</span> <span id="ram-usage">0%</span>
+            </div>
+            <div class="system-bar">
+              <div id="ram-bar" class="bar-fill"></div>
+            </div>
+            <div class="system-item">
+              <span>UPTIME:</span> <span id="uptime-display">0:00:00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="widget logs-widget">
+          <div class="widget-title">EVENT LOGS</div>
+          <div class="widget-content" id="logs-display">
+            <div class="log-entry">[INIT] System started</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="fs.js"></script>
+    <script src="system.js"></script>
+    <script src="api.js"></script>
+    <script src="themes.js"></script>
+    <script src="widgets.js"></script>
+    <script src="matrix.js"></script>
+    <script src="terminal.js"></script>
+  </body>
+</html>
