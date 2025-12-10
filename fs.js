@@ -436,6 +436,156 @@ class VirtualFileSystem {
 
     this.save();
   }
+
+  // --- New Methods from fs_new.js (Fixed) ---
+
+  findFiles(startPath, pattern, recursive = true) {
+    const results = [];
+
+    const search = (path, node) => {
+      if (!node.children) return;
+
+      for (const [name, child] of Object.entries(node.children)) {
+        const fullPath = path === "/" ? `/${name}` : `${path}/${name}`;
+
+        // Check if name matches pattern
+        if (this.matchPattern(name, pattern)) {
+          results.push({
+            path: fullPath,
+            name: name,
+            type: child.type,
+          });
+        }
+
+        // Recursively search directories
+        if (recursive && child.type === "directory") {
+          search(fullPath, child);
+        }
+      }
+    };
+
+    try {
+      const startNode = this.getNode(startPath);
+      search(startPath, startNode);
+    } catch (err) {
+      throw new Error(`bash: find: ${startPath}: No such file or directory`);
+    }
+
+    return results;
+  }
+
+  matchPattern(name, pattern) {
+    // Convert wildcard pattern to regex
+    if (pattern === "*") return true;
+
+    if (pattern.includes("*")) {
+      const regexPattern = pattern.replace(/\./g, "\\.").replace(/\*/g, ".*");
+
+      // Fixed the bug here where the code was duplicated inside the RegExp
+      const regex = new RegExp(`^${regexPattern}$`, "i");
+      return regex.test(name);
+    }
+
+    return name.toLowerCase().includes(pattern.toLowerCase());
+  }
+
+  searchInFile(path, filename, searchPattern, caseSensitive = false) {
+    try {
+      const content = this.readFile(path, filename);
+      const lines = content.split("\n");
+      const matches = [];
+
+      const flags = caseSensitive ? "g" : "gi";
+      const regex = new RegExp(searchPattern, flags);
+
+      lines.forEach((line, index) => {
+        if (regex.test(line)) {
+          matches.push({
+            lineNumber: index + 1,
+            line: line,
+          });
+        }
+      });
+
+      return matches;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  searchInDirectory(
+    startPath,
+    searchPattern,
+    recursive = true,
+    caseSensitive = false
+  ) {
+    const results = [];
+
+    const search = (path, node) => {
+      if (!node.children) return;
+
+      for (const [name, child] of Object.entries(node.children)) {
+        const fullPath = path === "/" ? `/${name}` : `${path}/${name}`;
+
+        if (child.type === "file") {
+          const matches = this.searchInFile(
+            path,
+            name,
+            searchPattern,
+            caseSensitive
+          );
+          if (matches && matches.length > 0) {
+            results.push({
+              file: fullPath,
+              matches: matches,
+            });
+          }
+        }
+
+        if (recursive && child.type === "directory") {
+          search(fullPath, child);
+        }
+      }
+    };
+
+    try {
+      const startNode = this.getNode(startPath);
+      search(startPath, startNode);
+    } catch (err) {
+      throw new Error(`bash: grep: ${startPath}: No such file or directory`);
+    }
+
+    return results;
+  }
+
+  getAllFiles(startPath, recursive = true) {
+    const files = [];
+
+    const traverse = (path, node) => {
+      if (!node.children) return;
+
+      for (const [name, child] of Object.entries(node.children)) {
+        const fullPath = path === "/" ? `/${name}` : `${path}/${name}`;
+
+        if (child.type === "file") {
+          files.push(fullPath);
+        }
+
+        if (recursive && child.type === "directory") {
+          traverse(fullPath, child);
+        }
+      }
+    };
+
+    try {
+      const startNode = this.getNode(startPath);
+      traverse(startPath, startNode);
+    } catch (err) {
+      // Path doesn't exist
+    }
+
+    return files;
+  }
 }
 
 // Initialize filesystem
