@@ -218,16 +218,41 @@ theme set hacker-amber  # Amber hacker theme
 | `news`            | Tech news    | `news`                     |
 | `quote`           | Random quote | `quote`                    |
 
+### Productivity & Widgets
+
+| Command       | Description           | Example                    |
+| ------------- | --------------------- | -------------------------- |
+| `todo          | Manage tasks          | `todo add "Buy milk"        |
+| `note	        | Save quick note	    | `note "Meeting ID: 123"     |
+| `notes	        | View/Clear notes	    | `notes list                 |
+| `timer	        | Set countdown	        | `timer 25m                  |
+| `alarm	        | Set alarm clock	    | `alarm 14:30                |
+| `google        | Google Search	        | `google javascript tutorial |
+| `youtube       | YouTube Search	    | `youtube funny cats         |
+| `github        | GitHub Search	        | `github reactjs             |
+| `stackoverflow | StackOverflow Search	| `stackoverflow center div   |
+| `wiki          | Wikipedia Search	    | `wiki Albert Einstein       |
+| `translate     | Google Translate	    | `translate hello en-hi      |
+| `map          	| Google Maps	        | `map New York               |
+| `open          | Open popular sites	| `open gmail                 |
+| `news          | Fetch latest news	    | `news                       |
+| `crypto        | Check crypto price	| `crypto BTC                 |
+| `weather       | Check weather	        | `weather gps                |
+
 ### Utilities
 
 | Command            | Description          | Example                     |
 | ------------------ | -------------------- | --------------------------- |
 | `theme set <name>` | Change theme         | `theme set kali`            |
+| `set               | Change settings      | set fontSize 18             |
 | `open <service>`   | Open web service     | `open gmail`, `open github` |
 | `neofetch`         | System banner        | `neofetch`                  |
 | `cowsay <text>`    | ASCII cow            | `cowsay "Moo!"`             |
 | `matrix`           | Toggle matrix effect | `matrix`                    |
 | `dev.mode.enable`  | Developer mode       | `dev.mode.enable`           |
+| `setting`          | Export/Import config | settings export             |
+| `shortcu`          | Custom keyboard keys | shortcut set "Ctrl+Q" clear"|
+| `session`          | Save/Load state      | session save work           |
 
 ### Command Chaining
 
@@ -241,14 +266,28 @@ theme set hacker-amber  # Amber hacker theme
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut   | Action               |
-| ---------- | -------------------- |
-| `↑` Arrow  | Previous command     |
-| `↓` Arrow  | Next command         |
-| `Tab`      | Autocomplete command |
-| `Ctrl + L` | Clear screen         |
-| `Ctrl + C` | Cancel input         |
-| `Enter`    | Execute command      |
+| Shortcut   | Action                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `↑` Arrow           | Previous command                                                                                                    |
+| `↓` Arrow           | Next command                                                                                                        |
+| `Tab`               | Autocomplete command                                                                                                |
+| `Ctrl + L`          | Clear screen                                                                                                        |
+| `Ctrl + C`          | Cancel input                                                                                                        |
+| `Enter`             | Execute command                                                                                                     |
+| `Ctrl + A`          | Move cursor to the start of the line                                                                                |
+| `Ctrl + E`          | Move cursor to the end of the line                                                                                  |
+| `Alt + B`           | Move cursor back one word                                                                                           |
+| `Alt + F`           | Move cursor forward one word                                                                                        |
+| `Ctrl + U`          | Clear the entire input line                                                                                         |
+| `Ctrl + K`          | Delete text from the cursor position to the end of the line                                                         |
+| `Ctrl + W`          | Delete the previous word                                                                                            |
+| `Alt + .(Dot)`      | Paste the last argument from the previous command (e.g., if you typed mkdir test, pressing this will type test)     |
+| `Ctrl + D`          | Exit/Logout (only works if the input line is empty)                                                                 |
+| `Ctrl + Z`          | Suspend the current process (Simulation)                                                                            |
+| `Ctrl + R`          | Start Reverse Search to find past commands                                                                          |
+| `Ctrl + R` (Again)  | Find the next previous match while searching                                                                        |
+| `Ctrl + G` or `ESC` | Cancel the search mode                                                                                              |
+| `Backspace`         | Delete characters from your search query                                                                            |
 
 ---
 
@@ -335,8 +374,8 @@ cyberterminal/
 - [ ] Bookmarks management
 - [ ] Download manager
 - [ ] Settings panel UI
-- [ ] Session save/restore
-- [ ] Custom keybindings
+- [✓] Session save/restore
+- [✓] Custom keybindings
 
 ### Version 2.0 (Future)
 
@@ -437,17 +476,17 @@ Have an idea? Open an issue with:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
 ---
 
 ## 👨‍💻 Author
 
-**Your Name**
+**Rehan Kumar**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-- Website: [yourwebsite.com](https://yourwebsite.com)
+- GitHub: [@Rehankumar554](https://github.com/Rehankumar554)
+- Email: work.rehankumarsahu@gmail.com
+<!-- - Website: [yourwebsite.com](https://yourwebsite.com) -->
 
 ---
 
