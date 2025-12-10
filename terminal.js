@@ -10,6 +10,12 @@ class Terminal {
     this.hostname = "cyberterm";
     this.devMode = false;
     this.commandBuffer = "";
+    // Search State
+    this.isSearching = false;
+    this.searchQuery = "";
+    this.searchMatchIndex = -1;
+    this.originalPrompt = "";
+
     this.currentTheme = "matrix"; // Default theme tracker
 
     // Add this inside constructor()
@@ -80,7 +86,120 @@ class Terminal {
     });
   }
 
+  // --- REVERSE SEARCH HELPERS ---
+
+  performSearch(findNext) {
+    if (this.history.length === 0) return;
+
+    // Kahan se dhundna shuru karein?
+    // Agar 'Next' (Ctrl+R again) dabaya hai to pichle result ke peeche se dhundo
+    // Nahi to sabse latest history se shuru karo
+    let startIndex = findNext
+      ? this.searchMatchIndex - 1
+      : this.history.length - 1;
+
+    // Loop backwards through history
+    for (let i = startIndex; i >= 0; i--) {
+      if (this.history[i].includes(this.searchQuery)) {
+        this.searchMatchIndex = i;
+        this.input.value = this.history[i]; // Found match
+        this.updateSearchPrompt("success");
+        return;
+      }
+    }
+
+    // Agar match nahi mila
+    this.updateSearchPrompt("fail");
+  }
+
+  updateSearchPrompt(status) {
+    const prefix =
+      status === "fail" ? "(failed reverse-i-search)" : "(reverse-i-search)";
+    this.prompt.textContent = `${prefix} \`${this.searchQuery}': `;
+  }
+
+  endSearch(restoreOriginal) {
+    this.isSearching = false;
+    this.prompt.textContent = this.originalPrompt; // Restore user@host prompt
+
+    if (restoreOriginal) {
+      this.input.value = ""; // Cancelled
+    }
+    // Agar restoreOriginal = false hai, to jo match mila tha wo input me hi rahega
+  }
+
   handleKeyDown(e) {
+    // 1. HANDLE SEARCH MODE (Ctrl + R Active)
+    // ==========================================
+    if (this.isSearching) {
+      // Exit Search: Esc or Ctrl+G -> Cancel
+      if (e.key === "Escape" || (e.ctrlKey && e.key === "g")) {
+        e.preventDefault();
+        this.endSearch(true);
+        return;
+      }
+
+      // Execute Match: Enter
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const cmd = this.input.value;
+        this.endSearch(false); // Keep the match in input
+        if (cmd) {
+          this.executeCommand(cmd);
+          this.addToHistory(cmd);
+        }
+        this.input.value = "";
+        this.historyIndex = -1;
+        return;
+      }
+
+      // Navigate Results: Ctrl + R (Find next previous)
+      if (e.ctrlKey && e.key === "r") {
+        e.preventDefault();
+        this.performSearch(true);
+        return;
+      }
+
+      // Editing Query: Backspace
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        this.searchQuery = this.searchQuery.slice(0, -1);
+        this.performSearch(false);
+        return;
+      }
+
+      // Editing Query: Typing Characters
+      if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        this.searchQuery += e.key;
+        this.performSearch(false);
+        return;
+      }
+
+      // Any other key (Arrow keys etc) accepts match and exits search mode
+      this.endSearch(false);
+      // Let the event fall through to normal handlers below...
+    }
+
+    // ==========================================
+    // 2. NORMAL MODE SHORTCUTS
+    // ==========================================
+
+    // Start Search Trigger (Ctrl + R)
+    if (e.ctrlKey && e.key === "r") {
+      e.preventDefault();
+      if (!this.isSearching) {
+        this.isSearching = true;
+        this.searchQuery = "";
+        this.searchMatchIndex = -1;
+        this.originalPrompt = this.prompt.textContent;
+        this.updateSearchPrompt("success");
+        this.input.value = "";
+      }
+      return;
+    }
+
+    // 1. EXECUTE COMMAND (Enter)
     if (e.key === "Enter") {
       e.preventDefault();
       const cmd = this.input.value.trim();
@@ -88,22 +207,159 @@ class Terminal {
         this.executeCommand(cmd);
         this.addToHistory(cmd);
       } else {
-        this.addOutput("");
+        this.addOutput(this.prompt.textContent); // Show empty prompt
       }
       this.input.value = "";
       this.historyIndex = -1;
-    } else if (e.key === "ArrowUp") {
+      return;
+    }
+
+    // 2. HISTORY NAVIGATION (Up / Down)
+    if (e.key === "ArrowUp") {
       e.preventDefault();
       this.navigateHistory(-1);
-    } else if (e.key === "ArrowDown") {
+      return;
+    }
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       this.navigateHistory(1);
-    } else if (e.key === "Tab") {
+      return;
+    }
+
+    // 3. AUTOCOMPLETE (Tab)
+    if (e.key === "Tab") {
       e.preventDefault();
       this.autocomplete();
-    } else if (e.key === "l" && e.ctrlKey) {
+      return;
+    }
+
+    // --- NEW SHORTCUTS ---
+
+    // 4. CLEAR SCREEN (Ctrl + L)
+    if (e.ctrlKey && e.key === "l") {
       e.preventDefault();
       this.clearScreen();
+      return;
+    }
+
+    // 5. CANCEL COMMAND (Ctrl + C)
+    if (e.ctrlKey && e.key === "c") {
+      e.preventDefault();
+      const currentInput = this.input.value;
+      this.addOutput(this.prompt.textContent + " " + currentInput + "^C");
+      this.input.value = "";
+      return;
+    }
+
+    // 6. CLEAR LINE (Ctrl + U)
+    if (e.ctrlKey && e.key === "u") {
+      e.preventDefault();
+      this.input.value = "";
+      return;
+    }
+
+    // 7. DELETE TO END (Ctrl + K)
+    if (e.ctrlKey && e.key === "k") {
+      e.preventDefault();
+      const pos = this.input.selectionStart;
+      this.input.value = this.input.value.substring(0, pos);
+      return;
+    }
+
+    // 8. MOVE TO START (Ctrl + A)
+    if (e.ctrlKey && e.key === "a") {
+      e.preventDefault();
+      this.input.setSelectionRange(0, 0);
+      return;
+    }
+
+    // 9. MOVE TO END (Ctrl + E)
+    if (e.ctrlKey && e.key === "e") {
+      e.preventDefault();
+      const len = this.input.value.length;
+      this.input.setSelectionRange(len, len);
+      return;
+    }
+
+    // 10. DELETE WORD (Ctrl + W)
+    if (e.ctrlKey && e.key === "w") {
+      e.preventDefault();
+      const pos = this.input.selectionStart;
+      const text = this.input.value;
+      const left = text.slice(0, pos);
+      const right = text.slice(pos);
+      // Logic: remove trailing spaces, then remove the word
+      const newLeft = left.replace(/(\s*\S+\s*)$/, "");
+      this.input.value = newLeft + right;
+      this.input.setSelectionRange(newLeft.length, newLeft.length);
+      return;
+    }
+
+    // 11. EXIT / LOGOUT (Ctrl + D)
+    if (e.ctrlKey && e.key === "d") {
+      e.preventDefault();
+      if (this.input.value === "") {
+        this.addOutput("logout");
+        setTimeout(() => {
+          this.clearScreen();
+          this.addOutput("Session closed. Refresh to restart.", "info");
+          this.input.disabled = true;
+        }, 800);
+      }
+      return;
+    }
+
+    // 12. SUSPEND (Ctrl + Z)
+    if (e.ctrlKey && e.key === "z") {
+      e.preventDefault();
+      this.addOutput(this.prompt.textContent + " " + this.input.value + "^Z");
+      this.addOutput("[1]+  Stopped", "info");
+      this.input.value = "";
+      return;
+    }
+
+    // 13. LAST ARGUMENT (Alt + .)
+    if (e.altKey && e.key === ".") {
+      e.preventDefault();
+      if (this.history.length > 0) {
+        const lastCmd = this.history[this.history.length - 1];
+        const parts = lastCmd.trim().split(/\s+/);
+        const lastArg = parts[parts.length - 1];
+        // Insert at cursor position
+        const start = this.input.selectionStart;
+        const end = this.input.selectionEnd;
+        const text = this.input.value;
+        this.input.value =
+          text.substring(0, start) + lastArg + text.substring(end);
+        this.input.setSelectionRange(
+          start + lastArg.length,
+          start + lastArg.length
+        );
+      }
+      return;
+    }
+
+    // 14. WORD BACK (Alt + B)
+    if (e.altKey && e.key === "b") {
+      e.preventDefault();
+      const pos = this.input.selectionStart;
+      const text = this.input.value;
+      // Find last space before cursor
+      let newPos = text.lastIndexOf(" ", pos - 2);
+      newPos = newPos === -1 ? 0 : newPos + 1;
+      this.input.setSelectionRange(newPos, newPos);
+      return;
+    }
+
+    // 15. WORD FORWARD (Alt + F)
+    if (e.altKey && e.key === "f") {
+      e.preventDefault();
+      const pos = this.input.selectionStart;
+      const text = this.input.value;
+      let newPos = text.indexOf(" ", pos + 1);
+      newPos = newPos === -1 ? text.length : newPos + 1;
+      this.input.setSelectionRange(newPos, newPos);
+      return;
     }
   }
 
