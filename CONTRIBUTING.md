@@ -119,7 +119,7 @@ Low / Medium / High
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/cyberterminal.git
+   git clone https://github.com/rehankumar554/cyberterminal.git
    cd cyberterminal
    ```
 
@@ -466,7 +466,7 @@ Need help contributing?
 
 - 💬 [GitHub Discussions](https://github.com/Rehankumar554/cyberterminal/discussions)
 - 📧 Email: work.rehankumarsahu@gmail.com
-<!-- - 📖 [Wiki](https://github.com/yourusername/cyberterminal/wiki) -->
+<!-- - 📖 [Wiki](https://github.com/rehankumar554/cyberterminal/wiki) -->
 
 ---
 

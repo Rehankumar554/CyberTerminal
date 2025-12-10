@@ -42,7 +42,7 @@ Perfect for developers, testers, or anyone who wants the latest features.
 
 **Option A: Download ZIP**
 
-1. Go to [GitHub Repository](https://github.com/yourusername/cyberterminal)
+1. Go to [GitHub Repository](https://github.com/rehankumar554/cyberterminal)
 2. Click green "Code" button
 3. Select "Download ZIP"
 4. Extract ZIP to a permanent location (e.g., `Documents/cyberterminal`)
@@ -51,7 +51,7 @@ Perfect for developers, testers, or anyone who wants the latest features.
 
 ```bash
 # Open terminal/command prompt
-git clone https://github.com/yourusername/cyberterminal.git
+git clone https://github.com/rehankumar554/cyberterminal.git
 cd cyberterminal
 ```
 

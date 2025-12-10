@@ -103,7 +103,7 @@ sys.log              # View system logs
 1. **Download the Extension**
 
    ```bash
-   git clone https://github.com/yourusername/cyberterminal.git
+   git clone https://github.com/rehankumar554/cyberterminal.git
    cd cyberterminal
    ```
 
@@ -506,18 +506,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 
 Need help?
 
-- 📖 [Read the docs](https://github.com/yourusername/cyberterminal/wiki)
-- 💬 [Join discussions](https://github.com/yourusername/cyberterminal/discussions)
-- 🐛 [Report bugs](https://github.com/yourusername/cyberterminal/issues)
+- 📖 [Read the docs](https://github.com/rehankumar554/cyberterminal/wiki)
+- 💬 [Join discussions](https://github.com/rehankumar554/cyberterminal/discussions)
+- 🐛 [Report bugs](https://github.com/rehankumar554/cyberterminal/issues)
 - ⭐ Star the repo if you like it!
 
 ---
 
 ## 📈 Stats
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/cyberterminal?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/cyberterminal?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/yourusername/cyberterminal?style=social)
+![GitHub stars](https://img.shields.io/github/stars/rehankumar554/cyberterminal?style=social)
+![GitHub forks](https://img.shields.io/github/forks/rehankumar554/cyberterminal?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/rehankumar554/cyberterminal?style=social)
 
 ---
 

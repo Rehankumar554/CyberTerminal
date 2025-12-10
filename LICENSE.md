@@ -102,7 +102,7 @@ APIs:
 
 For questions about licensing, contact:
 Email: your.email@example.com
-GitHub: https://github.com/yourusername/cyberterminal
+GitHub: https://github.com/rehankumar554/cyberterminal
 
 ---
 
