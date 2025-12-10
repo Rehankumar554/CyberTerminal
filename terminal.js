@@ -11,39 +11,15 @@ class Terminal {
     this.devMode = false;
     this.commandBuffer = "";
 
-    this.services = {};
-
     this.init();
   }
 
   init() {
     this.loadHistory();
     this.loadUsername();
-    this.loadServices();
     this.updatePrompt();
     this.setupEventListeners();
     this.showWelcome();
-  }
-
-  async loadServices() {
-    try {
-      // 'services.json' file ko fetch kar rahe hain
-      const response = await fetch('services.json');
-      
-      if (!response.ok) {
-        throw new Error("Failed to load services list");
-      }
-
-      // JSON data ko variable mein store kar diya
-      this.services = await response.json();
-      
-      // Optional: Console mein check karne ke liye
-      // console.log("Services loaded:", Object.keys(this.services).length);
-      
-    } catch (error) {
-      console.error("Error loading services:", error);
-      this.addOutput("Warning: Could not load service list.", "error");
-    }
   }
 
   setupEventListeners() {
@@ -230,6 +206,14 @@ FILE SYSTEM:
   rm <file>              Remove file
   mkdir <dir>            Create directory
   rmdir <dir>            Remove directory
+  cp <src> <dest>        Copy file
+  cp -r <src> <dest>     Copy directory recursively
+  mv <src> <dest>        Move/rename file or directory
+  head <file>            Show first 10 lines
+  head -n <num> <file>   Show first N lines
+  tail <file>            Show last 10 lines
+  tail -n <num> <file>   Show last N lines
+  wc <file>              Count lines, words, characters
 
 SYSTEM:
   clear                  Clear terminal screen
@@ -243,7 +227,8 @@ SYSTEM:
   sys.log                Show system logs
 
 NETWORK:
-  weather                Get weather information
+  weather                Get GPS-based weather
+  weather gps            Refresh weather with GPS
   crypto <symbol>        Get crypto prices (BTC, ETH)
   news                   Fetch latest news
   quote                  Get random quote
@@ -414,6 +399,157 @@ Use ↑↓ arrows for command history | Tab for autocomplete
       }
     },
 
+    cp: function (args) {
+      if (args.length < 2) {
+        this.addOutput("cp: missing file operand", "error");
+        this.addOutput(
+          "Usage: cp <source> <destination> or cp -r <source> <destination>"
+        );
+        return;
+      }
+
+      const isRecursive = args[0] === "-r";
+      const source = isRecursive ? args[1] : args[0];
+      const destination = isRecursive ? args[2] : args[1];
+
+      if (!source || !destination) {
+        this.addOutput("cp: missing file operand", "error");
+        return;
+      }
+
+      try {
+        if (isRecursive) {
+          fileSystem.copyDirectory(this.currentPath, source, destination);
+          this.addOutput(
+            `Copied directory: ${source} → ${destination}`,
+            "success"
+          );
+        } else {
+          fileSystem.copyFile(this.currentPath, source, destination);
+          this.addOutput(`Copied: ${source} → ${destination}`, "success");
+        }
+      } catch (err) {
+        this.addOutput(err.message, "error");
+      }
+    },
+
+    mv: function (args) {
+      if (args.length < 2) {
+        this.addOutput("mv: missing file operand", "error");
+        this.addOutput("Usage: mv <source> <destination>");
+        return;
+      }
+
+      const source = args[0];
+      const destination = args[1];
+
+      try {
+        // Check if it's a simple rename (same directory)
+        if (!destination.includes("/") && !source.includes("/")) {
+          fileSystem.renameFile(this.currentPath, source, destination);
+          this.addOutput(`Renamed: ${source} → ${destination}`, "success");
+        } else {
+          fileSystem.moveFile(this.currentPath, source, destination);
+          this.addOutput(`Moved: ${source} → ${destination}`, "success");
+        }
+      } catch (err) {
+        this.addOutput(err.message, "error");
+      }
+    },
+
+    head: function (args) {
+      if (args.length === 0) {
+        this.addOutput("head: missing file operand", "error");
+        this.addOutput("Usage: head <file> or head -n <number> <file>");
+        return;
+      }
+
+      let lines = 10;
+      let filename = args[0];
+
+      // Check for -n flag
+      if (args[0] === "-n" && args[1]) {
+        lines = parseInt(args[1]);
+        filename = args[2];
+
+        if (isNaN(lines) || lines < 1) {
+          this.addOutput("head: invalid number of lines", "error");
+          return;
+        }
+      }
+
+      if (!filename) {
+        this.addOutput("head: missing file operand", "error");
+        return;
+      }
+
+      try {
+        const content = fileSystem.readFile(this.currentPath, filename);
+        const allLines = content.split("\n");
+        const outputLines = allLines.slice(0, lines);
+        this.addOutput(outputLines.join("\n"));
+      } catch (err) {
+        this.addOutput(err.message, "error");
+      }
+    },
+
+    tail: function (args) {
+      if (args.length === 0) {
+        this.addOutput("tail: missing file operand", "error");
+        this.addOutput("Usage: tail <file> or tail -n <number> <file>");
+        return;
+      }
+
+      let lines = 10;
+      let filename = args[0];
+
+      // Check for -n flag
+      if (args[0] === "-n" && args[1]) {
+        lines = parseInt(args[1]);
+        filename = args[2];
+
+        if (isNaN(lines) || lines < 1) {
+          this.addOutput("tail: invalid number of lines", "error");
+          return;
+        }
+      }
+
+      if (!filename) {
+        this.addOutput("tail: missing file operand", "error");
+        return;
+      }
+
+      try {
+        const content = fileSystem.readFile(this.currentPath, filename);
+        const allLines = content.split("\n");
+        const outputLines = allLines.slice(-lines);
+        this.addOutput(outputLines.join("\n"));
+      } catch (err) {
+        this.addOutput(err.message, "error");
+      }
+    },
+
+    wc: function (args) {
+      if (args.length === 0) {
+        this.addOutput("wc: missing file operand", "error");
+        this.addOutput("Usage: wc <file>");
+        return;
+      }
+
+      const filename = args[0];
+
+      try {
+        const content = fileSystem.readFile(this.currentPath, filename);
+        const lines = content.split("\n").length;
+        const words = content.split(/\s+/).filter((w) => w.length > 0).length;
+        const chars = content.length;
+
+        this.addOutput(`  ${lines}  ${words}  ${chars} ${filename}`);
+      } catch (err) {
+        this.addOutput(err.message, "error");
+      }
+    },
+
     theme: function (args) {
       if (args[0] === "set" && args[1]) {
         const theme = args[1];
@@ -442,64 +578,24 @@ Use ↑↓ arrows for command history | Tab for autocomplete
     open: function (args) {
       if (args.length === 0) {
         this.addOutput("Usage: open <service>", "warning");
-        this.addOutput("Tip: Type 'quicklink' to see all services", "info");
         return;
       }
+
+      const services = {
+        gmail: "https://mail.google.com",
+        chatgpt: "https://chat.openai.com",
+        youtube: "https://youtube.com",
+        github: "https://github.com",
+      };
 
       const service = args[0].toLowerCase();
-
-      // Ab ye 'this.services' check karega
-      if (this.services[service]) {
+      if (services[service]) {
         this.addOutput(`Opening ${service}...`, "success");
-        window.open(this.services[service], "_blank");
+        window.open(services[service], "_blank");
       } else {
         this.addOutput(`Unknown service: ${service}`, "error");
-        this.addOutput(`Type 'quicklink' to see available services.`);
+        this.addOutput(`Available: ${Object.keys(services).join(", ")}`);
       }
-    },
-
-    quicklink: function () {
-      const keys = Object.keys(this.services).sort();
-      
-      // Check agar services load nahi hui ya list empty hai
-      if (keys.length === 0) {
-        this.addOutput("No services loaded yet or list is empty.", "error");
-        return;
-      }
-
-      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
-      this.addOutput("🔗 AVAILABLE QUICK LINKS", "success");
-      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
-
-      // Formatting Logic: Grid System (3 Columns)
-      let buffer = "";
-      const maxLen = 20; // Column width setup
-      const columns = 3;
-
-      keys.forEach((key, index) => {
-        // Har key ko padding dena taaki wo align ho
-        let paddedKey = key.padEnd(maxLen, " ");
-
-        // Clickable link jaisa dikhane ke liye (Visual only)
-        buffer += `➤ ${paddedKey}`;
-
-        // Har 3 items ke baad nayi line
-        if ((index + 1) % columns === 0) {
-          this.addOutput(buffer);
-          buffer = "";
-        }
-      });
-
-      // Agar last line me kuch bacha hai to use print karo
-      if (buffer) {
-        this.addOutput(buffer);
-      }
-
-      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
-      this.addOutput(
-        `Total: ${keys.length} services available. Usage: open <name>`,
-        "info"
-      );
     },
 
     weather: function (args) {
@@ -516,7 +612,7 @@ Use ↑↓ arrows for command history | Tab for autocomplete
             );
             this.addOutput("Fetching weather data...", "info");
 
-            const apiKey = "794f3ea37db442de8f642856250712";
+            const apiKey = "YOUR_WEATHERAPI_KEY_HERE";
 
             fetch(
               `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}&aqi=no`
@@ -713,18 +809,18 @@ Use ↑↓ arrows for command history | Tab for autocomplete
     const welcome = `
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
-║           ██████╗██╗   ██╗██████╗ ███████╗██████╗             ║
-║          ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗            ║
-║          ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝            ║
-║          ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗            ║
-║          ╚██████╗   ██║   ██████╔╝███████╗██║  ██║            ║
-║           ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝            ║
-║            ████████╗███████╗██████╗ ███╗   ███╗               ║
-║            ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║               ║
-║               ██║   █████╗  ██████╔╝██╔████╔██║               ║
-║               ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║               ║
-║               ██║   ███████╗██║  ██║██║ ╚═╝ ██║               ║
-║               ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝               ║
+║   ██████╗██╗   ██╗██████╗ ███████╗██████╗                   ║
+║  ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗                  ║
+║  ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝                  ║
+║  ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗                  ║
+║  ╚██████╗   ██║   ██████╔╝███████╗██║  ██║                  ║
+║   ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝                  ║
+║    ████████╗███████╗██████╗ ███╗   ███╗                     ║
+║    ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║                     ║
+║       ██║   █████╗  ██████╔╝██╔████╔██║                     ║
+║       ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║                     ║
+║       ██║   ███████╗██║  ██║██║ ╚═╝ ██║                     ║
+║       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝                     ║
 ║                                                               ║
 ║             Level 7 Linux-Grade Cyber Terminal                ║
 ║                    Version 1.0.0                              ║

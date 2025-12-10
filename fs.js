@@ -84,7 +84,11 @@ class VirtualFileSystem {
   }
 
   save() {
-    chrome.storage.sync.set({ virtualFileSystem: this.fs });
+    try {
+      localStorage.setItem("virtualFileSystem", JSON.stringify(this.fs));
+    } catch (error) {
+      console.error("Failed to save filesystem:", error);
+    }
   }
 
   parsePath(path) {
@@ -270,6 +274,166 @@ class VirtualFileSystem {
     }
 
     node.content = content;
+    this.save();
+  }
+
+  copyFile(currentPath, source, destination) {
+    const sourcePath = this.resolvePath(currentPath, source);
+    const sourceNode = this.getNode(sourcePath);
+
+    if (sourceNode.type !== "file") {
+      throw new Error(
+        `bash: cp: ${source}: Is a directory (use -r for directories)`
+      );
+    }
+
+    // Check if destination is a directory
+    let destPath;
+    try {
+      const destNode = this.getNode(this.resolvePath(currentPath, destination));
+      if (destNode.type === "directory") {
+        // Copy into directory with same filename
+        const filename = source.split("/").pop();
+        destPath = this.resolvePath(currentPath, destination) + "/" + filename;
+      } else {
+        destPath = this.resolvePath(currentPath, destination);
+      }
+    } catch {
+      // Destination doesn't exist, use as new filename
+      destPath = this.resolvePath(currentPath, destination);
+    }
+
+    // Get parent directory
+    const parts = this.parsePath(destPath);
+    const filename = parts.pop();
+    const parentPath = parts.length === 0 ? "/" : "/" + parts.join("/");
+    const parentNode = this.getNode(parentPath);
+
+    if (!parentNode.children) {
+      parentNode.children = {};
+    }
+
+    // Copy file
+    parentNode.children[filename] = {
+      type: "file",
+      content: sourceNode.content || "",
+    };
+
+    this.save();
+  }
+
+  copyDirectory(currentPath, source, destination) {
+    const sourcePath = this.resolvePath(currentPath, source);
+    const sourceNode = this.getNode(sourcePath);
+
+    if (sourceNode.type !== "directory") {
+      throw new Error(`bash: cp: ${source}: Not a directory`);
+    }
+
+    // Get destination path
+    let destPath = this.resolvePath(currentPath, destination);
+    const parts = this.parsePath(destPath);
+    const dirname = parts.pop();
+    const parentPath = parts.length === 0 ? "/" : "/" + parts.join("/");
+    const parentNode = this.getNode(parentPath);
+
+    if (!parentNode.children) {
+      parentNode.children = {};
+    }
+
+    // Deep copy directory
+    parentNode.children[dirname] = this.deepCopyNode(sourceNode);
+    this.save();
+  }
+
+  deepCopyNode(node) {
+    if (node.type === "file") {
+      return {
+        type: "file",
+        content: node.content || "",
+      };
+    } else {
+      const newNode = {
+        type: "directory",
+        children: {},
+      };
+
+      if (node.children) {
+        for (const [name, child] of Object.entries(node.children)) {
+          newNode.children[name] = this.deepCopyNode(child);
+        }
+      }
+
+      return newNode;
+    }
+  }
+
+  moveFile(currentPath, source, destination) {
+    const sourcePath = this.resolvePath(currentPath, source);
+    const sourceNode = this.getNode(sourcePath);
+
+    // Get source parent
+    const sourceParts = this.parsePath(sourcePath);
+    const sourceFilename = sourceParts.pop();
+    const sourceParentPath =
+      sourceParts.length === 0 ? "/" : "/" + sourceParts.join("/");
+    const sourceParent = this.getNode(sourceParentPath);
+
+    // Check if destination is a directory
+    let destPath;
+    let destFilename;
+    try {
+      const destNode = this.getNode(this.resolvePath(currentPath, destination));
+      if (destNode.type === "directory") {
+        // Move into directory with same filename
+        destPath = this.resolvePath(currentPath, destination);
+        destFilename = sourceFilename;
+      } else {
+        // Destination exists as file, overwrite
+        destPath = this.resolvePath(currentPath, destination);
+        const destParts = this.parsePath(destPath);
+        destFilename = destParts.pop();
+        destPath = destParts.length === 0 ? "/" : "/" + destParts.join("/");
+      }
+    } catch {
+      // Destination doesn't exist, use as new filename
+      const fullDestPath = this.resolvePath(currentPath, destination);
+      const destParts = this.parsePath(fullDestPath);
+      destFilename = destParts.pop();
+      destPath = destParts.length === 0 ? "/" : "/" + destParts.join("/");
+    }
+
+    const destParent = this.getNode(destPath);
+
+    if (!destParent.children) {
+      destParent.children = {};
+    }
+
+    // Move (copy then delete)
+    destParent.children[destFilename] = sourceNode;
+    delete sourceParent.children[sourceFilename];
+
+    this.save();
+  }
+
+  renameFile(currentPath, oldName, newName) {
+    const dir = this.getNode(currentPath);
+
+    if (dir.type !== "directory") {
+      throw new Error(`bash: mv: ${currentPath}: Not a directory`);
+    }
+
+    if (!dir.children || !dir.children[oldName]) {
+      throw new Error(`bash: mv: ${oldName}: No such file or directory`);
+    }
+
+    if (dir.children[newName]) {
+      throw new Error(`bash: mv: ${newName}: File exists`);
+    }
+
+    dir.children[newName] = dir.children[oldName];
+    delete dir.children[oldName];
+
     this.save();
   }
 }
