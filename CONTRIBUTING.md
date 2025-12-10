@@ -433,8 +433,6 @@ grep -i "WELCOME" file.txt
 - `-r` - Recursive search
 - `-i` - Case-insensitive
 
-```
-
 ---
 
 ## 🎯 Areas to Contribute
@@ -466,9 +464,9 @@ grep -i "WELCOME" file.txt
 
 Need help contributing?
 
-- 💬 [GitHub Discussions](https://github.com/yourusername/cyberterminal/discussions)
-- 📧 Email: your.email@example.com
-- 📖 [Wiki](https://github.com/yourusername/cyberterminal/wiki)
+- 💬 [GitHub Discussions](https://github.com/Rehankumar554/cyberterminal/discussions)
+- 📧 Email: work.rehankumarsahu@gmail.com
+<!-- - 📖 [Wiki](https://github.com/yourusername/cyberterminal/wiki) -->
 
 ---
 
