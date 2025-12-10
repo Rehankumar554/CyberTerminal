@@ -46,7 +46,6 @@ find *.js ; cat file.js
 
 - **5 Cyber Themes** - Matrix (green), Kali (blue), Ubuntu (orange), Neon Purple, Hacker Amber
 - **Matrix Rain Animation** - Toggleable background effect
-- **Radar Scanner** - Animated cyber radar in corner
 - **CRT Scanline Effect** - Authentic terminal look
 - **Boot Sequence** - Linux-style startup animation
 - **Smooth Animations** - GPU-optimized effects
