@@ -16,6 +16,9 @@ class Terminal {
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
 
+    this.activeTimer = null; // Timer track karne ke liye
+    this.activeAlarm = null; // Alarm track karne ke liye
+
     this.settings = {
       fontSize: 14,
       opacity: 0.95,
@@ -1087,6 +1090,252 @@ Use ↑↓ arrows for command history | Tab for autocomplete
         this.addOutput("  shortcut list");
         this.addOutput('  shortcut set "Ctrl+T" clear');
       }
+    },
+
+    // --- PRODUCTIVITY WIDGETS ---
+
+    // 1. QUICK NOTES
+    note: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: note <text>", "warning");
+        return;
+      }
+
+      const text = args.join(" ");
+      const notes = JSON.parse(localStorage.getItem("terminalNotes") || "[]");
+
+      const newNote = {
+        id: Date.now(),
+        text: text,
+        date: new Date().toLocaleString(),
+      };
+
+      notes.push(newNote);
+      localStorage.setItem("terminalNotes", JSON.stringify(notes));
+      this.addOutput("📝 Note saved.", "success");
+    },
+
+    notes: function (args) {
+      const action = args[0] || "list";
+      let notes = JSON.parse(localStorage.getItem("terminalNotes") || "[]");
+
+      if (action === "clear") {
+        localStorage.removeItem("terminalNotes");
+        this.addOutput("🗑️ All notes cleared.", "success");
+      } else if (action === "list") {
+        if (notes.length === 0) {
+          this.addOutput("No notes found.", "info");
+        } else {
+          this.addOutput("\n📒 QUICK NOTES:", "info");
+          notes.forEach((note, index) => {
+            this.addOutput(`${index + 1}. ${note.text}`);
+            this.addOutput(`   [${note.date}]`, "info"); // Faint date
+          });
+          this.addOutput("");
+        }
+      } else {
+        this.addOutput("Usage: notes list OR notes clear", "warning");
+      }
+    },
+
+    // 2. TODO LIST
+    todo: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: todo <add|list|done|clear> [args]", "warning");
+        return;
+      }
+
+      const action = args[0];
+      let todos = JSON.parse(localStorage.getItem("terminalTodos") || "[]");
+
+      switch (action) {
+        case "add":
+          const task = args.slice(1).join(" ");
+          if (!task) {
+            this.addOutput("Error: Missing task text.", "error");
+            return;
+          }
+          todos.push({ text: task, completed: false });
+          localStorage.setItem("terminalTodos", JSON.stringify(todos));
+          this.addOutput(`✅ Added task: "${task}"`, "success");
+          break;
+
+        case "list":
+          if (todos.length === 0) {
+            this.addOutput("No tasks found.", "info");
+          } else {
+            this.addOutput("\n✅ TODO LIST:", "info");
+            todos.forEach((t, i) => {
+              const status = t.completed ? "[x]" : "[ ]";
+              const style = t.completed ? "success" : ""; // Green if done
+              this.addOutput(`${i + 1}. ${status} ${t.text}`, style);
+            });
+            this.addOutput("");
+          }
+          break;
+
+        case "done":
+          const idx = parseInt(args[1]) - 1;
+          if (todos[idx]) {
+            todos[idx].completed = true;
+            localStorage.setItem("terminalTodos", JSON.stringify(todos));
+            this.addOutput(`👍 Marked task ${args[1]} as complete.`, "success");
+          } else {
+            this.addOutput("❌ Invalid task number.", "error");
+          }
+          break;
+
+        case "clear":
+          // Sirf completed tasks hatayenge, ya user chahe to 'all' clear kare
+          const initialLen = todos.length;
+          todos = todos.filter((t) => !t.completed); // Keep only incomplete
+
+          if (args[1] === "all") {
+            todos = []; // Clear everything
+            this.addOutput("🗑️ Todo list completely cleared.", "success");
+          } else {
+            const removed = initialLen - todos.length;
+            this.addOutput(
+              `🗑️ Cleared ${removed} completed task(s).`,
+              "success"
+            );
+          }
+
+          localStorage.setItem("terminalTodos", JSON.stringify(todos));
+          break;
+
+        default:
+          this.addOutput(`Unknown todo action: ${action}`, "error");
+      }
+    },
+
+    // --- TIMER WIDGETS ---
+
+    timer: function (args) {
+      const cmd = args[0];
+
+      if (cmd === "stop") {
+        if (this.activeTimer) {
+          clearInterval(this.activeTimer);
+          this.activeTimer = null;
+          this.addOutput("🛑 Timer stopped.", "warning");
+        } else {
+          this.addOutput("No active timer found.", "info");
+        }
+        return;
+      }
+
+      // Parse time (e.g., "25m", "10s", "1h")
+      const timeStr = args[0];
+      if (!timeStr) {
+        this.addOutput(
+          "Usage: timer <duration> (e.g., 10s, 5m, 1h)",
+          "warning"
+        );
+        return;
+      }
+
+      const match = timeStr.match(/^(\d+)([smh])$/);
+      if (!match) {
+        this.addOutput("Invalid format. Use 10s, 5m, or 1h.", "error");
+        return;
+      }
+
+      const amount = parseInt(match[1]);
+      const unit = match[2];
+      let durationMs = 0;
+
+      if (unit === "s") durationMs = amount * 1000;
+      else if (unit === "m") durationMs = amount * 60 * 1000;
+      else if (unit === "h") durationMs = amount * 60 * 60 * 1000;
+
+      this.addOutput(
+        `⏳ Timer set for ${timeStr}. I'll notify you when done.`,
+        "success"
+      );
+
+      // Clear existing timer if any
+      if (this.activeTimer) clearInterval(this.activeTimer);
+
+      const startTime = Date.now();
+      const endTime = startTime + durationMs;
+
+      // Start Interval
+      this.activeTimer = setInterval(() => {
+        const timeLeft = endTime - Date.now();
+
+        if (timeLeft <= 0) {
+          clearInterval(this.activeTimer);
+          this.activeTimer = null;
+
+          // ALARM SOUND & NOTIFICATION
+          this.addOutput("⏰ TIMER FINISHED!", "success");
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "warning");
+
+          // Audio Beep Simulation
+          const audio = new AudioContext(); // Modern browsers support this
+          const osc = audio.createOscillator();
+          osc.connect(audio.destination);
+          osc.start();
+          setTimeout(() => osc.stop(), 500); // Beep for 0.5 sec
+
+          alert("⏰ Timer Finished!"); // Browser alert popup
+        }
+      }, 1000);
+    },
+
+    alarm: function (args) {
+      if (!args[0]) {
+        this.addOutput("Usage: alarm HH:MM (24-hour format)", "warning");
+        return;
+      }
+
+      const targetTimeParts = args[0].split(":");
+      if (targetTimeParts.length !== 2) {
+        this.addOutput("Invalid format. Use HH:MM (e.g., 14:30)", "error");
+        return;
+      }
+
+      const now = new Date();
+      const target = new Date();
+      target.setHours(parseInt(targetTimeParts[0]));
+      target.setMinutes(parseInt(targetTimeParts[1]));
+      target.setSeconds(0);
+
+      // Agar time beet chuka hai, to agle din ka alarm set karein
+      if (target < now) {
+        target.setDate(target.getDate() + 1);
+      }
+
+      const timeToWait = target - now;
+      const hoursLeft = Math.floor(timeToWait / (1000 * 60 * 60));
+      const minutesLeft = Math.floor(
+        (timeToWait % (1000 * 60 * 60)) / (1000 * 60)
+      );
+
+      this.addOutput(
+        `🔔 Alarm set for ${args[0]} (in ${hoursLeft}h ${minutesLeft}m).`,
+        "success"
+      );
+
+      if (this.activeAlarm) clearTimeout(this.activeAlarm);
+
+      this.activeAlarm = setTimeout(() => {
+        this.addOutput("🔔 ALARM RINGING!", "success");
+        this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "warning");
+
+        // Audio Beep
+        try {
+          const audio = new AudioContext();
+          const osc = audio.createOscillator();
+          osc.frequency.value = 800; // High pitch
+          osc.connect(audio.destination);
+          osc.start();
+          setTimeout(() => osc.stop(), 1000);
+        } catch (e) {}
+
+        alert(`🔔 Alarm: It is ${args[0]}!`);
+      }, timeToWait);
     },
 
     man: function (args) {
