@@ -1,0 +1,347 @@
+{
+  "ls": {
+    "desc": "List directory contents",
+    "usage": "ls [options] [path]",
+    "man": "NAME\n\tls - list directory contents\n\nSYNOPSIS\n\tls [-a] [FILE]...\n\nDESCRIPTION\n\tList information about the FILEs (the current directory by default).\n\nOPTIONS\n\t-a, --all\n\t\tdo not ignore entries starting with .",
+    "examples": ["ls", "ls -a", "ls /home/user/logs"]
+  },
+  "cd": {
+    "desc": "Change the shell working directory",
+    "usage": "cd <path>",
+    "man": "NAME\n\tcd - change directory\n\nSYNOPSIS\n\tcd [dir]\n\nDESCRIPTION\n\tChange the current directory to dir. The default DIR is the value of the HOME shell variable.",
+    "examples": ["cd downloads", "cd ..", "cd /home/user"]
+  },
+  "pwd": {
+    "desc": "Print name of current/working directory",
+    "usage": "pwd",
+    "man": "NAME\n\tpwd - print name of current/working directory\n\nSYNOPSIS\n\tpwd\n\nDESCRIPTION\n\tPrint the full filename of the current working directory.",
+    "examples": ["pwd"]
+  },
+  "cat": {
+    "desc": "Concatenate files and print on the standard output",
+    "usage": "cat <file>",
+    "man": "NAME\n\tcat - concatenate files and print on the standard output\n\nSYNOPSIS\n\tcat [FILE]...\n\nDESCRIPTION\n\tConcatenate FILE(s) to standard output.",
+    "examples": ["cat readme.md", "cat file1.txt file2.txt"]
+  },
+  "touch": {
+    "desc": "Change file timestamps / Create empty file",
+    "usage": "touch <file>",
+    "man": "NAME\n\ttouch - change file timestamps\n\nSYNOPSIS\n\ttouch FILE...\n\nDESCRIPTION\n\tUpdate the access and modification times of each FILE to the current time. If file does not exist, it is created empty.",
+    "examples": ["touch newfile.txt", "touch logs/error.log"]
+  },
+  "rm": {
+    "desc": "Remove files or directories",
+    "usage": "rm <file>",
+    "man": "NAME\n\trm - remove files or directories\n\nSYNOPSIS\n\trm [FILE]...\n\nDESCRIPTION\n\trm removes each specified file. By default, it does not remove directories.",
+    "examples": ["rm old_file.txt", "rm data.json"]
+  },
+  "mkdir": {
+    "desc": "Make directories",
+    "usage": "mkdir <directory>",
+    "man": "NAME\n\tmkdir - make directories\n\nSYNOPSIS\n\tmkdir DIRECTORY...\n\nDESCRIPTION\n\tCreate the DIRECTORY(ies), if they do not already exist.",
+    "examples": ["mkdir photos", "mkdir /home/user/projects"]
+  },
+  "rmdir": {
+    "desc": "Remove empty directories",
+    "usage": "rmdir <directory>",
+    "man": "NAME\n\trmdir - remove empty directories\n\nSYNOPSIS\n\trmdir DIRECTORY...\n\nDESCRIPTION\n\tRemove the DIRECTORY(ies), if they are empty.",
+    "examples": ["rmdir empty_folder"]
+  },
+  "cp": {
+    "desc": "Copy files and directories",
+    "usage": "cp [option] <source> <dest>",
+    "man": "NAME\n\tcp - copy files and directories\n\nSYNOPSIS\n\tcp [OPTION]... SOURCE DEST\n\nDESCRIPTION\n\tCopy SOURCE to DEST.\n\nOPTIONS\n\t-r\tcopy directories recursively",
+    "examples": ["cp file.txt backup.txt", "cp -r /docs /backup/docs"]
+  },
+  "mv": {
+    "desc": "Move (rename) files",
+    "usage": "mv <source> <dest>",
+    "man": "NAME\n\tmv - move (rename) files\n\nSYNOPSIS\n\tmv SOURCE DEST\n\nDESCRIPTION\n\tRename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.",
+    "examples": ["mv file.txt newname.txt", "mv photo.jpg /home/user/pictures/"]
+  },
+  "head": {
+    "desc": "Output the first part of files",
+    "usage": "head [-n lines] <file>",
+    "man": "NAME\n\thead - output the first part of files\n\nSYNOPSIS\n\thead [OPTION]... [FILE]...\n\nDESCRIPTION\n\tPrint the first 10 lines of each FILE to standard output.\n\nOPTIONS\n\t-n NUM\tprint the first NUM lines instead of the first 10",
+    "examples": ["head system.log", "head -n 5 notes.txt"]
+  },
+  "tail": {
+    "desc": "Output the last part of files",
+    "usage": "tail [-n lines] <file>",
+    "man": "NAME\n\ttail - output the last part of files\n\nSYNOPSIS\n\ttail [OPTION]... [FILE]...\n\nDESCRIPTION\n\tPrint the last 10 lines of each FILE to standard output.\n\nOPTIONS\n\t-n NUM\tprint the last NUM lines instead of the last 10",
+    "examples": ["tail error.log", "tail -n 20 debug.txt"]
+  },
+  "wc": {
+    "desc": "Print newline, word, and byte counts",
+    "usage": "wc <file>",
+    "man": "NAME\n\twc - print newline, word, and byte counts for each file\n\nSYNOPSIS\n\twc [FILE]...\n\nDESCRIPTION\n\tPrint newline, word, and byte counts for each FILE.",
+    "examples": ["wc story.txt"]
+  },
+  "find": {
+    "desc": "Search for files in a directory hierarchy",
+    "usage": "find [path] <pattern>",
+    "man": "NAME\n\tfind - search for files in a directory hierarchy\n\nSYNOPSIS\n\tfind [path] [pattern]\n\nDESCRIPTION\n\tSearch for files matching the pattern within the specified path (recursive).",
+    "examples": ["find *.js", "find /home/user *.txt"]
+  },
+  "grep": {
+    "desc": "Print lines that match patterns",
+    "usage": "grep [options] <pattern> <file>",
+    "man": "NAME\n\tgrep - print lines that match patterns\n\nSYNOPSIS\n\tgrep [OPTIONS] PATTERN [FILE...]\n\nDESCRIPTION\n\tSearch for PATTERN in each FILE.\n\nOPTIONS\n\t-r\tRecursive search in directories\n\t-i\tCase insensitive",
+    "examples": [
+      "grep 'error' system.log",
+      "grep -r 'todo' /home/user",
+      "ls | grep '.js'"
+    ]
+  },
+  "clear": {
+    "desc": "Clear the terminal screen",
+    "usage": "clear",
+    "man": "NAME\n\tclear - clear the terminal screen\n\nSYNOPSIS\n\tclear\n\nDESCRIPTION\n\tClears your screen if this is possible, including its scrollback buffer.",
+    "examples": ["clear"]
+  },
+  "echo": {
+    "desc": "Display a line of text",
+    "usage": "echo [text...]",
+    "man": "NAME\n\techo - display a line of text\n\nSYNOPSIS\n\techo [STRING]...\n\nDESCRIPTION\n\tEcho the STRING(s) to standard output.",
+    "examples": ["echo Hello World", "echo 'System Check'"]
+  },
+  "date": {
+    "desc": "Print the system date",
+    "usage": "date",
+    "man": "NAME\n\tdate - print the system date\n\nSYNOPSIS\n\tdate\n\nDESCRIPTION\n\tDisplay the current system date.",
+    "examples": ["date"]
+  },
+  "time": {
+    "desc": "Print the system time",
+    "usage": "time",
+    "man": "NAME\n\ttime - print the system time\n\nSYNOPSIS\n\ttime\n\nDESCRIPTION\n\tDisplay the current system time.",
+    "examples": ["time"]
+  },
+  "whoami": {
+    "desc": "Print effective userid",
+    "usage": "whoami",
+    "man": "NAME\n\twhoami - print effective userid\n\nSYNOPSIS\n\twhoami\n\nDESCRIPTION\n\tPrint the user name associated with the current effective user ID.",
+    "examples": ["whoami"]
+  },
+  "uptime": {
+    "desc": "Tell how long the system has been running",
+    "usage": "uptime",
+    "man": "NAME\n\tuptime - tell how long the system has been running\n\nSYNOPSIS\n\tuptime\n\nDESCRIPTION\n\tDisplay the current time, and how long the system has been running since the page loaded.",
+    "examples": ["uptime"]
+  },
+  "history": {
+    "desc": "Display command history",
+    "usage": "history [-c]",
+    "man": "NAME\n\thistory - display command history\n\nSYNOPSIS\n\thistory [-c]\n\nDESCRIPTION\n\tDisplay the list of commands you have typed.\n\nOPTIONS\n\t-c\tClear the history list",
+    "examples": ["history", "history -c"]
+  },
+  "sudo": {
+    "desc": "Execute a command as another user",
+    "usage": "sudo <command>",
+    "man": "NAME\n\tsudo - execute a command as another user\n\nSYNOPSIS\n\tsudo COMMAND\n\nDESCRIPTION\n\tAllows a permitted user to execute a command as the superuser (root). Note: This is a simulation.",
+    "examples": ["sudo rm -rf /system", "sudo apt-get update"]
+  },
+  "sys.info": {
+    "desc": "Display system information",
+    "usage": "sys.info",
+    "man": "NAME\n\tsys.info - display system information\n\nSYNOPSIS\n\tsys.info\n\nDESCRIPTION\n\tDisplays details about the browser, platform, and screen resolution.",
+    "examples": ["sys.info"]
+  },
+  "sys.log": {
+    "desc": "View system logs",
+    "usage": "sys.log",
+    "man": "NAME\n\tsys.log - view system logs\n\nSYNOPSIS\n\tsys.log\n\nDESCRIPTION\n\tDisplays the internal simulated kernel and boot logs.",
+    "examples": ["sys.log"]
+  },
+  "neofetch": {
+    "desc": "System information tool",
+    "usage": "neofetch",
+    "man": "NAME\n\tneofetch - a command-line system information tool\n\nSYNOPSIS\n\tneofetch\n\nDESCRIPTION\n\tDisplays information about your operating system, software and hardware in an aesthetic and visually pleasing way.",
+    "examples": ["neofetch"]
+  },
+  "todo": {
+    "desc": "Manage a simple todo list",
+    "usage": "todo <add|list|done|clear> [args]",
+    "man": "NAME\n\ttodo - manage a simple todo list\n\nSYNOPSIS\n\ttodo [ACTION] [ARGS]\n\nACTIONS\n\tadd <text>   Add a new task\n\tlist         Show all tasks\n\tdone <id>    Mark task <id> as complete\n\tclear [all]  Remove completed tasks (or all)",
+    "examples": [
+      "todo add Buy milk",
+      "todo list",
+      "todo done 1",
+      "todo clear all"
+    ]
+  },
+  "note": {
+    "desc": "Quickly save a note",
+    "usage": "note <text>",
+    "man": "NAME\n\tnote - quickly save a note\n\nSYNOPSIS\n\tnote TEXT\n\nDESCRIPTION\n\tSaves a quick text note to local storage. Use 'notes' to view them.",
+    "examples": ["note Meeting at 5PM", "note Idea for new app"]
+  },
+  "notes": {
+    "desc": "Manage saved notes",
+    "usage": "notes <list|clear>",
+    "man": "NAME\n\tnotes - manage saved notes\n\nSYNOPSIS\n\tnotes [ACTION]\n\nACTIONS\n\tlist    List all saved notes (default)\n\tclear   Delete all notes",
+    "examples": ["notes", "notes list", "notes clear"]
+  },
+  "timer": {
+    "desc": "Set a countdown timer",
+    "usage": "timer <duration>",
+    "man": "NAME\n\ttimer - set a countdown timer\n\nSYNOPSIS\n\ttimer [DURATION] | stop\n\nDESCRIPTION\n\tSets a timer for the specified duration. Notifies via alert and sound when done.\n\nFORMATS\n\t10s (seconds), 5m (minutes), 1h (hours)",
+    "examples": ["timer 30s", "timer 15m", "timer stop"]
+  },
+  "alarm": {
+    "desc": "Set a daily alarm",
+    "usage": "alarm <HH:MM>",
+    "man": "NAME\n\talarm - set a daily alarm\n\nSYNOPSIS\n\talarm HH:MM\n\nDESCRIPTION\n\tSets an alarm for a specific time in 24-hour format. If time has passed, sets for the next day.",
+    "examples": ["alarm 08:30", "alarm 23:00"]
+  },
+  "session": {
+    "desc": "Manage terminal sessions",
+    "usage": "session <save|load|list|delete> [name]",
+    "man": "NAME\n\tsession - manage terminal sessions\n\nSYNOPSIS\n\tsession ACTION [NAME]\n\nDESCRIPTION\n\tSave and restore terminal state (history, path, theme, etc.).\n\nACTIONS\n\tsave <name>   Save current state\n\tload <name>   Restore a saved state\n\tlist          Show saved sessions\n\tdelete <name> Delete a session",
+    "examples": ["session save work", "session load work", "session list"]
+  },
+  "theme": {
+    "desc": "Change terminal theme",
+    "usage": "theme set <name>",
+    "man": "NAME\n\ttheme - change terminal theme\n\nSYNOPSIS\n\ttheme set NAME\n\nDESCRIPTION\n\tChanges the color scheme of the terminal.\n\nTHEMES\n\tmatrix, kali, ubuntu, neon-purple, hacker-amber",
+    "examples": ["theme set kali", "theme set neon-purple"]
+  },
+  "set": {
+    "desc": "Configure terminal settings",
+    "usage": "set <property> <value>",
+    "man": "NAME\n\tset - configure terminal settings\n\nSYNOPSIS\n\tset PROPERTY VALUE\n\nPROPERTIES\n\tfontSize <px>   Set font size (8-40)\n\topacity <0-1>   Set background opacity\n\tprompt <text>   Set custom prompt string\n\tstartupCmd <cmd> Command to run on start",
+    "examples": ["set fontSize 16", "set opacity 0.8", "set prompt default"]
+  },
+  "open": {
+    "desc": "Open external services",
+    "usage": "open <service>",
+    "man": "NAME\n\topen - open external services\n\nSYNOPSIS\n\topen SERVICE\n\nDESCRIPTION\n\tOpens a predefined service URL in a new tab. Use 'quicklink' to see available services.",
+    "examples": ["open gmail", "open youtube", "open chatgpt"]
+  },
+  "google": {
+    "desc": "Search Google",
+    "usage": "google <query>",
+    "man": "NAME\n\tgoogle - search Google\n\nSYNOPSIS\n\tgoogle QUERY\n\nDESCRIPTION\n\tOpens a Google search for the specified query in a new tab.",
+    "examples": ["google javascript tutorial", "google best linux distros"]
+  },
+  "youtube": {
+    "desc": "Search YouTube",
+    "usage": "youtube <query>",
+    "man": "NAME\n\tyoutube - search YouTube\n\nSYNOPSIS\n\tyoutube QUERY\n\nDESCRIPTION\n\tOpens a YouTube search for the specified query in a new tab.",
+    "examples": ["youtube lo-fi music", "youtube coding patterns"]
+  },
+  "weather": {
+    "desc": "Get weather information",
+    "usage": "weather [gps]",
+    "man": "NAME\n\tweather - get weather information\n\nSYNOPSIS\n\tweather [gps]\n\nDESCRIPTION\n\tFetches current weather. Use 'gps' argument to use your current location, otherwise defaults to API default.",
+    "examples": ["weather", "weather gps"]
+  },
+  "matrix": {
+    "desc": "Toggle Matrix rain effect",
+    "usage": "matrix",
+    "man": "NAME\n\tmatrix - toggle Matrix rain effect\n\nSYNOPSIS\n\tmatrix\n\nDESCRIPTION\n\tEnables or disables the background digital rain visual effect.",
+    "examples": ["matrix"]
+  },
+  "cowsay": {
+    "desc": "Configurable speaking cow",
+    "usage": "cowsay <text>",
+    "man": "NAME\n\tcowsay - configurable speaking cow\n\nSYNOPSIS\n\tcowsay TEXT\n\nDESCRIPTION\n\tGenerates an ASCII picture of a cow saying something.",
+    "examples": ["cowsay Hello World", "cowsay I am a terminal"]
+  },
+  "help": {
+    "desc": "Display help information",
+    "usage": "help [command]",
+    "man": "NAME\n\thelp - display help information\n\nSYNOPSIS\n\thelp [COMMAND]\n\nDESCRIPTION\n\tDisplay general help or detailed help for a specific command.",
+    "examples": ["help", "help ls"]
+  },
+  "man": {
+    "desc": "Format and display the on-line manual pages",
+    "usage": "man <command>",
+    "man": "NAME\n\tman - format and display the on-line manual pages\n\nSYNOPSIS\n\tman COMMAND\n\nDESCRIPTION\n\tShows the detailed manual page for a command, including synopsis and options.",
+    "examples": ["man grep", "man ls"]
+  },
+  "github": {
+    "desc": "Search GitHub",
+    "usage": "github <query>",
+    "man": "NAME\n\tgithub - search GitHub\n\nSYNOPSIS\n\tgithub QUERY\n\nDESCRIPTION\n\tSearches GitHub repositories for the query.",
+    "examples": ["github react", "github terminal-js"]
+  },
+  "stackoverflow": {
+    "desc": "Search StackOverflow",
+    "usage": "stackoverflow <query>",
+    "man": "NAME\n\tstackoverflow - search StackOverflow\n\nSYNOPSIS\n\tstackoverflow QUERY\n\nDESCRIPTION\n\tSearches StackOverflow for questions matching the query.",
+    "examples": ["stackoverflow center div", "stackoverflow js array methods"]
+  },
+  "translate": {
+    "desc": "Translate text via Google",
+    "usage": "translate <text> [lang-pair]",
+    "man": "NAME\n\ttranslate - translate text via Google\n\nSYNOPSIS\n\ttranslate TEXT [SOURCE-TARGET]\n\nDESCRIPTION\n\tTranslates text. Optional language pair (e.g., en-es, en-hi). Default is auto-detect to English.",
+    "examples": ["translate hello world", "translate hello world en-hi"]
+  },
+  "map": {
+    "desc": "Open location in Google Maps",
+    "usage": "map <location>",
+    "man": "NAME\n\tmap - open location in Google Maps\n\nSYNOPSIS\n\tmap LOCATION\n\nDESCRIPTION\n\tOpens Google Maps showing the specified location.",
+    "examples": ["map New York", "map Eiffel Tower"]
+  },
+  "crypto": {
+    "desc": "Get cryptocurrency prices",
+    "usage": "crypto <symbol>",
+    "man": "NAME\n\tcrypto - get cryptocurrency prices\n\nSYNOPSIS\n\tcrypto [SYMBOL]\n\nDESCRIPTION\n\tFetches current price of a cryptocurrency. Default is BTC.",
+    "examples": ["crypto", "crypto ETH", "crypto DOGE"]
+  },
+  "news": {
+    "desc": "Fetch latest news headlines",
+    "usage": "news",
+    "man": "NAME\n\tnews - fetch latest news headlines\n\nSYNOPSIS\n\tnews\n\nDESCRIPTION\n\tFetches top news headlines from external API.",
+    "examples": ["news"]
+  },
+  "quote": {
+    "desc": "Get a random quote",
+    "usage": "quote",
+    "man": "NAME\n\tquote - get a random quote\n\nSYNOPSIS\n\tquote\n\nDESCRIPTION\n\tDisplays a random inspirational quote.",
+    "examples": ["quote"]
+  },
+  "shortcut": {
+    "desc": "Manage custom keyboard shortcuts",
+    "usage": "shortcut <list|set> [key] [cmd]",
+    "man": "NAME\n\tshortcut - manage custom keyboard shortcuts\n\nSYNOPSIS\n\tshortcut list\n\tshortcut set KEY_COMBO COMMAND\n\nDESCRIPTION\n\tDefine custom key combinations to trigger specific commands.",
+    "examples": ["shortcut list", "shortcut set Ctrl+Q clear"]
+  },
+  "settings": {
+    "desc": "Import/Export terminal settings",
+    "usage": "settings <export|import|reset>",
+    "man": "NAME\n\tsettings - manage terminal settings\n\nSYNOPSIS\n\tsettings ACTION\n\nDESCRIPTION\n\tExport settings to JSON file, import from JSON, or reset to defaults.",
+    "examples": ["settings export", "settings import"]
+  },
+  "dev.mode.enable": {
+    "desc": "Enable developer mode",
+    "usage": "dev.mode.enable",
+    "man": "NAME\n\tdev.mode.enable - enable developer mode\n\nSYNOPSIS\n\tdev.mode.enable\n\nDESCRIPTION\n\tEnables verbose debugging logs in the console.",
+    "examples": ["dev.mode.enable"]
+  },
+  "quicklink": {
+    "desc": "List available quick links",
+    "usage": "quicklink [filter]",
+    "man": "NAME\n\tquicklink - list available quick links\n\nSYNOPSIS\n\tquicklink [FILTER]\n\nDESCRIPTION\n\tLists all services available for the 'open' command. Optional filter searches by name.",
+    "examples": ["quicklink", "quicklink google"]
+  },
+  "tutorial": {
+    "desc": "Start interactive tutorial",
+    "usage": "tutorial [topic]",
+    "man": "NAME\n\ttutorial - start interactive tutorial\n\nSYNOPSIS\n\ttutorial [start|commands|shortcuts]\n\nDESCRIPTION\n\tGuides the user through terminal features.",
+    "examples": ["tutorial", "tutorial shortcuts"]
+  },
+  "examples": {
+    "desc": "Show examples for a command",
+    "usage": "examples <command>",
+    "man": "NAME\n\texamples - show examples for a command\n\nSYNOPSIS\n\texamples COMMAND\n\nDESCRIPTION\n\tDisplays usage examples for the specified command.",
+    "examples": ["examples grep", "examples tar"]
+  },
+  "wiki": {
+    "desc": "Search Wikipedia",
+    "usage": "wiki <query>",
+    "man": "NAME\n\twiki - search Wikipedia\n\nSYNOPSIS\n\twiki QUERY\n\nDESCRIPTION\n\tOpens a Wikipedia search for the query.",
+    "examples": ["wiki linux", "wiki quantum physics"]
+  }
+}

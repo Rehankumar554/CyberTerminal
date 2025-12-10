@@ -31,44 +31,9 @@ class Terminal {
     this.currentTheme = "matrix"; // Default theme tracker
 
     // Add this inside constructor()
-    this.tips = [
-      "Use 'Tab' to autocomplete commands.",
-      "Press 'Up Arrow' to cycle through previous commands.",
-      "You can chain commands using '&&' (e.g., 'mkdir test && cd test').",
-      "Use 'CTRL + L' to quickly clear the screen.",
-      "The 'cat' command can read multiple files at once.",
-      "Try 'weather gps' to get local weather data.",
-      "Pipe output to grep to filter results: 'ls | grep .js'",
-      "Use 'open' to launch external websites like Gmail or YouTube.",
-    ];
+    this.tips = [];
 
-    this.docs = {
-      ls: {
-        desc: "List directory contents",
-        usage: "ls [options] [path]",
-        man: "NAME\n\tls - list directory contents\n\nSYNOPSIS\n\tls [-a] [file...]\n\nDESCRIPTION\n\tList information about the FILEs (the current directory by default).\n\nOPTIONS\n\t-a, --all\n\t\tdo not ignore entries starting with .",
-        examples: ["ls", "ls -a", "ls /home/user/logs"],
-      },
-      cd: {
-        desc: "Change the shell working directory",
-        usage: "cd <path>",
-        man: "NAME\n\tcd - change directory\n\nSYNOPSIS\n\tcd [dir]\n\nDESCRIPTION\n\tChange the current directory to dir. The default DIR is the value of the HOME shell variable.",
-        examples: ["cd downloads", "cd ..", "cd /home/user"],
-      },
-      cat: {
-        desc: "Concatenate files and print on the standard output",
-        usage: "cat <file>",
-        man: "NAME\n\tcat - concatenate files and print on the standard output\n\nSYNOPSIS\n\tcat [FILE]...\n\nDESCRIPTION\n\tConcatenate FILE(s) to standard output.",
-        examples: ["cat readme.md", "cat file1.txt file2.txt"],
-      },
-      grep: {
-        desc: "Print lines that match patterns",
-        usage: "grep <pattern> <file>",
-        man: "NAME\n\tgrep - print lines that match patterns\n\nSYNOPSIS\n\tgrep [OPTIONS] PATTERN [FILE...]\n\nDESCRIPTION\n\tSearch for PATTERN in each FILE.\n\nOPTIONS\n\t-r\tRecursive search\n\t-i\tCase insensitive",
-        examples: ["grep 'error' system.log", "ls | grep '.txt'"],
-      },
-      // You can add more specific docs for other commands here
-    };
+    this.docs = {};
 
     this.init();
   }
@@ -80,22 +45,65 @@ class Terminal {
     this.loadUsername();
     this.updatePrompt();
     this.setupEventListeners();
+    this.loadTips();
     this.showWelcome();
+    this.loadDocs();
     this.loadServices();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
-        // Sirf tab run karein agar command valid hai
         if (this.settings.startupCmd !== "none") {
           this.executeCommand(this.settings.startupCmd);
         }
       }, 600);
     }
 
-    // Add this line to show daily tip on startup
+    // Daily tip wala code...
     setTimeout(() => {
-      this.commands["tip.daily"].call(this);
-    }, 500); // Small delay so it appears after the welcome message
+      // Agar aapne tips.json bhi lagaya hai to 'loadTips()' call karein
+      // Nahi to purana code rakhein
+      if (this.commands["tip.daily"]) {
+        this.commands["tip.daily"].call(this);
+      }
+    }, 500);
+  }
+
+  // --- DOCS LOADER (New Integration) ---
+  async loadDocs() {
+    try {
+      const response = await fetch("cmd_docs.json");
+      if (!response.ok) throw new Error("Failed to load documentation");
+      this.docs = await response.json();
+    } catch (error) {
+      console.error("Error loading cmd_docs.json:", error);
+      this.addOutput("Warning: Could not load command documentation.", "error");
+
+      // Fallback: Agar file na mile to kam se kam basic help chale
+      this.docs = {
+        help: {
+          desc: "Show help",
+          usage: "help",
+          man: "Help command",
+          examples: [],
+        },
+      };
+    }
+  }
+
+  async loadTips() {
+    try {
+      const response = await fetch("tips.json");
+      if (!response.ok) throw new Error("Failed to load tips");
+      this.tips = await response.json();
+    } catch (error) {
+      console.error("Error loading tips.json:", error);
+      // Fallback tips agar file na mile
+      this.tips = [
+        "Tip: Type 'help' to see available commands.",
+        "Tip: Use Tab for autocomplete.",
+        "Tip: Ctrl+L clears the screen.",
+      ];
+    }
   }
 
   // --- SERVICE LOADER ---
@@ -793,58 +801,78 @@ FILE SYSTEM:
   rm <file>              Remove file
   mkdir <dir>            Create directory
   rmdir <dir>            Remove directory
-  cp <src> <dest>        Copy file
-  cp -r <src> <dest>     Copy directory recursively
+  cp <src> <dest>        Copy file (-r for recursive)
   mv <src> <dest>        Move/rename file or directory
-  head <file>            Show first 10 lines
-  head -n <num> <file>   Show first N lines
-  tail <file>            Show last 10 lines
-  tail -n <num> <file>   Show last N lines
+  head <file>            Show first 10 lines (-n for custom)
+  tail <file>            Show last 10 lines (-n for custom)
   wc <file>              Count lines, words, characters
 
 SEARCH & FILTER:
   find <pattern>         Find files by name/pattern
-  find <path> <pattern>  Search in specific path
-  grep "pattern" <file>  Search text in file
-  grep -r "pattern"      Search recursively in directory
-  grep -i "pattern"      Case-insensitive search
+  grep "pattern" <file>  Search text in file (-r for dir)
   ls | grep ".txt"       Filter command output
-  history | grep "cmd"   Filter history
 
-SYSTEM:
-  clear                  Clear terminal screen
-  echo <text>            Display text
-  date                   Show current date
-  time                   Show current time
-  whoami                 Display current user
-  uptime                 Show system uptime
-  history                Show command history
-  sys.info               Display system information
-  sys.log                Show system logs
+PRODUCTIVITY:
+  todo add <task>        Add item to Todo list
+  todo list              Show Todo list
+  todo done <num>        Mark task as completed
+  note <text>            Save a quick note
+  notes list             View saved notes
+  timer <time>           Set timer (e.g., 10s, 5m, 1h)
+  alarm <HH:MM>          Set alarm (24h format)
 
-NETWORK:
-  weather                Get GPS-based weather
-  weather gps            Refresh weather with GPS
-  crypto <symbol>        Get crypto prices (BTC, ETH)
+WEB & SEARCH:
+  google <query>         Search Google
+  youtube <query>        Search YouTube
+  github <query>         Search GitHub
+  stackoverflow <query>  Search StackOverflow
+  wiki <query>           Search Wikipedia
+  map <location>         Open Google Maps
+  translate <text>       Translate text (Google)
+  open <service>         Open site (gmail, chatgpt, etc.)
+  quicklink              List all available quick links
+  weather <gps>          Get Weather (use 'gps' for local)
   news                   Fetch latest news
-  quote                  Get random quote
+  crypto <symbol>        Get crypto prices (BTC, ETH)
 
-UTILITIES:
-  theme set <name>       Change theme (matrix, kali, ubuntu, neon-purple, hacker-amber)
-  open <service>         Open service (gmail, chatgpt, youtube, github)
-  dev.mode.enable        Enable developer mode
+SYSTEM & UTILITIES:
+  clear                  Clear terminal screen
+  history                Show command history
+  neofetch               Show system info (ASCII art)
+  date / time            Show current date or time
+  whoami                 Display current user
+  sudo <command>         Execute as superuser (simulation)
+  sys.info               Display hardware/software info
+  sys.log                Show system logs
+  dev.mode.enable        Enable developer debug mode
+
+SETTINGS & SESSION:
+  session save <name>    Save current session state
+  session load <name>    Load a saved session
+  theme set <name>       Change theme (matrix, kali, neon-purple)
+  set fontSize <px>      Adjust font size
+  set opacity <0-1>      Adjust transparency
+  shortcut list          View custom keyboard shortcuts
+
+HELP & FUN:
+  help [cmd]             Show help menu or specific command info
+  man <cmd>              Read detailed manual page
+  examples <cmd>         Show usage examples
+  tutorial               Start interactive tutorial
+  tip                    Get a random terminal tip
+  matrix                 Toggle Matrix screen effect
+  cowsay <text>          Make the cow speak
 
 CHAINING:
-  cmd1 ; cmd2            Execute commands sequentially
-  cmd1 && cmd2           Execute cmd2 if cmd1 succeeds
-  cmd1 | cmd2            Pipe output (basic simulation)
+  cmd1 ; cmd2            Execute sequentially
+  cmd1 && cmd2           Execute if first succeeds
+  cmd1 | cmd2            Pipe output (e.g., ls | grep js)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Use ↑↓ arrows for command history | Tab for autocomplete
+Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 `;
       this.addOutput(helpText, "info");
     },
-
     // --- SESSION MANAGEMENT ---
 
     session: function (args) {
