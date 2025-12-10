@@ -176,6 +176,10 @@ theme set hacker-amber  # Amber hacker theme
 | `cp <src> <dest>`    | Copy file/directory     | `cp file.txt backup.txt`  |
 | `cp -r <src> <dest>` | Copy recursively        | `cp -r folder backup`     |
 | `mv <src> <dest>`    | Move/rename             | `mv old.txt new.txt`      |
+| `man <cmd>`          | Full manual page        | `man grep`                |
+| `examples`           | Usage examples          | `examples cp`             |
+| `tutorial`           | Interactive guide       | `tutorial start`          |
+| `tip`                | Random tip              | `tip`                     |
 | `head <file>`        | First 10 lines          | `head readme.md`          |
 | `head -n 5 <file>`   | First N lines           | `head -n 5 file.txt`      |
 | `tail <file>`        | Last 10 lines           | `tail logs.txt`           |
