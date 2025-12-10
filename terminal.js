@@ -16,6 +16,14 @@ class Terminal {
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
 
+    this.settings = {
+      fontSize: 14,
+      opacity: 0.95,
+      customPrompt: null,
+      startupCmd: null,
+      shortcuts: {}, // e.g. "Ctrl+q": "clear"
+    };
+
     this.currentTheme = "matrix"; // Default theme tracker
 
     // Add this inside constructor()
@@ -62,11 +70,22 @@ class Terminal {
   }
 
   init() {
+    this.loadSettings(); // 1. Settings load karein
+    this.applySettings(); // 2. Visuals apply karein (font/opacity)
     this.loadHistory();
     this.loadUsername();
     this.updatePrompt();
     this.setupEventListeners();
     this.showWelcome();
+
+    if (this.settings.startupCmd) {
+      setTimeout(() => {
+        // Sirf tab run karein agar command valid hai
+        if (this.settings.startupCmd !== "none") {
+          this.executeCommand(this.settings.startupCmd);
+        }
+      }, 600);
+    }
 
     // Add this line to show daily tip on startup
     setTimeout(() => {
@@ -128,7 +147,85 @@ class Terminal {
     // Agar restoreOriginal = false hai, to jo match mila tha wo input me hi rahega
   }
 
+  // --- SETTINGS HELPERS ---
+
+  loadSettings() {
+    const saved = localStorage.getItem("terminalSettings");
+    if (saved) {
+      this.settings = { ...this.settings, ...JSON.parse(saved) };
+    }
+  }
+
+  saveSettings() {
+    localStorage.setItem("terminalSettings", JSON.stringify(this.settings));
+  }
+
+  applySettings() {
+    const size = this.settings.fontSize;
+    const opacity = this.settings.opacity;
+
+    // Check karein ki kya dynamic style tag pehle se maujud hai
+    let styleTag = document.getElementById("dynamic-term-style");
+
+    // Agar nahi hai, to naya banayein
+    if (!styleTag) {
+      styleTag = document.createElement("style");
+      styleTag.id = "dynamic-term-style";
+      document.head.appendChild(styleTag);
+    }
+
+    // Is tag ke andar hum CSS rules likhenge jo turant apply honge
+    // Hum '!important' use kar rahe hain taaki purana CSS issue na kare
+    styleTag.innerHTML = `
+      /* Font Size Control */
+      .output-line, #input, .prompt, .terminal-body {
+        font-size: ${size}px !important;
+        line-height: ${Math.round(
+          size * 1.4
+        )}px !important; /* Spacing bhi adjust karein */
+      }
+      
+      /* Opacity Control */
+      .terminal-section, .terminal-container {
+        opacity: ${opacity};
+      }
+    `;
+  }
+
+  // Update this existing method to support custom prompt
+  updatePrompt() {
+    if (this.settings.customPrompt) {
+      this.prompt.textContent = this.settings.customPrompt;
+    } else {
+      const path = this.currentPath === "/home/user" ? "~" : this.currentPath;
+      this.prompt.textContent = `${this.username}@${this.hostname}:${path}$`;
+    }
+  }
+
   handleKeyDown(e) {
+    // --- CUSTOM SHORTCUTS CHECK ---
+    // Key generate karo: e.g. "Ctrl+k", "Alt+m"
+    let keyCombo = "";
+    if (e.ctrlKey) keyCombo += "Ctrl+";
+    if (e.altKey) keyCombo += "Alt+";
+    if (e.shiftKey) keyCombo += "Shift+";
+    keyCombo += e.key.toUpperCase(); // Case insensitive match ke liye
+
+    // Check karo agar ye combo settings me exist karta hai
+    // Hum settings me keys ko bhi store karte waqt dhyan rakhenge
+    // (User input "Ctrl+t" might be stored strictly, so loop check is safer)
+
+    // Simple direct match attempt:
+    for (const [combo, cmd] of Object.entries(this.settings.shortcuts)) {
+      // Case-insensitive comparison
+      if (combo.toUpperCase() === keyCombo) {
+        e.preventDefault();
+        this.executeCommand(cmd);
+        // Optionally add to history or just run quietly
+        return;
+      }
+    }
+
     // 1. HANDLE SEARCH MODE (Ctrl + R Active)
     // ==========================================
     if (this.isSearching) {
@@ -852,6 +949,143 @@ Use ↑↓ arrows for command history | Tab for autocomplete
 
         default:
           this.addOutput(`Unknown action: ${action}`, "error");
+      }
+    },
+
+    // --- SETTINGS & CUSTOMIZATION ---
+
+    set: function (args) {
+      if (args.length < 2) {
+        this.addOutput("Usage: set <property> <value>", "warning");
+        this.addOutput(
+          "Properties: fontSize, opacity, prompt, startupCmd",
+          "info"
+        );
+        return;
+      }
+
+      const prop = args[0].toLowerCase();
+      const val = args.slice(1).join(" ");
+
+      switch (prop) {
+        case "fontsize":
+          const size = parseInt(val);
+          if (isNaN(size) || size < 8 || size > 40) {
+            this.addOutput(
+              "Error: Font size must be between 8 and 40.",
+              "error"
+            );
+            return;
+          }
+          this.settings.fontSize = size;
+          this.applySettings();
+          this.saveSettings();
+          this.addOutput(`Font size set to ${size}px`, "success");
+          break;
+
+        case "opacity":
+          const op = parseFloat(val);
+          if (isNaN(op) || op < 0.1 || op > 1.0) {
+            this.addOutput(
+              "Error: Opacity must be between 0.1 and 1.0",
+              "error"
+            );
+            return;
+          }
+          this.settings.opacity = op;
+          this.applySettings();
+          this.saveSettings();
+          this.addOutput(`Opacity set to ${op}`, "success");
+          break;
+
+        case "prompt":
+          // "default" likhne par reset kar dega
+          if (val === "default") {
+            this.settings.customPrompt = null;
+            this.addOutput("Prompt reset to default.", "success");
+          } else {
+            this.settings.customPrompt = val + " "; // Space add kar diya
+            this.addOutput(`Prompt changed to: ${val}`, "success");
+          }
+          this.updatePrompt();
+          this.saveSettings();
+          break;
+
+        case "startupcmd":
+          this.settings.startupCmd = val === "none" ? null : val;
+          this.saveSettings();
+          this.addOutput(`Startup command set to: "${val}"`, "success");
+          break;
+
+        default:
+          this.addOutput(`Unknown setting: ${prop}`, "error");
+      }
+    },
+
+    settings: function (args) {
+      const action = args[0];
+
+      if (action === "export") {
+        const data = JSON.stringify(this.settings, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "terminal_settings.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        this.addOutput("Settings exported successfully.", "success");
+      } else if (action === "import") {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            try {
+              const newSettings = JSON.parse(event.target.result);
+              this.settings = { ...this.settings, ...newSettings };
+              this.saveSettings();
+              this.applySettings();
+              this.updatePrompt();
+              this.addOutput("Settings imported successfully!", "success");
+            } catch (err) {
+              this.addOutput("Invalid settings file.", "error");
+            }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      } else if (action === "reset") {
+        localStorage.removeItem("terminalSettings");
+        this.addOutput("Settings reset to default. Refreshing...", "warning");
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        this.addOutput("Usage: settings <export|import|reset>", "warning");
+      }
+    },
+
+    shortcut: function (args) {
+      if (args[0] === "list") {
+        this.addOutput("Custom Shortcuts:", "info");
+        const keys = Object.keys(this.settings.shortcuts);
+        if (keys.length === 0) this.addOutput("  (None set)");
+        keys.forEach((k) => {
+          this.addOutput(`  ${k}  →  ${this.settings.shortcuts[k]}`);
+        });
+      } else if (args[0] === "set" && args[1] && args[2]) {
+        // args[1] = "Ctrl+T", args[2] = "clear"
+        const keyCombo = args[1];
+        const cmd = args.slice(2).join(" ");
+        this.settings.shortcuts[keyCombo] = cmd;
+        this.saveSettings();
+        this.addOutput(`Shortcut set: ${keyCombo} runs "${cmd}"`, "success");
+      } else {
+        this.addOutput("Usage:", "warning");
+        this.addOutput("  shortcut list");
+        this.addOutput('  shortcut set "Ctrl+T" clear');
       }
     },
 
