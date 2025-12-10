@@ -71,7 +71,7 @@ class Terminal {
   // --- DOCS LOADER (New Integration) ---
   async loadDocs() {
     try {
-      const response = await fetch("cmd_docs.json");
+      const response = await fetch("assets/jsons/cmd_docs.json");
       if (!response.ok) throw new Error("Failed to load documentation");
       this.docs = await response.json();
     } catch (error) {
@@ -92,7 +92,7 @@ class Terminal {
 
   async loadTips() {
     try {
-      const response = await fetch("tips.json");
+      const response = await fetch("assets/jsons/tips.json");
       if (!response.ok) throw new Error("Failed to load tips");
       this.tips = await response.json();
     } catch (error) {
@@ -109,7 +109,7 @@ class Terminal {
   // --- SERVICE LOADER ---
   async loadServices() {
     try {
-      const response = await fetch("services.json");
+      const response = await fetch("assets/jsons/services.json");
       if (!response.ok) throw new Error("Failed to load services");
       this.services = await response.json();
     } catch (error) {
