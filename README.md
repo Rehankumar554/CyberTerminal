@@ -10,7 +10,7 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 
 ## 📸 Screenshots
 
-<img src="assets/screenshots/theme_hacker_amber.png" alt="Screenshot" width="300" />
+<img src="assets/screenshots/theme_hacker_amber.png" alt="Screenshot" width="auto" loading="lazy"/>
 
 ---
 
