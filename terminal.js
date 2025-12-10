@@ -10,6 +10,7 @@ class Terminal {
     this.hostname = "cyberterm";
     this.devMode = false;
     this.commandBuffer = "";
+    this.currentTheme = "matrix"; // Default theme tracker
 
     // Add this inside constructor()
     this.tips = [
@@ -470,6 +471,132 @@ CHAINING:
 Use ↑↓ arrows for command history | Tab for autocomplete
 `;
       this.addOutput(helpText, "info");
+    },
+
+    // --- SESSION MANAGEMENT ---
+
+    session: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: session <action> [name]", "warning");
+        this.addOutput("Actions: save, load, list, delete", "info");
+        return;
+      }
+
+      const action = args[0];
+      const name = args[1];
+
+      // Load all sessions from localStorage
+      let sessions = {};
+      try {
+        sessions = JSON.parse(localStorage.getItem("terminalSessions")) || {};
+      } catch (e) {
+        sessions = {};
+      }
+
+      switch (action) {
+        case "save":
+          if (!name) {
+            this.addOutput("Error: Please provide a session name.", "error");
+            return;
+          }
+
+          // Capture current state
+          const state = {
+            timestamp: new Date().toLocaleString(),
+            path: this.currentPath,
+            history: this.history,
+            user: this.username,
+            theme: this.currentTheme,
+            // Capture Widget HTML content
+            weatherWidget: document.getElementById("weather-display")
+              ? document.getElementById("weather-display").innerHTML
+              : "",
+          };
+
+          sessions[name] = state;
+          localStorage.setItem("terminalSessions", JSON.stringify(sessions));
+          this.addOutput(`💾 Session "${name}" saved successfully.`, "success");
+          break;
+
+        case "load":
+          if (!name) {
+            this.addOutput("Error: Please provide a session name.", "error");
+            return;
+          }
+
+          if (!sessions[name]) {
+            this.addOutput(`❌ Session "${name}" not found.`, "error");
+            return;
+          }
+
+          const s = sessions[name];
+
+          // 1. Restore Path & History
+          this.currentPath = s.path;
+          this.history = s.history || [];
+          this.username = s.user || "user";
+
+          // 2. Restore Theme (Updated Logic)
+          if (s.theme) {
+            try {
+              // Check Global scope or Window scope
+              if (typeof themeManager !== "undefined") {
+                themeManager.setTheme(s.theme);
+              } else if (window.themeManager) {
+                window.themeManager.setTheme(s.theme);
+              }
+
+              // Track current theme internally
+              this.currentTheme = s.theme;
+            } catch (e) {
+              console.error("Failed to restore theme:", e);
+            }
+          }
+
+          // 3. Restore Widgets
+          const widgetEl = document.getElementById("weather-display");
+          if (widgetEl && s.weatherWidget) {
+            widgetEl.innerHTML = s.weatherWidget;
+          }
+
+          this.updatePrompt();
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
+          this.addOutput(`📂 Session "${name}" restored.`, "success");
+          this.addOutput(`🎨 Theme: ${s.theme || "default"}`); // Confirmation message
+          this.addOutput(`📍 Directory: ${s.path}`);
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
+          break;
+
+        case "list":
+          const keys = Object.keys(sessions);
+          if (keys.length === 0) {
+            this.addOutput("No saved sessions found.", "warning");
+          } else {
+            this.addOutput("\n💾 SAVED SESSIONS:", "info");
+            keys.forEach((key) => {
+              this.addOutput(`• ${key} \t(Saved: ${sessions[key].timestamp})`);
+            });
+            this.addOutput("");
+          }
+          break;
+
+        case "delete":
+          if (!name) {
+            this.addOutput("Error: Session name required.", "error");
+            return;
+          }
+          if (sessions[name]) {
+            delete sessions[name];
+            localStorage.setItem("terminalSessions", JSON.stringify(sessions));
+            this.addOutput(`🗑️ Session "${name}" deleted.`, "success");
+          } else {
+            this.addOutput(`❌ Session "${name}" not found.`, "error");
+          }
+          break;
+
+        default:
+          this.addOutput(`Unknown action: ${action}`, "error");
+      }
     },
 
     man: function (args) {
@@ -1024,7 +1151,7 @@ Use ↑↓ arrows for command history | Tab for autocomplete
 
     theme: function (args) {
       if (args[0] === "set" && args[1]) {
-        const theme = args[1];
+        const themeName = args[1];
         const validThemes = [
           "matrix",
           "kali",
@@ -1033,9 +1160,29 @@ Use ↑↓ arrows for command history | Tab for autocomplete
           "hacker-amber",
         ];
 
-        if (validThemes.includes(theme)) {
-          themeManager.setTheme(theme);
-          this.addOutput(`Theme changed to: ${theme}`, "success");
+        if (validThemes.includes(themeName)) {
+          // --- FIX START ---
+
+          // 1. Visual Change (Ye line color badlegi)
+          // Hum try-catch use karenge taaki agar themeManager na mile to error dikh jaye
+          try {
+            if (typeof themeManager !== "undefined") {
+              themeManager.setTheme(themeName);
+            } else if (window.themeManager) {
+              window.themeManager.setTheme(themeName);
+            } else {
+              console.warn("ThemeManager not found");
+            }
+          } catch (e) {
+            console.error("Theme change failed:", e);
+          }
+
+          // 2. Session Tracking (Ye line session save ke liye hai)
+          this.currentTheme = themeName;
+
+          // --- FIX END ---
+
+          this.addOutput(`Theme changed to: ${themeName}`, "success");
         } else {
           this.addOutput(
             `Invalid theme. Available: ${validThemes.join(", ")}`,
