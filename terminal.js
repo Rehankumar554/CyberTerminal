@@ -9,6 +9,7 @@ class Terminal {
     this.username = "user";
     this.hostname = "cyberterm";
     this.devMode = false;
+    this.services = {};
     this.commandBuffer = "";
     // Search State
     this.isSearching = false;
@@ -80,6 +81,7 @@ class Terminal {
     this.updatePrompt();
     this.setupEventListeners();
     this.showWelcome();
+    this.loadServices();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
@@ -94,6 +96,20 @@ class Terminal {
     setTimeout(() => {
       this.commands["tip.daily"].call(this);
     }, 500); // Small delay so it appears after the welcome message
+  }
+
+  // --- SERVICE LOADER ---
+  async loadServices() {
+    try {
+      const response = await fetch("services.json");
+      if (!response.ok) throw new Error("Failed to load services");
+      this.services = await response.json();
+    } catch (error) {
+      console.error("Error loading services.json:", error);
+      this.addOutput("Warning: Could not load external services.", "error");
+      // Fallback empty object
+      this.services = {};
+    }
   }
 
   setupEventListeners() {
@@ -1933,27 +1949,71 @@ Use ↑↓ arrows for command history | Tab for autocomplete
       }
     },
 
+    // --- UPDATED COMMANDS ---
+
     open: function (args) {
       if (args.length === 0) {
-        this.addOutput("Usage: open <service>", "warning");
+        this.addOutput("Usage: open <service_name>", "warning");
+        this.addOutput("Type 'quicklink' to see available services.", "info");
         return;
       }
 
-      const services = {
-        gmail: "https://mail.google.com",
-        chatgpt: "https://chat.openai.com",
-        youtube: "https://youtube.com",
-        github: "https://github.com",
-      };
+      const serviceName = args[0].toLowerCase();
 
-      const service = args[0].toLowerCase();
-      if (services[service]) {
-        this.addOutput(`Opening ${service}...`, "success");
-        window.open(services[service], "_blank");
-      } else {
-        this.addOutput(`Unknown service: ${service}`, "error");
-        this.addOutput(`Available: ${Object.keys(services).join(", ")}`);
+      // Check if services are loaded
+      if (Object.keys(this.services).length === 0) {
+        this.addOutput("Error: Services data not loaded yet.", "error");
+        return;
       }
+
+      if (this.services[serviceName]) {
+        const url = this.services[serviceName];
+        this.addOutput(`Opening ${serviceName}...`, "success");
+        this.addOutput(`URL: ${url}`, "info");
+        window.open(url, "_blank");
+      } else {
+        this.addOutput(`Error: Service '${serviceName}' not found.`, "error");
+        this.addOutput(
+          "Type 'quicklink' to view all available services.",
+          "warning"
+        );
+      }
+    },
+
+    quicklink: function (args) {
+      const keys = Object.keys(this.services);
+
+      if (keys.length === 0) {
+        this.addOutput(
+          "No services loaded or services.json is empty.",
+          "warning"
+        );
+        return;
+      }
+
+      this.addOutput("\n🔗 AVAILABLE QUICK LINKS:", "info");
+      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+      // Grid layout logic or Simple List
+      // Yahan hum neat list formatting kar rahe hain
+
+      // Agar user ne 'search' term diya hai: e.g., quicklink google
+      const filter = args[0] ? args[0].toLowerCase() : null;
+
+      let count = 0;
+      keys.sort().forEach((key) => {
+        if (filter && !key.includes(filter)) return;
+
+        const url = this.services[key];
+        // Formatting: Name (padded) -> URL
+        // padEnd(20) ensure karega ki sab ek line me dikhe
+        this.addOutput(`${key.padEnd(18)} →  ${url}`);
+        count++;
+      });
+
+      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      this.addOutput(`Total: ${count} services found.`, "info");
+      this.addOutput("Usage: open <name> to launch.", "warning");
     },
 
     // --- SEARCH ENGINES & GOOGLE APPS ---

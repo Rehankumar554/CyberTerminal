@@ -495,10 +495,10 @@ neofetch
 
 ### Need Help?
 
-- 📖 [Read the docs](https://github.com/yourusername/cyberterminal)
-- 💬 [Ask questions](https://github.com/yourusername/cyberterminal/discussions)
-- 🐛 [Report bugs](https://github.com/yourusername/cyberterminal/issues)
-- 📧 Email: your.email@example.com
+- 📖 [Read the docs](https://github.com/Rehankumar554/cyberterminal)
+- 💬 [Ask questions](https://github.com/Rehankumar554/cyberterminal/discussions)
+- 🐛 [Report bugs](https://github.com/Rehankumar554/cyberterminal/issues)
+- 📧 Email: work.rehankumarsahu@gmail.com
 
 ### Before Asking for Help
 

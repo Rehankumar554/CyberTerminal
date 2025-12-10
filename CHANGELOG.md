@@ -292,14 +292,14 @@ None yet.
 
 ### Reporting Issues
 
-- 🐛 [Report bugs](https://github.com/yourusername/cyberterminal/issues)
-- 💡 [Request features](https://github.com/yourusername/cyberterminal/issues)
-- 💬 [Ask questions](https://github.com/yourusername/cyberterminal/discussions)
+- 🐛 [Report bugs](https://github.com/Rehankumar554/cyberterminal/issues)
+- 💡 [Request features](https://github.com/Rehankumar554/cyberterminal/issues)
+- 💬 [Ask questions](https://github.com/Rehankumar554/cyberterminal/discussions)
 
 ### Getting Help
 
-- 📖 [Documentation](https://github.com/yourusername/cyberterminal)
-- 📧 Email: your.email@example.com
+- 📖 [Documentation](https://github.com/Rehankumar554/cyberterminal)
+- 📧 Email: work.rehankumarsahu@gmail.com
 - 🌟 Star the repo!
 
 ---
@@ -308,8 +308,8 @@ None yet.
 
 **CyberTerminal** - Level 7 Linux-Grade Terminal for Chrome
 
-[Homepage](https://github.com/yourusername/cyberterminal) •
-[Issues](https://github.com/yourusername/cyberterminal/issues) •
-[Discussions](https://github.com/yourusername/cyberterminal/discussions)
+[Homepage](https://github.com/Rehankumar554/cyberterminal) •
+[Issues](https://github.com/Rehankumar554/cyberterminal/issues) •
+[Discussions](https://github.com/Rehankumar554/cyberterminal/discussions)
 
 </div>

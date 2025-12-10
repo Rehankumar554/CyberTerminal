@@ -40,7 +40,7 @@ class WidgetManager {
 
   initWeather() {
     // Hardcoded API key - replace with your own WeatherAPI key
-    const API_KEY = "794f3ea37db442de8f642856250712";
+    const API_KEY = "YOUR_ACTUAL_API_KEY_HERE";
 
     // Automatically get GPS location on load
     this.getGPSLocation(API_KEY);
