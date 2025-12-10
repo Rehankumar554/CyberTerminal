@@ -220,24 +220,24 @@ theme set hacker-amber  # Amber hacker theme
 
 ### Productivity & Widgets
 
-| Command        | Description          | Example                      |
-| -------------- | -------------------- | ---------------------------- |
-| `todo          | Manage tasks         | `todo add "Buy milk"`        |
-| `note          | Save quick note      | `note "Meeting ID: 123"`     |
-| `notes         | View/Clear notes     | `notes list`                 |
-| `timer         | Set countdown        | `timer 25m`                  |
-| `alarm         | Set alarm clock      | `alarm 14:30`                |
-| `google        | Google Search        | `google javascript tutorial` |
-| `youtube       | YouTube Search       | `youtube funny cats`         |
-| `github        | GitHub Search        | `github reactjs`             |
-| `stackoverflow | StackOverflow Search | `stackoverflow center div`   |
-| `wiki          | Wikipedia Search     | `wiki Albert Einstein`       |
-| `translate     | Google Translate     | `translate hello en-hi`      |
-| `map           | Google Maps          | `map New York`               |
-| `open          | Open popular sites   | `open gmail`                 |
-| `news          | Fetch latest news    | `news`                       |
-| `crypto        | Check crypto price   | `crypto BTC`                 |
-| `weather       | Check weather        | `weather gps`                |
+| Command         | Description          | Example                      |
+| --------------- | -------------------- | ---------------------------- |
+| `todo`          | Manage tasks         | `todo add "Buy milk"`        |
+| `note`          | Save quick note      | `note "Meeting ID: 123"`     |
+| `notes`         | View/Clear notes     | `notes list`                 |
+| `timer`         | Set countdown        | `timer 25m`                  |
+| `alarm`         | Set alarm clock      | `alarm 14:30`                |
+| `google`        | Google Search        | `google javascript tutorial` |
+| `youtube`       | YouTube Search       | `youtube funny cats`         |
+| `github`        | GitHub Search        | `github reactjs`             |
+| `stackoverflow` | StackOverflow Search | `stackoverflow center div`   |
+| `wiki`          | Wikipedia Search     | `wiki Albert Einstein`       |
+| `translate`     | Google Translate     | `translate hello en-hi`      |
+| `map`           | Google Maps          | `map New York`               |
+| `open`          | Open popular sites   | `open gmail`                 |
+| `news`          | Fetch latest news    | `news`                       |
+| `crypto`        | Check crypto price   | `crypto BTC`                 |
+| `weather`       | Check weather        | `weather gps`                |
 
 ### Utilities
 
