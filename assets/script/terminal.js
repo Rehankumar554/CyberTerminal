@@ -916,6 +916,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           sessions[name] = state;
           localStorage.setItem("terminalSessions", JSON.stringify(sessions));
           this.addOutput(`💾 Session "${name}" saved successfully.`, "success");
+          showToast("Session saved successfully");
           break;
 
         case "load":
@@ -989,6 +990,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             delete sessions[name];
             localStorage.setItem("terminalSessions", JSON.stringify(sessions));
             this.addOutput(`🗑️ Session "${name}" deleted.`, "success");
+            showToast("Session delete successfully");
           } else {
             this.addOutput(`❌ Session "${name}" not found.`, "error");
           }
@@ -1028,6 +1030,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           this.applySettings();
           this.saveSettings();
           this.addOutput(`Font size set to ${size}px`, "success");
+          showToast(`Font size set to ${size} px`);
           break;
 
         case "opacity":
@@ -1043,6 +1046,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           this.applySettings();
           this.saveSettings();
           this.addOutput(`Opacity set to ${op}`, "success");
+          showToast(`Opacity set to ${op}`);
           break;
 
         case "prompt":
@@ -1050,9 +1054,11 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           if (val === "default") {
             this.settings.customPrompt = null;
             this.addOutput("Prompt reset to default.", "success");
+            showToast("Prompt reset to default.");
           } else {
             this.settings.customPrompt = val + " "; // Space add kar diya
             this.addOutput(`Prompt changed to: ${val}`, "success");
+            showToast(`Prompt changed to: ${val}`);
           }
           this.updatePrompt();
           this.saveSettings();
@@ -1062,6 +1068,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           this.settings.startupCmd = val === "none" ? null : val;
           this.saveSettings();
           this.addOutput(`Startup command set to: "${val}"`, "success");
+          showToast(`Startup command set to: "${val}"`);
           break;
 
         default:
@@ -1083,6 +1090,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         a.click();
         document.body.removeChild(a);
         this.addOutput("Settings exported successfully.", "success");
+        showToast("Settings exported successfully.");
       } else if (action === "import") {
         const input = document.createElement("input");
         input.type = "file";
@@ -1098,6 +1106,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
               this.applySettings();
               this.updatePrompt();
               this.addOutput("Settings imported successfully!", "success");
+              showToast("Settings imported successfully!");
             } catch (err) {
               this.addOutput("Invalid settings file.", "error");
             }
@@ -1108,6 +1117,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       } else if (action === "reset") {
         localStorage.removeItem("terminalSettings");
         this.addOutput("Settings reset to default. Refreshing...", "warning");
+        showToast("Settings reset to default. Refreshing...");
         setTimeout(() => location.reload(), 1000);
       } else {
         this.addOutput("Usage: settings <export|import|reset>", "warning");
@@ -1129,6 +1139,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         this.settings.shortcuts[keyCombo] = cmd;
         this.saveSettings();
         this.addOutput(`Shortcut set: ${keyCombo} runs "${cmd}"`, "success");
+        showToast(`Shortcut set: ${keyCombo} runs "${cmd}"`);
       } else {
         this.addOutput("Usage:", "warning");
         this.addOutput("  shortcut list");
@@ -1157,6 +1168,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       notes.push(newNote);
       localStorage.setItem("terminalNotes", JSON.stringify(notes));
       this.addOutput("📝 Note saved.", "success");
+      showToast("Note saved.");
     },
 
     notes: function (args) {
@@ -1166,6 +1178,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       if (action === "clear") {
         localStorage.removeItem("terminalNotes");
         this.addOutput("🗑️ All notes cleared.", "success");
+        showToast("All notes cleared.");
       } else if (action === "list") {
         if (notes.length === 0) {
           this.addOutput("No notes found.", "info");
@@ -1202,6 +1215,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           todos.push({ text: task, completed: false });
           localStorage.setItem("terminalTodos", JSON.stringify(todos));
           this.addOutput(`✅ Added task: "${task}"`, "success");
+          showToast(`Added task: "${task}"`);
           break;
 
         case "list":
@@ -1224,6 +1238,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             todos[idx].completed = true;
             localStorage.setItem("terminalTodos", JSON.stringify(todos));
             this.addOutput(`👍 Marked task ${args[1]} as complete.`, "success");
+            showToast(`Marked task ${args[1]} as complete.`);
           } else {
             this.addOutput("❌ Invalid task number.", "error");
           }
@@ -1237,12 +1252,14 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           if (args[1] === "all") {
             todos = []; // Clear everything
             this.addOutput("🗑️ Todo list completely cleared.", "success");
+            showToast("Todo list completely cleared.");
           } else {
             const removed = initialLen - todos.length;
             this.addOutput(
               `🗑️ Cleared ${removed} completed task(s).`,
               "success"
             );
+            showToast(`Cleared ${removed} completed task(s)`);
           }
 
           localStorage.setItem("terminalTodos", JSON.stringify(todos));
@@ -1263,6 +1280,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           clearInterval(this.activeTimer);
           this.activeTimer = null;
           this.addOutput("🛑 Timer stopped.", "warning");
+          showToast("Timer stopped.");
         } else {
           this.addOutput("No active timer found.", "info");
         }
@@ -1297,6 +1315,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         `⏳ Timer set for ${timeStr}. I'll notify you when done.`,
         "success"
       );
+      showToast(`Timer set for ${timeStr}`);
 
       // Clear existing timer if any
       if (this.activeTimer) clearInterval(this.activeTimer);
@@ -1315,6 +1334,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           // ALARM SOUND & NOTIFICATION
           this.addOutput("⏰ TIMER FINISHED!", "success");
           this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "warning");
+          showToast("TIMER FINISHED!");
 
           // Audio Beep Simulation
           const audio = new AudioContext(); // Modern browsers support this
@@ -1361,12 +1381,14 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         `🔔 Alarm set for ${args[0]} (in ${hoursLeft}h ${minutesLeft}m).`,
         "success"
       );
+      showToast(`Alarm set for ${args[0]}`);
 
       if (this.activeAlarm) clearTimeout(this.activeAlarm);
 
       this.activeAlarm = setTimeout(() => {
         this.addOutput("🔔 ALARM RINGING!", "success");
         this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "warning");
+        showToast("ALARM RINGING!");
 
         // Audio Beep
         try {
@@ -1485,6 +1507,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 
     clear: function () {
       this.clearScreen();
+      showToast("Screen cleared");
     },
 
     echo: function (args) {
@@ -1515,6 +1538,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         this.history = [];
         this.saveHistory();
         this.addOutput("History cleared");
+        showToast("History cleared");
       } else {
         this.history.forEach((cmd, idx) => {
           this.addOutput(`${idx + 1}  ${cmd}`);
@@ -1606,6 +1630,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       try {
         fileSystem.createFile(this.currentPath, args[0], "");
         this.addOutput(`Created file: ${args[0]}`, "success");
+        showToast(`Created file: ${args[0]}`);
       } catch (err) {
         this.addOutput(err.message, "error");
       }
@@ -1620,6 +1645,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       try {
         fileSystem.deleteFile(this.currentPath, args[0]);
         this.addOutput(`Removed: ${args[0]}`, "success");
+        showToast(`Removed: ${args[0]}`);
       } catch (err) {
         this.addOutput(err.message, "error");
       }
@@ -1634,6 +1660,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       try {
         fileSystem.createDirectory(this.currentPath, args[0]);
         this.addOutput(`Created directory: ${args[0]}`, "success");
+        showToast(`Created directory: ${args[0]}`);
       } catch (err) {
         this.addOutput(err.message, "error");
       }
@@ -1648,6 +1675,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       try {
         fileSystem.deleteDirectory(this.currentPath, args[0]);
         this.addOutput(`Removed directory: ${args[0]}`, "success");
+        showToast(`Removed directory: ${args[0]}`);
       } catch (err) {
         this.addOutput(err.message, "error");
       }
@@ -1678,9 +1706,11 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             `Copied directory: ${source} → ${destination}`,
             "success"
           );
+          showToast(`Copied directory: ${source} → ${destination}`);
         } else {
           fileSystem.copyFile(this.currentPath, source, destination);
           this.addOutput(`Copied: ${source} → ${destination}`, "success");
+          showToast(`Copied: ${source} → ${destination}`);
         }
       } catch (err) {
         this.addOutput(err.message, "error");
@@ -1702,9 +1732,11 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         if (!destination.includes("/") && !source.includes("/")) {
           fileSystem.renameFile(this.currentPath, source, destination);
           this.addOutput(`Renamed: ${source} → ${destination}`, "success");
+          showToast(`Renamed: ${source} → ${destination}`);
         } else {
           fileSystem.moveFile(this.currentPath, source, destination);
           this.addOutput(`Moved: ${source} → ${destination}`, "success");
+          showToast(`Moved: ${source} → ${destination}`);
         }
       } catch (err) {
         this.addOutput(err.message, "error");
@@ -1966,6 +1998,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           // --- FIX END ---
 
           this.addOutput(`Theme changed to: ${themeName}`, "success");
+          showToast(`Theme changed to: ${themeName}`);
         } else {
           this.addOutput(
             `Invalid theme. Available: ${validThemes.join(", ")}`,
@@ -1997,6 +2030,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       if (this.services[serviceName]) {
         const url = this.services[serviceName];
         this.addOutput(`Opening ${serviceName}...`, "success");
+        showToast(`Opening ${serviceName}...`);
         this.addOutput(`URL: ${url}`, "info");
         window.open(url, "_blank");
       } else {
@@ -2052,6 +2086,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const query = args.join(" ");
       this.addOutput(`Searching Google for: "${query}"...`, "success");
+      showToast(`Searching Google for: "${query}"...`);
       window.open(
         `https://www.google.com/search?q=${encodeURIComponent(query)}`,
         "_blank"
@@ -2065,6 +2100,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const query = args.join(" ");
       this.addOutput(`Searching YouTube for: "${query}"...`, "success");
+      showToast(`Searching YouTube for: "${query}"...`);
       window.open(
         `https://www.youtube.com/results?search_query=${encodeURIComponent(
           query
@@ -2080,6 +2116,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const query = args.join(" ");
       this.addOutput(`Searching GitHub for: "${query}"...`, "success");
+      showToast(`Searching GitHub for: "${query}"...`);
       window.open(
         `https://github.com/search?q=${encodeURIComponent(query)}`,
         "_blank"
@@ -2093,6 +2130,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const query = args.join(" ");
       this.addOutput(`Searching StackOverflow for: "${query}"...`, "success");
+      showToast(`Searching StackOverflow for: "${query}"...`);
       window.open(
         `https://stackoverflow.com/search?q=${encodeURIComponent(query)}`,
         "_blank"
@@ -2106,6 +2144,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const query = args.join(" ");
       this.addOutput(`Searching Wikipedia for: "${query}"...`, "success");
+      showToast(`Searching Wikipedia for: "${query}"...`);
       window.open(
         `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(
           query
@@ -2121,6 +2160,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
       const location = args.join(" ");
       this.addOutput(`Opening Maps for: "${location}"...`, "success");
+      showToast(`Opening Maps for: "${location}"...`);
       window.open(
         `https://www.google.com/maps/search/${encodeURIComponent(location)}`,
         "_blank"
@@ -2158,6 +2198,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
 
       this.addOutput(`Translating "${textToTranslate}"...`, "success");
+      showToast(`Translating "${textToTranslate}"...`);
       window.open(
         `https://translate.google.com/?sl=${source}&tl=${target}&text=${encodeURIComponent(
           textToTranslate
@@ -2169,6 +2210,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
     weather: function (args) {
       if (args[0] === "gps") {
         this.addOutput("Getting GPS location...", "info");
+        showToast("Getting GPS location...");
 
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -2179,6 +2221,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
               "success"
             );
             this.addOutput("Fetching weather data...", "info");
+            showToast("Fetching weather data...");
 
             const apiKey = "YOUR_WEATHERAPI_KEY_HERE";
 
@@ -2230,6 +2273,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
 
       this.addOutput("Fetching weather data from GPS...", "info");
+      showToast("Fetching weather data from GPS...");
       apiManager.getWeather().then((data) => {
         if (data) {
           this.addOutput(`Temperature: ${data.temp}°C`);
@@ -2249,16 +2293,19 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
     crypto: function (args) {
       const symbol = args[0] ? args[0].toUpperCase() : "BTC";
       this.addOutput(`Fetching ${symbol} price...`, "info");
+      showToast(`Fetching ${symbol} price...`);
 
       apiManager.getCryptoPrice(symbol).then((price) => {
         if (price) {
           this.addOutput(`${symbol}: $${price}`, "success");
+          showToast(`${symbol}: $${price}`);
         }
       });
     },
 
     news: function () {
       this.addOutput("Fetching latest news...", "info");
+      showToast("Fetching latest news...");
       apiManager.getNews().then((articles) => {
         if (articles && articles.length > 0) {
           articles.forEach((article, idx) => {
@@ -2271,6 +2318,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 
     quote: function () {
       this.addOutput("Fetching quote...", "info");
+      showToast("Fetching quote...");
       apiManager.getQuote().then((quote) => {
         if (quote) {
           this.addOutput(`\n"${quote.content}"`);
@@ -2302,6 +2350,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
     "dev.mode.enable": function () {
       this.devMode = true;
       this.addOutput("Developer mode enabled", "success");
+      showToast("Developer mode enabled");
       this.addOutput(
         "Additional debugging information will be displayed",
         "info"
@@ -2354,6 +2403,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         `Matrix effect ${style === "0" ? "enabled" : "disabled"}`,
         "success"
       );
+      showToast(`Matrix effect ${style === "0" ? "enabled" : "disabled"}`);
     },
   };
 

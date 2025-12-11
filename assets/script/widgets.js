@@ -68,12 +68,14 @@ class WidgetManager {
           document.getElementById("weather-display").innerHTML =
             '<div style="text-align:center;color:#ff6600;">GPS Denied</div>';
           systemMonitor.addLog("GPS location denied");
+          showToast("GPS location denied");
         }
       );
     } else {
       document.getElementById("weather-display").innerHTML =
         '<div style="text-align:center;color:#ff6600;">GPS Not Available</div>';
       systemMonitor.addLog("GPS not supported");
+      showToast("GPS not supported");
     }
   }
 
@@ -111,6 +113,7 @@ class WidgetManager {
         document.getElementById("weather-display").innerHTML =
           '<div style="text-align:center;color:#ff6600;">Fetch Failed</div>';
         systemMonitor.addLog("Weather fetch failed");
+        showToast("Weather fetch failed");
       });
   }
 

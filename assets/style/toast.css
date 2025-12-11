@@ -1,0 +1,38 @@
+#toastContainer {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 9999;
+}
+
+.glass-toast {
+  padding: 18px 24px;
+  width: fit-content;
+
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0px 0px rgba(255, 255, 255, 0);
+
+  border-radius: 14px;
+  color: #ffffffcc;
+  font-size: 15px;
+  letter-spacing: 0.4px;
+
+  opacity: 0;
+  transform: translateY(25px);
+  transition: all 0.35s ease;
+}
+
+.glass-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
