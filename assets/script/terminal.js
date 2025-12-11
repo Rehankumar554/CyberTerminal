@@ -1071,9 +1071,44 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           showToast(`Startup command set to: "${val}"`);
           break;
 
+        case "boot":
+          if (val === "off" || val === "false") {
+            this.settings.skipBoot = true;
+            this.saveSettings();
+            this.addOutput("🚫 Boot sequence DISABLED.", "success");
+            showToast("Boot sequence DISABLED");
+          } else if (val === "on" || val === "true") {
+            this.settings.skipBoot = false;
+            this.saveSettings();
+            this.addOutput("✅ Boot sequence ENABLED.", "success");
+            showToast("Boot sequence ENABLED");
+          } else {
+            this.addOutput("Usage: set boot <on|off>", "warning");
+          }
+          break;
+
         default:
           this.addOutput(`Unknown setting: ${prop}`, "error");
       }
+    },
+
+    refresh: function () {
+      this.addOutput("🔄 System refresh initiated...", "warning");
+      this.addOutput("Re-establishing connection...", "info");
+
+      if (typeof showToast === "function") {
+        showToast("Refreshing page...");
+      }
+
+      // 1 second ka delay taaki user message padh sake
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    },
+
+    // Optional: Agar aap 'reboot' command bhi chahte hain same kaam ke liye
+    reboot: function () {
+      this.commands.refresh.call(this);
     },
 
     settings: function (args) {

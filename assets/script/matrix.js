@@ -160,6 +160,23 @@ class BootSequence {
   constructor() {
     this.overlay = document.getElementById("boot-sequence");
     this.textElement = document.getElementById("boot-text");
+
+    // --- NEW LOGIC START ---
+    // Check settings from LocalStorage
+    const savedSettings = localStorage.getItem("terminalSettings");
+    const settings = savedSettings ? JSON.parse(savedSettings) : {};
+
+    // Agar setting me skipBoot true hai, to overlay chupao aur return kar jao
+    if (settings.skipBoot) {
+      if (this.overlay) {
+        this.overlay.style.display = "none"; // Hide immediately
+        this.overlay.style.opacity = "0";
+        this.overlay.style.pointerEvents = "none";
+      }
+      return; // Stop execution here
+    }
+    // --- NEW LOGIC END ---
+
     this.messages = [
       "[ OK ] Starting CyberTerm Boot Sequence...",
       "[ OK ] Loading kernel modules...",
@@ -187,6 +204,7 @@ class BootSequence {
     this.start();
   }
 
+  // Baaki methods (start, showNextMessage) same rahenge...
   start() {
     this.showNextMessage();
   }
