@@ -343,5 +343,11 @@
     "usage": "wiki <query>",
     "man": "NAME\n\twiki - search Wikipedia\n\nSYNOPSIS\n\twiki QUERY\n\nDESCRIPTION\n\tOpens a Wikipedia search for the query.",
     "examples": ["wiki linux", "wiki quantum physics"]
+  },
+  "refresh": {
+    "desc": "Reload the current browser tab",
+    "usage": "refresh",
+    "man": "NAME\n\trefresh - reload current browser tab\n\nSYNOPSIS\n\trefresh\n\nDESCRIPTION\n\tReloads the currently active browser tab to update the page content.",
+    "examples": ["refresh"]
   }
 }
