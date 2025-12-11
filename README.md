@@ -186,6 +186,7 @@ theme set hacker-amber  # Amber hacker theme
 | `theme set <name>`    | Change theme               | `theme set kali`    |
 | `set fontSize <px>`   | Adjust font size           | `set fontSize 16`   |
 | `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`   |
+| `refresh`             | Refresh the terminal       | `refresh`           |
 | `shortcut list`       | View custom shortcuts      | `shortcut list`     |
 
 ### 💡 Help & Fun
@@ -266,7 +267,7 @@ theme set hacker-amber  # Amber hacker theme
  ┃ ┃ ┗ 📜style.css
  ┣ 📜manifest.json
  ┗ 📜newtab.html
-  
+
 ```
 
 ---
