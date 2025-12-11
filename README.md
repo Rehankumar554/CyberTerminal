@@ -462,7 +462,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 Need help?
 
 - 📖 [Read the docs](https://github.com/rehankumar554/cyberterminal/wiki)
-- 💬 [Join discussions](https://github.com/rehankumar554/cyberterminal/discussions)
+- 💬 [Join discussions](https://github.com/Rehankumar554/CyberTerminal/blob/main/discussions.md)
 - 🐛 [Report bugs](https://github.com/rehankumar554/cyberterminal/issues)
 - ⭐ Star the repo if you like it!
 
