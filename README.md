@@ -28,8 +28,6 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 ### 🎨 Visual Features
 
 - **5 Cyber Themes** - Matrix (green), Kali (blue), Ubuntu (orange), Neon Purple, Hacker Amber
-- **Matrix Rain Animation** - Toggleable background effect
-- **Radar Scanner** - Animated cyber radar in corner
 - **CRT Scanline Effect** - Authentic terminal look
 - **Boot Sequence** - Linux-style startup animation
 - **Smooth Animations** - GPU-optimized effects
@@ -266,7 +264,7 @@ cyberterminal/
   - WeatherAPI (weather data)
   - CoinGecko (crypto prices)
   - Custom APIs (quotes, news)
-- **Graphics**: HTML5 Canvas (Matrix rain, radar)
+- **Graphics**: HTML5 Canvas (Matrix rain)
 - **Styling**: Pure CSS with CSS variables
 - **Architecture**: Modular ES6 classes
 
