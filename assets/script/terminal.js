@@ -1342,8 +1342,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           osc.connect(audio.destination);
           osc.start();
           setTimeout(() => osc.stop(), 500); // Beep for 0.5 sec
-
-          alert("⏰ Timer Finished!"); // Browser alert popup
         }
       }, 1000);
     },
@@ -1401,6 +1399,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         } catch (e) {}
 
         alert(`🔔 Alarm: It is ${args[0]}!`);
+        showToast(`Alarm: It is ${args[0]}!`);
       }, timeToWait);
     },
 
