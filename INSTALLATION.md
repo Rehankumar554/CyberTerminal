@@ -153,13 +153,13 @@ The weather widget requires a free API key:
 **Files to Update:**
 
 ```javascript
-// widgets.js (line 3)
+// widgets.js (line 43)
 const API_KEY = "your_actual_api_key_here";
 
 // api.js (line 4)
 this.weatherApiKey = "your_actual_api_key_here";
 
-// terminal.js (line ~680 in weather command)
+// terminal.js (line ~2169 in weather command)
 const apiKey = "your_actual_api_key_here";
 ```
 

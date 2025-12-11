@@ -101,7 +101,7 @@ APIs:
 ---
 
 For questions about licensing, contact:
-Email: your.email@example.com
+Email: work.rehankumarsahu@gmail.com
 GitHub: https://github.com/rehankumar554/cyberterminal
 
 ---

@@ -54,7 +54,6 @@ The first stable release of CyberTerminal - Level 7 Linux-Grade Terminal for Chr
   - Neon Purple
   - Hacker Amber
 - Matrix rain background animation
-- Radar scanner animation
 - CRT scanline effect
 - Boot sequence animation
 - Smooth GPU-optimized transitions
@@ -82,9 +81,11 @@ The first stable release of CyberTerminal - Level 7 Linux-Grade Terminal for Chr
 
 - **File System**: `ls`, `cd`, `pwd`, `cat`, `touch`, `rm`, `mkdir`, `rmdir`, `cp`, `mv`, `head`, `tail`, `wc`
 - **Search**: `find`, `grep`
-- **System**: `clear`, `echo`, `date`, `time`, `whoami`, `uptime`, `history`, `sys.info`, `sys.log`
-- **Network**: `weather`, `crypto`, `news`, `quote`
-- **Utilities**: `theme`, `open`, `neofetch`, `cowsay`, `matrix`, `dev.mode.enable`
+- **Productivity**: `todo`, `note`, `notes list`, `timer`, `alarm`
+- **Web Search**: `google <query>`, `youtube <query>`, `github <query>`, `stackoverflow <query>`, `wiki <query>`, `map <location>`, `translate <text>`, `open <service>`, `quicklink`, `weather <gps>`, `news`, `crypto <symbol>`
+- **System Utilities**: `clear`, `history`, `neofetch`, `date / time`, `whoami`, `sudo <command>`, `sys.info`, `sys.log`, `dev.mode.enable`
+- **Settings & Session**: `session save <name>`, `session save work`, `session load <name>`, `theme set <name>`, `set fontSize <px>`, `set opacity <0-1>`, `shortcut list`
+- **Help & Fun**: `help [cmd]`, `man <cmd>`, `examples <cmd>`, `tutorial`, `tip`, `matrix`, `cowsay <text>`
 
 #### Documentation
 
@@ -139,26 +140,26 @@ The first stable release of CyberTerminal - Level 7 Linux-Grade Terminal for Chr
 #### Settings & Preferences
 
 - [ ] Settings panel UI
-- [ ] Font size customization
-- [ ] Opacity control
-- [ ] Custom prompt
-- [ ] Startup commands
-- [ ] Settings import/export
+- [✓] Font size customization
+- [✓] Opacity control
+- [✓] Custom prompt
+- [✓] Startup commands
+- [✓] Settings import/export
 
 #### Session Management
 
-- [ ] Session save/restore
-- [ ] Named sessions
+- [✓] Session save/restore
+- [✓] Named sessions
 - [ ] Auto-save option
-- [ ] Session list
+- [✓] Session list
 
 #### Enhanced Features
 
-- [ ] More keyboard shortcuts
-- [ ] Custom keybindings
-- [ ] Better error messages
-- [ ] Command suggestions
-- [ ] Improved autocomplete
+- [✓] More keyboard shortcuts
+- [✓] Custom keybindings
+- [✓] Better error messages
+- [✓] Command suggestions
+- [✓] Improved autocomplete
 
 ### 🔮 Planned for v2.0.0
 
@@ -174,9 +175,9 @@ The first stable release of CyberTerminal - Level 7 Linux-Grade Terminal for Chr
 
 #### Productivity
 
-- [ ] Todo list integrated
-- [ ] Notes system
-- [ ] Timer/Pomodoro
+- [✓] Todo list integrated
+- [✓] Notes system
+- [✓] Timer/Pomodoro
 - [ ] Calculator
 - [ ] Text editor (nano/vim mode)
 
@@ -272,7 +273,7 @@ None yet.
 
 ### Contributors
 
-- **Your Name** - Initial development and design
+- **Rehan kumar** - Initial development and design
 
 ### Special Thanks
 
