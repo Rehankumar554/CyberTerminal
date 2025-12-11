@@ -239,19 +239,34 @@ theme set hacker-amber  # Amber hacker theme
 ## 🏗️ Project Structure
 
 ```
-cyberterminal/
-├── manifest.json          # Chrome extension manifest
-├── newtab.html           # Main HTML structure
-├── style.css             # Styling and themes
-├── terminal.js           # Terminal emulator core
-├── fs.js                 # Virtual filesystem
-├── widgets.js            # Widget management
-├── matrix.js             # Visual effects
-├── system.js             # System monitoring
-├── api.js                # API integrations
-├── themes.js             # Theme management
-├── README.md             # Documentation
-└── LICENSE               # MIT License
+📦CyberTerminal
+ ┣ 📂assets
+ ┃ ┣ 📂image
+ ┃ ┃ ┗ 📜icon.png
+ ┃ ┣ 📂jsons
+ ┃ ┃ ┣ 📜cmd_docs.json
+ ┃ ┃ ┣ 📜commands.json
+ ┃ ┃ ┣ 📜services.json
+ ┃ ┃ ┗ 📜tips.json
+ ┃ ┣ 📂screenshots
+ ┃ ┃ ┣ 📜theme_hacker_amber.png
+ ┃ ┃ ┣ 📜theme_kali.png
+ ┃ ┃ ┣ 📜theme_matrix.png
+ ┃ ┃ ┣ 📜theme_neon_purple.png
+ ┃ ┃ ┗ 📜theme_ubuntu.png
+ ┃ ┣ 📂script
+ ┃ ┃ ┣ 📜api.js
+ ┃ ┃ ┣ 📜fs.js
+ ┃ ┃ ┣ 📜matrix.js
+ ┃ ┃ ┣ 📜system.js
+ ┃ ┃ ┣ 📜terminal.js
+ ┃ ┃ ┣ 📜themes.js
+ ┃ ┃ ┗ 📜widgets.js
+ ┃ ┗ 📂style
+ ┃ ┃ ┗ 📜style.css
+ ┣ 📜manifest.json
+ ┗ 📜newtab.html
+  
 ```
 
 ---
