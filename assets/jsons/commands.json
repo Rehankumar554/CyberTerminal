@@ -1,0 +1,86 @@
+{
+    "FILE_SYSTEM": [
+      { "cmd": "ls [path]", "desc": "List directory contents" },
+      { "cmd": "cd <path>", "desc": "Change directory" },
+      { "cmd": "pwd", "desc": "Print working directory" },
+      { "cmd": "cat <file>", "desc": "Display file contents" },
+      { "cmd": "touch <file>", "desc": "Create new file" },
+      { "cmd": "rm <file>", "desc": "Remove file" },
+      { "cmd": "mkdir <dir>", "desc": "Create directory" },
+      { "cmd": "rmdir <dir>", "desc": "Remove directory" },
+      { "cmd": "cp <src> <dest>", "desc": "Copy file (-r for recursive)" },
+      { "cmd": "mv <src> <dest>", "desc": "Move/rename file or directory" },
+      { "cmd": "head <file>", "desc": "Show first 10 lines (-n for custom)" },
+      { "cmd": "tail <file>", "desc": "Show last 10 lines (-n for custom)" },
+      { "cmd": "wc <file>", "desc": "Count lines, words, characters" }
+    ],
+  
+    "SEARCH_FILTER": [
+      { "cmd": "find <pattern>", "desc": "Find files by name/pattern" },
+      { "cmd": "grep \"pattern\" <file>", "desc": "Search text in file (-r for dir)" },
+      { "cmd": "ls | grep \".txt\"", "desc": "Filter command output" }
+    ],
+  
+    "PRODUCTIVITY": [
+      { "cmd": "todo add <task>", "desc": "Add item to Todo list" },
+      { "cmd": "todo list", "desc": "Show Todo list" },
+      { "cmd": "todo done <num>", "desc": "Mark task as completed" },
+      { "cmd": "note <text>", "desc": "Save a quick note" },
+      { "cmd": "notes list", "desc": "View saved notes" },
+      { "cmd": "timer <time>", "desc": "Set timer (10s, 5m, 1h)" },
+      { "cmd": "alarm <HH:MM>", "desc": "Set alarm (24h)" }
+    ],
+  
+    "WEB_SEARCH": [
+      { "cmd": "google <query>", "desc": "Search Google" },
+      { "cmd": "youtube <query>", "desc": "Search YouTube" },
+      { "cmd": "github <query>", "desc": "Search GitHub" },
+      { "cmd": "stackoverflow <query>", "desc": "Search StackOverflow" },
+      { "cmd": "wiki <query>", "desc": "Search Wikipedia" },
+      { "cmd": "map <location>", "desc": "Open Google Maps" },
+      { "cmd": "translate <text>", "desc": "Translate text" },
+      { "cmd": "open <service>", "desc": "Open site (gmail, chatgpt, etc.)" },
+      { "cmd": "quicklink", "desc": "List all quick links" },
+      { "cmd": "weather <gps>", "desc": "Get weather (use 'gps' for local)" },
+      { "cmd": "news", "desc": "Fetch latest news" },
+      { "cmd": "crypto <symbol>", "desc": "Get crypto prices (BTC, ETH)" }
+    ],
+  
+    "SYSTEM_UTILITIES": [
+      { "cmd": "clear", "desc": "Clear terminal screen" },
+      { "cmd": "history", "desc": "Show command history" },
+      { "cmd": "neofetch", "desc": "Show system info (ASCII art)" },
+      { "cmd": "date / time", "desc": "Show current date or time" },
+      { "cmd": "whoami", "desc": "Display current user" },
+      { "cmd": "sudo <command>", "desc": "Execute as superuser (simulation)" },
+      { "cmd": "sys.info", "desc": "Display hardware/software info" },
+      { "cmd": "sys.log", "desc": "Show system logs" },
+      { "cmd": "dev.mode.enable", "desc": "Enable developer debug mode" }
+    ],
+  
+    "SETTINGS_SESSION": [
+      { "cmd": "session save <name>", "desc": "Save current session state" },
+      { "cmd": "session load <name>", "desc": "Load a saved session" },
+      { "cmd": "theme set <name>", "desc": "Change theme" },
+      { "cmd": "set fontSize <px>", "desc": "Adjust font size" },
+      { "cmd": "set opacity <0-1>", "desc": "Adjust transparency" },
+      { "cmd": "shortcut list", "desc": "View custom shortcuts" }
+    ],
+  
+    "HELP_FUN": [
+      { "cmd": "help [cmd]", "desc": "Show help menu" },
+      { "cmd": "man <cmd>", "desc": "Read manual page" },
+      { "cmd": "examples <cmd>", "desc": "Show usage examples" },
+      { "cmd": "tutorial", "desc": "Start interactive tutorial" },
+      { "cmd": "tip", "desc": "Show random terminal tip" },
+      { "cmd": "matrix", "desc": "Toggle Matrix effect" },
+      { "cmd": "cowsay <text>", "desc": "Make the cow speak" }
+    ],
+  
+    "CHAINING": [
+      { "cmd": "cmd1 ; cmd2", "desc": "Sequential execution" },
+      { "cmd": "cmd1 && cmd2", "desc": "Execute if first succeeds" },
+      { "cmd": "cmd1 | cmd2", "desc": "Pipe output" }
+    ]
+  }
+  

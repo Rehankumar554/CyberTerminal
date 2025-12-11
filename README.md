@@ -25,27 +25,11 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 - **Command Chaining** - Support for `;`, `&&`, and `|` operators
 - **Keyboard Shortcuts** - Ctrl+L (clear), Tab (autocomplete), arrows (history)
 
-### 📁 File System Commands
-
-```bash
-# Navigation & Viewing
-ls, cd, pwd, cat, head, tail, wc
-
-# File Operations
-touch, rm, cp, mv, mkdir, rmdir
-
-# Search & Filter
-find, grep (with -r and -i flags)
-
-# Piping & Chaining
-ls | grep ".txt"
-find *.js ; cat file.js
-```
-
 ### 🎨 Visual Features
 
 - **5 Cyber Themes** - Matrix (green), Kali (blue), Ubuntu (orange), Neon Purple, Hacker Amber
 - **Matrix Rain Animation** - Toggleable background effect
+- **Radar Scanner** - Animated cyber radar in corner
 - **CRT Scanline Effect** - Authentic terminal look
 - **Boot Sequence** - Linux-style startup animation
 - **Smooth Animations** - GPU-optimized effects
@@ -58,29 +42,6 @@ find *.js ; cat file.js
 - **💭 Daily Quotes** - Inspirational programming quotes
 - **📊 System Monitor** - Real CPU & RAM usage (browser-based)
 - **📝 Event Logs** - System activity monitoring
-
-### 🌐 Network & API Commands
-
-```bash
-weather              # GPS-based weather
-weather gps          # Refresh location
-crypto BTC           # Bitcoin price
-crypto ETH           # Ethereum price
-news                 # Latest tech news
-quote                # Random quote
-```
-
-### 🎯 Utility Commands
-
-```bash
-theme set matrix     # Change theme
-open gmail           # Open web services
-neofetch             # System info banner
-cowsay "text"        # ASCII cow
-matrix               # Toggle matrix effect
-sys.info             # Detailed system info
-sys.log              # View system logs
-```
 
 ---
 
@@ -149,137 +110,131 @@ theme set hacker-amber  # Amber hacker theme
 
 ## 📖 Command Reference
 
-### File System Operations
+### 📁 File System
 
-| Command              | Description             | Example                   |
-| -------------------- | ----------------------- | ------------------------- |
-| `ls [path]`          | List directory contents | `ls`, `ls -a`, `ls /home` |
-| `cd <path>`          | Change directory        | `cd /logs`, `cd ..`       |
-| `pwd`                | Print working directory | `pwd`                     |
-| `cat <file>`         | Display file contents   | `cat welcome.txt`         |
-| `touch <file>`       | Create new file         | `touch myfile.txt`        |
-| `rm <file>`          | Remove file             | `rm oldfile.txt`          |
-| `mkdir <dir>`        | Create directory        | `mkdir projects`          |
-| `rmdir <dir>`        | Remove directory        | `rmdir old_folder`        |
-| `cp <src> <dest>`    | Copy file/directory     | `cp file.txt backup.txt`  |
-| `cp -r <src> <dest>` | Copy recursively        | `cp -r folder backup`     |
-| `mv <src> <dest>`    | Move/rename             | `mv old.txt new.txt`      |
-| `man <cmd>`          | Full manual page        | `man grep`                |
-| `examples`           | Usage examples          | `examples cp`             |
-| `tutorial`           | Interactive guide       | `tutorial start`          |
-| `tip`                | Random tip              | `tip`                     |
-| `head <file>`        | First 10 lines          | `head readme.md`          |
-| `head -n 5 <file>`   | First N lines           | `head -n 5 file.txt`      |
-| `tail <file>`        | Last 10 lines           | `tail logs.txt`           |
-| `tail -n 5 <file>`   | Last N lines            | `tail -n 20 logs.txt`     |
-| `wc <file>`          | Word count              | `wc welcome.txt`          |
+| Command           | Description                         | Example                  |
+| ----------------- | ----------------------------------- | ------------------------ |
+| `ls [path]`       | List directory contents             | `ls`, `ls -a`            |
+| `cd <path>`       | Change directory                    | `cd /logs`, `cd ..`      |
+| `pwd`             | Print working directory             | `pwd`                    |
+| `cat <file>`      | Display file contents               | `cat welcome.txt`        |
+| `touch <file>`    | Create new file                     | `touch myfile.txt`       |
+| `rm <file>`       | Remove file                         | `rm oldfile.txt`         |
+| `mkdir <dir>`     | Create directory                    | `mkdir projects`         |
+| `rmdir <dir>`     | Remove directory                    | `rmdir old_folder`       |
+| `cp <src> <dest>` | Copy file (-r for recursive)        | `cp file.txt backup.txt` |
+| `mv <src> <dest>` | Move/rename file or directory       | `mv old.txt new.txt`     |
+| `head <file>`     | Show first 10 lines (-n for custom) | `head readme.md`         |
+| `tail <file>`     | Show last 10 lines (-n for custom)  | `tail logs.txt`          |
+| `wc <file>`       | Count lines, words, characters      | `wc welcome.txt`         |
 
-### Search & Filter
+### 🔍 Search & Filter
 
-| Command                 | Description        | Example                       |
-| ----------------------- | ------------------ | ----------------------------- |
-| `find <pattern>`        | Find files by name | `find *.txt`, `find welcome*` |
-| `find <path> <pattern>` | Search in path     | `find /logs system*`          |
-| `grep "pattern" <file>` | Search in file     | `grep "Linux" readme.md`      |
-| `grep -r "pattern"`     | Recursive search   | `grep -r "error" /logs`       |
-| `grep -i "pattern"`     | Case-insensitive   | `grep -i "welcome"`           |
-| `cmd \| grep "pattern"` | Filter output      | `ls \| grep ".txt"`           |
+| Command                 | Description                      | Example                  |
+| ----------------------- | -------------------------------- | ------------------------ |
+| `find <pattern>`        | Find files by name/pattern       | `find *.txt`             |
+| `grep "pattern" <file>` | Search text in file (-r for dir) | `grep "Linux" readme.md` |
+| `ls \| grep ".txt"`     | Filter command output            | `ls \| grep ".txt"`      |
 
-### System Commands
+### ✅ Productivity
 
-| Command       | Description        | Example              |
-| ------------- | ------------------ | -------------------- |
-| `clear`       | Clear screen       | `clear` or `Ctrl+L`  |
-| `echo <text>` | Print text         | `echo "Hello World"` |
-| `date`        | Show date          | `date`               |
-| `time`        | Show time          | `time`               |
-| `whoami`      | Current user       | `whoami`             |
-| `uptime`      | System uptime      | `uptime`             |
-| `history`     | Command history    | `history`            |
-| `history -c`  | Clear history      | `history -c`         |
-| `sys.info`    | System information | `sys.info`           |
-| `sys.log`     | System logs        | `sys.log`            |
+| Command           | Description             | Example                 |
+| ----------------- | ----------------------- | ----------------------- |
+| `todo add <task>` | Add item to Todo list   | `todo add "Buy milk"`   |
+| `todo list`       | Show Todo list          | `todo list`             |
+| `todo done <num>` | Mark task as completed  | `todo done 1`           |
+| `note <text>`     | Save a quick note       | `note "Meeting at 3pm"` |
+| `notes list`      | View saved notes        | `notes list`            |
+| `timer <time>`    | Set timer (10s, 5m, 1h) | `timer 25m`             |
+| `alarm <HH:MM>`   | Set alarm (24h)         | `alarm 14:30`           |
 
-### Network & API
+### 🌐 Web Search
 
-| Command           | Description  | Example                    |
-| ----------------- | ------------ | -------------------------- |
-| `weather`         | GPS weather  | `weather`                  |
-| `weather gps`     | Refresh GPS  | `weather gps`              |
-| `crypto <symbol>` | Crypto price | `crypto BTC`, `crypto ETH` |
-| `news`            | Tech news    | `news`                     |
-| `quote`           | Random quote | `quote`                    |
+| Command                 | Description                       | Example                      |
+| ----------------------- | --------------------------------- | ---------------------------- |
+| `google <query>`        | Search Google                     | `google javascript tutorial` |
+| `youtube <query>`       | Search YouTube                    | `youtube funny cats`         |
+| `github <query>`        | Search GitHub                     | `github reactjs`             |
+| `stackoverflow <query>` | Search StackOverflow              | `stackoverflow center div`   |
+| `wiki <query>`          | Search Wikipedia                  | `wiki Albert Einstein`       |
+| `map <location>`        | Open Google Maps                  | `map New York`               |
+| `translate <text>`      | Translate text                    | `translate hello en-hi`      |
+| `open <service>`        | Open site (gmail, chatgpt, etc.)  | `open gmail`                 |
+| `quicklink`             | List all quick links              | `quicklink`                  |
+| `weather <gps>`         | Get weather (use 'gps' for local) | `weather gps`                |
+| `news`                  | Fetch latest news                 | `news`                       |
+| `crypto <symbol>`       | Get crypto prices (BTC, ETH)      | `crypto BTC`                 |
 
-### Productivity & Widgets
+### 🛠️ System Utilities
 
-| Command         | Description          | Example                      |
-| --------------- | -------------------- | ---------------------------- |
-| `todo`          | Manage tasks         | `todo add "Buy milk"`        |
-| `note`          | Save quick note      | `note "Meeting ID: 123"`     |
-| `notes`         | View/Clear notes     | `notes list`                 |
-| `timer`         | Set countdown        | `timer 25m`                  |
-| `alarm`         | Set alarm clock      | `alarm 14:30`                |
-| `google`        | Google Search        | `google javascript tutorial` |
-| `youtube`       | YouTube Search       | `youtube funny cats`         |
-| `github`        | GitHub Search        | `github reactjs`             |
-| `stackoverflow` | StackOverflow Search | `stackoverflow center div`   |
-| `wiki`          | Wikipedia Search     | `wiki Albert Einstein`       |
-| `translate`     | Google Translate     | `translate hello en-hi`      |
-| `map`           | Google Maps          | `map New York`               |
-| `open`          | Open popular sites   | `open gmail`                 |
-| `news`          | Fetch latest news    | `news`                       |
-| `crypto`        | Check crypto price   | `crypto BTC`                 |
-| `weather`       | Check weather        | `weather gps`                |
+| Command           | Description                       | Example             |
+| ----------------- | --------------------------------- | ------------------- |
+| `clear`           | Clear terminal screen             | `clear` or `Ctrl+L` |
+| `history`         | Show command history              | `history`           |
+| `neofetch`        | Show system info (ASCII art)      | `neofetch`          |
+| `date / time`     | Show current date or time         | `date`, `time`      |
+| `whoami`          | Display current user              | `whoami`            |
+| `sudo <command>`  | Execute as superuser (simulation) | `sudo ls`           |
+| `sys.info`        | Display hardware/software info    | `sys.info`          |
+| `sys.log`         | Show system logs                  | `sys.log`           |
+| `dev.mode.enable` | Enable developer debug mode       | `dev.mode.enable`   |
 
-### Utilities
+### ⚙️ Settings & Session
 
-| Command            | Description          | Example                      |
-| ------------------ | -------------------- | ---------------------------- |
-| `theme set <name>` | Change theme         | `theme set kali`             |
-| `set               | Change settings      | set fontSize 18              |
-| `open <service>`   | Open web service     | `open gmail`, `open github`  |
-| `neofetch`         | System banner        | `neofetch`                   |
-| `cowsay <text>`    | ASCII cow            | `cowsay "Moo!"`              |
-| `matrix`           | Toggle matrix effect | `matrix`                     |
-| `dev.mode.enable`  | Developer mode       | `dev.mode.enable`            |
-| `setting`          | Export/Import config | settings export              |
-| `shortcu`          | Custom keyboard keys | shortcut set "Ctrl+Q" clear" |
-| `session`          | Save/Load state      | session save work            |
+| Command               | Description                | Example             |
+| --------------------- | -------------------------- | ------------------- |
+| `session save <name>` | Save current session state | `session save work` |
+| `session load <name>` | Load a saved session       | `session load work` |
+| `theme set <name>`    | Change theme               | `theme set kali`    |
+| `set fontSize <px>`   | Adjust font size           | `set fontSize 16`   |
+| `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`   |
+| `shortcut list`       | View custom shortcuts      | `shortcut list`     |
 
-### Command Chaining
+### 💡 Help & Fun
 
-| Operator | Description           | Example                |
-| -------- | --------------------- | ---------------------- |
-| `;`      | Sequential execution  | `date ; time ; whoami` |
-| `&&`     | Conditional execution | `cd /logs && ls`       |
-| `\|`     | Pipe output           | `ls \| grep ".txt"`    |
+| Command          | Description                | Example             |
+| ---------------- | -------------------------- | ------------------- |
+| `help [cmd]`     | Show help menu             | `help`, `help grep` |
+| `man <cmd>`      | Read manual page           | `man ls`            |
+| `examples <cmd>` | Show usage examples        | `examples cp`       |
+| `tutorial`       | Start interactive tutorial | `tutorial`          |
+| `tip`            | Show random terminal tip   | `tip`               |
+| `matrix`         | Toggle Matrix effect       | `matrix`            |
+| `cowsay <text>`  | Make the cow speak         | `cowsay "Hello!"`   |
+
+### 🔗 Command Chaining
+
+| Command        | Description               | Example                |
+| -------------- | ------------------------- | ---------------------- |
+| `cmd1 ; cmd2`  | Sequential execution      | `date ; time ; whoami` |
+| `cmd1 && cmd2` | Execute if first succeeds | `cd /logs && ls`       |
+| `cmd1 \| cmd2` | Pipe output               | `ls \| grep ".txt"`    |
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut            | Action                                                                                                          |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `↑` Arrow           | Previous command                                                                                                |
-| `↓` Arrow           | Next command                                                                                                    |
-| `Tab`               | Autocomplete command                                                                                            |
-| `Ctrl + L`          | Clear screen                                                                                                    |
-| `Ctrl + C`          | Cancel input                                                                                                    |
-| `Enter`             | Execute command                                                                                                 |
-| `Ctrl + A`          | Move cursor to the start of the line                                                                            |
-| `Ctrl + E`          | Move cursor to the end of the line                                                                              |
-| `Alt + B`           | Move cursor back one word                                                                                       |
-| `Alt + F`           | Move cursor forward one word                                                                                    |
-| `Ctrl + U`          | Clear the entire input line                                                                                     |
-| `Ctrl + K`          | Delete text from the cursor position to the end of the line                                                     |
-| `Ctrl + W`          | Delete the previous word                                                                                        |
-| `Alt + .(Dot)`      | Paste the last argument from the previous command (e.g., if you typed mkdir test, pressing this will type test) |
-| `Ctrl + D`          | Exit/Logout (only works if the input line is empty)                                                             |
-| `Ctrl + Z`          | Suspend the current process (Simulation)                                                                        |
-| `Ctrl + R`          | Start Reverse Search to find past commands                                                                      |
-| `Ctrl + R` (Again)  | Find the next previous match while searching                                                                    |
-| `Ctrl + G` or `ESC` | Cancel the search mode                                                                                          |
-| `Backspace`         | Delete characters from your search query                                                                        |
+| Shortcut            | Action                       |
+| ------------------- | ---------------------------- |
+| `↑` Arrow           | Previous command             |
+| `↓` Arrow           | Next command                 |
+| `Tab`               | Autocomplete command         |
+| `Ctrl + L`          | Clear screen                 |
+| `Ctrl + C`          | Cancel input                 |
+| `Enter`             | Execute command              |
+| `Ctrl + A`          | Move cursor to start         |
+| `Ctrl + E`          | Move cursor to end           |
+| `Alt + B`           | Move cursor back one word    |
+| `Alt + F`           | Move cursor forward one word |
+| `Ctrl + U`          | Clear entire input line      |
+| `Ctrl + K`          | Delete to end of line        |
+| `Ctrl + W`          | Delete previous word         |
+| `Alt + .` (Dot)     | Paste last argument          |
+| `Ctrl + D`          | Exit/Logout (if line empty)  |
+| `Ctrl + Z`          | Suspend process (simulation) |
+| `Ctrl + R`          | Reverse search history       |
+| `Ctrl + G` or `ESC` | Cancel search mode           |
+| `Backspace`         | Delete characters in search  |
 
 ---
 
@@ -478,7 +433,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 
 - GitHub: [@Rehankumar554](https://github.com/Rehankumar554)
 - Email: work.rehankumarsahu@gmail.com
-<!-- - Website: [yourwebsite.com](https://yourwebsite.com) -->
 
 ---
 
