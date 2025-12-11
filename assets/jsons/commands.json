@@ -64,6 +64,7 @@
       { "cmd": "theme set <name>", "desc": "Change theme" },
       { "cmd": "set fontSize <px>", "desc": "Adjust font size" },
       { "cmd": "set opacity <0-1>", "desc": "Adjust transparency" },
+      { "cmd": "refresh", "desc": "Refresh the terminal" },
       { "cmd": "shortcut list", "desc": "View custom shortcuts" }
     ],
   
