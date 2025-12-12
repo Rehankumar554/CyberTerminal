@@ -60,102 +60,6 @@ class MatrixRain {
   }
 }
 
-class RadarScanner {
-  constructor() {
-    this.canvas = document.getElementById("radar-canvas");
-    this.ctx = this.canvas.getContext("2d");
-    this.angle = 0;
-    this.blips = [];
-    this.generateBlips();
-    this.animate();
-  }
-
-  generateBlips() {
-    for (let i = 0; i < 15; i++) {
-      this.blips.push({
-        angle: Math.random() * Math.PI * 2,
-        distance: Math.random() * 80 + 10,
-        opacity: Math.random() * 0.5 + 0.5,
-      });
-    }
-  }
-
-  draw() {
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 10;
-
-    // Clear canvas
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Draw grid circles
-    this.ctx.strokeStyle = "#00ff0033";
-    this.ctx.lineWidth = 1;
-    for (let i = 1; i <= 3; i++) {
-      this.ctx.beginPath();
-      this.ctx.arc(centerX, centerY, (radius / 3) * i, 0, Math.PI * 2);
-      this.ctx.stroke();
-    }
-
-    // Draw crosshairs
-    this.ctx.beginPath();
-    this.ctx.moveTo(centerX, centerY - radius);
-    this.ctx.lineTo(centerX, centerY + radius);
-    this.ctx.moveTo(centerX - radius, centerY);
-    this.ctx.lineTo(centerX + radius, centerY);
-    this.ctx.stroke();
-
-    // Draw scanning line
-    this.ctx.save();
-    this.ctx.translate(centerX, centerY);
-    this.ctx.rotate(this.angle);
-
-    const gradient = this.ctx.createLinearGradient(0, 0, radius, 0);
-    gradient.addColorStop(0, "rgba(0, 255, 0, 0)");
-    gradient.addColorStop(0.5, "rgba(0, 255, 0, 0.3)");
-    gradient.addColorStop(1, "rgba(0, 255, 0, 0.8)");
-
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(radius, 0);
-    this.ctx.strokeStyle = gradient;
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
-
-    this.ctx.restore();
-
-    // Draw blips
-    this.blips.forEach((blip) => {
-      const x = centerX + Math.cos(blip.angle) * blip.distance;
-      const y = centerY + Math.sin(blip.angle) * blip.distance;
-
-      this.ctx.fillStyle = `rgba(0, 255, 0, ${blip.opacity})`;
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, 3, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Fade blips that the scanner has passed
-      const angleDiff = Math.abs(this.angle - blip.angle);
-      if (angleDiff < 0.5 || angleDiff > Math.PI * 2 - 0.5) {
-        blip.opacity = Math.min(1, blip.opacity + 0.1);
-      } else {
-        blip.opacity = Math.max(0.1, blip.opacity - 0.01);
-      }
-    });
-
-    this.angle += 0.02;
-    if (this.angle > Math.PI * 2) {
-      this.angle = 0;
-    }
-  }
-
-  animate() {
-    this.draw();
-    requestAnimationFrame(() => this.animate());
-  }
-}
-
 class BootSequence {
   constructor() {
     this.overlay = document.getElementById("boot-sequence");
@@ -224,6 +128,5 @@ window.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => {
     new BootSequence();
     new MatrixRain();
-    new RadarScanner();
   }, 100);
 });

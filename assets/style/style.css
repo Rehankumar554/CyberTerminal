@@ -34,19 +34,6 @@ body {
   opacity: 0.15;
 }
 
-#radar-canvas {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 200px;
-  height: 200px;
-  z-index: 1;
-  opacity: 0.6;
-  border: 2px solid var(--border-color);
-  border-radius: 50%;
-  background: #00000088;
-}
-
 .boot-overlay {
   position: fixed;
   top: 0;
