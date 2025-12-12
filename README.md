@@ -1,6 +1,6 @@
 # 🚀 CyberTerminal - Level 7 Linux-Grade Terminal for Chrome
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Chrome](https://img.shields.io/badge/chrome-extension-orange.svg)
 
@@ -15,6 +15,16 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 ---
 
 ## ✨ Features
+
+### 🌐 Advanced Browser Tab Manager (v1.2.0)
+
+Control your browser tabs entirely from the keyboard without touching the mouse.
+
+- **Smart Control**: List, switch, and organize tabs using simple commands.
+- **Bulk Actions**: Close, reload, pin, or mute multiple tabs at once (e.g., `tabs close 1 3 5`).
+- **Memory Saver**: Suspend inactive tabs to free up RAM (`tabs discard`).
+- **Duplicate Cleaner**: Auto-detect and close duplicate open tabs (`tabs dedup`).
+- **Multi-Opening**: Open multiple sites instantly (e.g., `tabs new 2 google 1 youtube`).
 
 #### New Tools (v1.1)
 
