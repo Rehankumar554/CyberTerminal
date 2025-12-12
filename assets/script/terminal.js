@@ -246,7 +246,8 @@ class Terminal {
 
     if (matrixCanvas) {
       // Agar enabled hai to 0.15 opacity, nahi to 0
-      matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
+      // matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
+      matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.7" : "0";
     }
 
     if (this.settings.zenEnabled) {
@@ -267,29 +268,45 @@ class Terminal {
       }
     }
 
-    // Agar nahi hai, to naya banayein
+    // --- DYNAMIC CSS INJECTION ---
     if (!styleTag) {
       styleTag = document.createElement("style");
       styleTag.id = "dynamic-term-style";
       document.head.appendChild(styleTag);
     }
 
-    // Is tag ke andar hum CSS rules likhenge jo turant apply honge
-    // Hum '!important' use kar rahe hain taaki purana CSS issue na kare
     styleTag.innerHTML = `
-      /* Font Size Control */
-      .output-line, #input, .prompt, .terminal-body {
-        font-size: ${size}px !important;
-        line-height: ${Math.round(
-          size * 1.4
-        )}px !important; /* Spacing bhi adjust karein */
-      }
+    /* Font Size Control */
+    .output-line, #input, .prompt, .terminal-body {
+      font-size: ${size}px !important;
+      line-height: ${Math.round(size * 1.4)}px !important;
+    }
+    
+    /* Advanced Opacity Control */
+    .terminal-section {
+      /* Background Color: Opacity user ke hisaab se (0 means fully transparent black) */
+      background: rgba(0, 0, 0, ${opacity}) !important;
       
-      /* Opacity Control */
-      .terminal-section, .terminal-container {
-        opacity: ${opacity};
-      }
-    `;
+      /* Blur Effect: Hamesha ON rahega (Frosted Glass Look) */
+      backdrop-filter: blur(3px) !important;
+      -webkit-backdrop-filter: blur(3px) !important;
+      
+      /* Shadow aur Border: Glass feel ke liye zaroori hain */
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    /* Scanlines (TV effect) ko 0 opacity par hata dete hain taaki saaf dikhe */
+    .terminal-section::before {
+      display: ${opacity < 0.1 ? "none" : "block"} !important;
+    }
+    
+    /* Widget Transparency Update */
+    .widget {
+       background: rgba(10, 14, 39, ${Math.max(opacity, 0.2)}) !important;
+       backdrop-filter: blur(10px);
+    }
+  `;
   }
 
   // Update this existing method to support custom prompt
@@ -1204,18 +1221,22 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 
         case "opacity":
           const op = parseFloat(val);
-          if (isNaN(op) || op < 0.1 || op > 1.0) {
+
+          // Updated Validation: Ab 0.0 se 1.0 tak allowed hai
+          if (isNaN(op) || op < 0.0 || op > 1.0) {
             this.addOutput(
-              "Error: Opacity must be between 0.1 and 1.0",
+              "Error: Opacity must be between 0.0 and 1.0",
               "error"
             );
             return;
           }
+
           this.settings.opacity = op;
           this.applySettings();
           this.saveSettings();
           this.addOutput(`Opacity set to ${op}`, "success");
-          showToast(`Opacity set to ${op}`);
+          if (typeof showToast === "function")
+            showToast(`Opacity set to ${op}`);
           break;
 
         case "prompt":
@@ -2622,7 +2643,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       // 2. Apply Visual Change
       const canvas = document.getElementById("matrix-canvas");
       if (canvas) {
-        canvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
+        canvas.style.opacity = this.settings.matrixEnabled ? "0.7" : "0";
       }
 
       // 3. Save to LocalStorage (Taaki refresh ke baad yaad rahe)
