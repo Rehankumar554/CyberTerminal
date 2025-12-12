@@ -1007,7 +1007,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       if (args.length < 2) {
         this.addOutput("Usage: set <property> <value>", "warning");
         this.addOutput(
-          "Properties: fontSize, opacity, prompt, startupCmd",
+          "Properties: fontSize, opacity, prompt, startupCmd, boot",
           "info"
         );
         return;
