@@ -34,6 +34,36 @@ body {
   opacity: 0.15;
 }
 
+/* Network Status Colors */
+.net-good {
+  color: #00ff00; /* Bright Green */
+  font-weight: bold;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+.net-poor {
+  color: #ffaa00; /* Orange/Amber */
+  font-weight: bold;
+  text-shadow: 0 0 5px #ffaa00;
+}
+
+.net-offline {
+  color: #ff0000; /* Red */
+  font-weight: bold;
+  text-shadow: 0 0 5px #ff0000;
+  animation: blink-status 1s infinite;
+}
+
+@keyframes blink-status {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .boot-overlay {
   position: fixed;
   top: 0;

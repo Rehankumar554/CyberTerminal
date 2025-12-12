@@ -10,6 +10,7 @@ class SystemMonitor {
   init() {
     this.addLog("[INIT] System monitor started");
     this.simulateUsage();
+    this.initNetworkMonitoring();
   }
 
   simulateUsage() {
@@ -32,6 +33,70 @@ class SystemMonitor {
       this.ramHistory.push(ram);
       if (this.ramHistory.length > 60) this.ramHistory.shift();
     }, 2000);
+  }
+
+  initNetworkMonitoring() {
+    // 1. Initial Check (Load hote hi)
+    this.updateNetworkStatus();
+
+    // 2. Event Listeners (Jab net ON/OFF ho tab turant pakde)
+    window.addEventListener("online", () => {
+      this.updateNetworkStatus();
+      this.addLog("Network connection restored");
+      if (typeof showToast === "function") showToast("🟢 System is Online");
+    });
+
+    window.addEventListener("offline", () => {
+      this.updateNetworkStatus();
+      this.addLog("Network connection lost");
+      if (typeof showToast === "function") showToast("🔴 System is Offline");
+    });
+
+    // 3. Connection Change Listener (Agar browser support kare)
+    if (navigator.connection) {
+      navigator.connection.addEventListener("change", () => {
+        this.updateNetworkStatus();
+      });
+    }
+
+    // 4. LIVE POLLING (Ye hai wo magic jo bina refresh ke update karega)
+    // Har 2 second (2000ms) mein status check karo
+    setInterval(() => {
+      this.updateNetworkStatus();
+    }, 2000);
+  }
+
+  updateNetworkStatus() {
+    const el = document.getElementById("int_status");
+    if (!el) return;
+
+    // 1. Check Offline Status
+    if (!navigator.onLine) {
+      el.innerHTML = "Internet: <span class='net-offline'>OFFLINE</span>";
+      return;
+    }
+
+    // 2. Check Connection Quality (Chromium browsers only)
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+
+    if (connection) {
+      const speed = connection.downlink; // Mbps
+      const type = connection.effectiveType; // '4g', '3g', '2g', 'slow-2g'
+
+      // Logic for Good vs Poor
+      // Agar 4g hai aur speed 1.5 Mbps se zyada hai to GOOD, varna POOR
+      if (type === "4g" && speed > 1.5) {
+        el.innerHTML = `Internet: <span class='net-good'>GOOD (${speed} Mbps)</span>`;
+      } else {
+        el.innerHTML = `Internet: <span class='net-poor'>POOR (${type})</span>`;
+      }
+    } else {
+      // Fallback agar Network API support nahi karta (Firefox etc.)
+      el.innerHTML = "Internet: <span class='net-good'>ONLINE</span>";
+    }
   }
 
   getCpuUsage() {

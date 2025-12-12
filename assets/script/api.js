@@ -1,7 +1,7 @@
 class APIManager {
   constructor() {
     // Hardcoded WeatherAPI key
-    this.weatherApiKey = "YOUR_ACTUAL_API_KEY_HERE";
+    this.weatherApiKey = "794f3ea37db442de8f642856250712";
     this.weatherCity = "";
   }
 

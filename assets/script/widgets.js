@@ -40,7 +40,7 @@ class WidgetManager {
 
   initWeather() {
     // Hardcoded API key - replace with your own WeatherAPI key
-    const API_KEY = "YOUR_ACTUAL_API_KEY_HERE";
+    const API_KEY = "794f3ea37db442de8f642856250712";
 
     // Automatically get GPS location on load
     this.getGPSLocation(API_KEY);
@@ -123,109 +123,174 @@ class WidgetManager {
     setInterval(() => this.fetchQuote(), 3600000);
   }
 
-  fetchQuote() {
-    const quotes = [
-      {
+  async fetchQuote() {
+    try {
+      // JSON file se quotes fetch karein
+      // Ensure karein ki file 'assets/jsons/quotes.json' location par ho
+      const response = await fetch("assets/jsons/quote.json");
+
+      if (!response.ok) {
+        throw new Error("Failed to load quotes.json");
+      }
+
+      const quotes = await response.json();
+
+      if (!quotes || quotes.length === 0) {
+        throw new Error("Quotes list is empty");
+      }
+
+      // Random quote select karein
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+      // DOM Update karein
+      const quoteTextEl = document.getElementById("quote-text");
+      const quoteAuthorEl = document.getElementById("quote-author");
+
+      if (quoteTextEl) {
+        quoteTextEl.textContent = `"${randomQuote.content}"`;
+      }
+      if (quoteAuthorEl) {
+        quoteAuthorEl.textContent = `— ${randomQuote.author}`;
+      }
+
+      // System Log update
+      if (typeof systemMonitor !== "undefined") {
+        systemMonitor.addLog("Quote updated");
+      }
+    } catch (error) {
+      console.error("Quote Fetch Error:", error);
+
+      // Fallback (Agar file load na ho to default quote dikhayein)
+      const fallbackQuote = {
         content: "The only way to do great work is to love what you do.",
         author: "Steve Jobs",
-      },
-      {
-        content: "Innovation distinguishes between a leader and a follower.",
-        author: "Steve Jobs",
-      },
-      {
-        content: "Code is like humor. When you have to explain it, it's bad.",
-        author: "Cory House",
-      },
-      {
-        content: "First, solve the problem. Then, write the code.",
-        author: "John Johnson",
-      },
-      {
-        content: "Experience is the name everyone gives to their mistakes.",
-        author: "Oscar Wilde",
-      },
-      {
-        content: "In order to be irreplaceable, one must always be different.",
-        author: "Coco Chanel",
-      },
-      {
-        content: "Java is to JavaScript what car is to Carpet.",
-        author: "Chris Heilmann",
-      },
-      { content: "Knowledge is power.", author: "Francis Bacon" },
-      {
-        content:
-          "Sometimes it pays to stay in bed on Monday, rather than spending the rest of the week debugging Monday's code.",
-        author: "Dan Salomon",
-      },
-      {
-        content:
-          "Perfection is achieved not when there is nothing more to add, but rather when there is nothing more to take away.",
-        author: "Antoine de Saint-Exupery",
-      },
-      {
-        content: "Ruby is rubbish! PHP is phpantastic!",
-        author: "Nikita Popov",
-      },
-      {
-        content: "Code never lies, comments sometimes do.",
-        author: "Ron Jeffries",
-      },
-      {
-        content: "Simplicity is the soul of efficiency.",
-        author: "Austin Freeman",
-      },
-      {
-        content: "Before software can be reusable it first has to be usable.",
-        author: "Ralph Johnson",
-      },
-      {
-        content: "Make it work, make it right, make it fast.",
-        author: "Kent Beck",
-      },
-    ];
+      };
 
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-    document.getElementById(
-      "quote-text"
-    ).textContent = `"${randomQuote.content}"`;
-    document.getElementById(
-      "quote-author"
-    ).textContent = `— ${randomQuote.author}`;
-    systemMonitor.addLog("Quote updated");
+      const quoteTextEl = document.getElementById("quote-text");
+      const quoteAuthorEl = document.getElementById("quote-author");
+
+      if (quoteTextEl) quoteTextEl.textContent = `"${fallbackQuote.content}"`;
+      if (quoteAuthorEl)
+        quoteAuthorEl.textContent = `— ${fallbackQuote.author}`;
+    }
   }
 
   initCrypto() {
-    this.fetchCrypto();
-    // Refresh crypto prices every 2 minutes
-    setInterval(() => this.fetchCrypto(), 120000);
+    this.CRYPTO_INTERVAL_MS = 120000; // 2 Minutes
+
+    const now = Date.now();
+    const lastUpdate = parseInt(
+      localStorage.getItem("crypto_last_update_ts") || "0"
+    );
+    const timeSinceLast = now - lastUpdate;
+    const timeSinceSec = (timeSinceLast / 1000).toFixed(0);
+
+    // --- 1. INITIAL LOAD CHECK (Refresh Logic) ---
+    console.log(`🔍 [Crypto Init] Checking status...`);
+
+    if (lastUpdate > 0 && timeSinceLast < this.CRYPTO_INTERVAL_MS) {
+      // 2 Minute nahi hue -> Cache Use karo
+      console.log(
+        `♻️ [Refresh Detected] Last update was only ${timeSinceSec}s ago (< 120s). Using LocalStorage Cache.`
+      );
+      this.restoreCachedCrypto();
+    } else {
+      // Time poora ho gaya ya first load hai -> Fetch karo
+      const reason =
+        lastUpdate === 0
+          ? "First Load"
+          : `Time Expired (${timeSinceSec}s > 120s)`;
+      console.log(`🚀 [Fresh Load] Fetching new data. Reason: ${reason}`);
+      this.fetchCrypto();
+    }
+
+    // --- 2. INTERVAL TIMER (Auto-Update Logic) ---
+    setInterval(() => {
+      if (document.hidden) {
+        console.log(
+          "💤 [Auto-Update] Interval triggered but Tab is HIDDEN. Skipping API call."
+        );
+      } else {
+        console.log(
+          "⏰ [Auto-Update] Interval triggered and Tab is VISIBLE. Fetching data..."
+        );
+        this.fetchCrypto();
+      }
+    }, this.CRYPTO_INTERVAL_MS);
+
+    // --- 3. VISIBILITY CHANGE (User Returns Logic) ---
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        // User wapas aaya hai, check karo kitna time hua
+        const currentNow = Date.now();
+        const currentLastTs = parseInt(
+          localStorage.getItem("crypto_last_update_ts") || "0"
+        );
+        const diff = currentNow - currentLastTs;
+        const diffSec = (diff / 1000).toFixed(0);
+
+        if (diff >= this.CRYPTO_INTERVAL_MS) {
+          console.log(
+            `👋 [User Returned] Stale data detected (Age: ${diffSec}s). Updating immediately...`
+          );
+          this.fetchCrypto();
+        } else {
+          console.log(
+            `👋 [User Returned] Data is still fresh (Age: ${diffSec}s). No update needed.`
+          );
+        }
+      }
+    });
   }
 
   fetchCrypto() {
-    // Simulated crypto prices that update with realistic variations
-    const updatePrice = (basePrice, lastPrice) => {
-      if (!lastPrice) return basePrice;
-      const change = (Math.random() - 0.5) * basePrice * 0.02; // 2% max change
-      return Math.max(
-        basePrice * 0.8,
-        Math.min(basePrice * 1.2, lastPrice + change)
-      );
-    };
+    if (typeof apiManager === "undefined") {
+      console.warn("❌ [Error] apiManager not found.");
+      return;
+    }
 
-    if (!this.lastBtcPrice) this.lastBtcPrice = 43250;
-    if (!this.lastEthPrice) this.lastEthPrice = 2280;
+    console.log("📡 [API] Sending request to fetch crypto prices...");
 
-    this.lastBtcPrice = updatePrice(43250, this.lastBtcPrice);
-    this.lastEthPrice = updatePrice(2280, this.lastEthPrice);
+    // 1. Fetch BTC
+    apiManager.getCryptoPrice("BTC").then((price) => {
+      if (price) {
+        const el = document.getElementById("btc-price");
+        if (el) el.textContent = price;
+        localStorage.setItem("cached_btc", price);
+      }
+    });
 
-    document.getElementById("btc-price").textContent = `${Math.round(
-      this.lastBtcPrice
-    ).toLocaleString()}`;
-    document.getElementById("eth-price").textContent = `${Math.round(
-      this.lastEthPrice
-    ).toLocaleString()}`;
-    systemMonitor.addLog("Crypto prices updated");
+    // 2. Fetch ETH
+    apiManager.getCryptoPrice("ETH").then((price) => {
+      if (price) {
+        const el = document.getElementById("eth-price");
+        if (el) el.textContent = price;
+        localStorage.setItem("cached_eth", price);
+      }
+    });
+
+    // Timestamp save karo
+    localStorage.setItem("crypto_last_update_ts", Date.now());
+
+    if (typeof systemMonitor !== "undefined") {
+      systemMonitor.addLog("Crypto prices updated");
+    }
+  }
+
+  restoreCachedCrypto() {
+    console.log("💾 [Cache] Restoring prices from LocalStorage...");
+    const btc = localStorage.getItem("cached_btc");
+    const eth = localStorage.getItem("cached_eth");
+
+    if (btc) {
+      const el = document.getElementById("btc-price");
+      if (el) el.textContent = btc;
+    }
+
+    if (eth) {
+      const el = document.getElementById("eth-price");
+      if (el) el.textContent = eth;
+    }
   }
 
   initSystemMonitor() {

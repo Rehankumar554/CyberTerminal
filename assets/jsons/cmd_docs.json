@@ -349,5 +349,35 @@
     "usage": "refresh",
     "man": "NAME\n\trefresh - reload current browser tab\n\nSYNOPSIS\n\trefresh\n\nDESCRIPTION\n\tReloads the currently active browser tab to update the page content.",
     "examples": ["refresh"]
+  },
+  "calc": {
+    "desc": "Evaluate mathematical expressions",
+    "usage": "calc <expression>",
+    "man": "NAME\n\tcalc - in-terminal calculator\n\nSYNOPSIS\n\tcalc EXPRESSION\n\nDESCRIPTION\n\tEvaluates a mathematical expression and prints the result. Supports basic operators (+, -, *, /, ()).\n\nEXAMPLES\n\tcalc 10 + 5\n\tcalc (100 * 2) / 5",
+    "examples": ["calc 2 + 2", "calc 10 * (5 + 2)"]
+  },
+  "bookmark": {
+    "desc": "Manage custom web bookmarks",
+    "usage": "bookmark <action> [args]",
+    "man": "NAME\n\tbookmark - manage custom web bookmarks\n\nSYNOPSIS\n\tbookmark ACTION [NAME] [URL]\n\nACTIONS\n\tadd <name> <url>   Save a bookmark\n\tremove <name>      Delete a bookmark\n\tlist               Show all bookmarks\n\topen <name>        Open a bookmark",
+    "examples": ["bookmark add mygit github.com/myrepo", "bookmark list", "open mygit"]
+  },
+  "passgen": {
+    "desc": "Generate secure passwords",
+    "usage": "passgen [length]",
+    "man": "NAME\n\tpassgen - secure password generator\n\nSYNOPSIS\n\tpassgen [LENGTH]\n\nDESCRIPTION\n\tGenerates a random, secure password of the specified length (default 12). Automatically copies to clipboard.",
+    "examples": ["passgen", "passgen 24"]
+  },
+  "zen": {
+    "desc": "Toggle Focus/Zen mode",
+    "usage": "zen <on|off>",
+    "man": "NAME\n\tzen - toggle focus mode\n\nSYNOPSIS\n\tzen [on|off]\n\nDESCRIPTION\n\tHides all widgets and centers the terminal for a distraction-free coding environment. State is persistent.",
+    "examples": ["zen on", "zen off"]
+  },
+  "alias": {
+    "desc": "Create custom command shortcuts",
+    "usage": "alias <action> [name] [command]",
+    "man": "NAME\n\talias - manage command aliases\n\nSYNOPSIS\n\talias ACTION [NAME] [COMMAND]\n\nACTIONS\n\tset <name> <cmd>   Create a shortcut\n\tremove <name>      Delete a shortcut\n\tlist               Show all aliases\n\nDESCRIPTION\n\tAllows you to create short names for long commands.",
+    "examples": ["alias set cls clear", "alias set ll ls -la", "alias list"]
   }
 }

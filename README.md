@@ -1,6 +1,6 @@
 # 🚀 CyberTerminal - Level 7 Linux-Grade Terminal for Chrome
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Chrome](https://img.shields.io/badge/chrome-extension-orange.svg)
 
@@ -15,6 +15,13 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 ---
 
 ## ✨ Features
+
+#### New Tools (v1.1)
+- **Calculator**: In-terminal math evaluation (`calc`).
+- **Bookmark Manager**: Save and open your own links (`bookmark`, `open`).
+- **Password Gen**: Create secure passwords instantly (`passgen`).
+- **Zen Mode**: Hide widgets for focused work (`zen`).
+- **Aliases**: Create your own command shortcuts (`alias`).
 
 ### 🖥️ Terminal Emulator
 
@@ -136,15 +143,17 @@ theme set hacker-amber  # Amber hacker theme
 
 ### ✅ Productivity
 
-| Command           | Description             | Example                 |
-| ----------------- | ----------------------- | ----------------------- |
-| `todo add <task>` | Add item to Todo list   | `todo add "Buy milk"`   |
-| `todo list`       | Show Todo list          | `todo list`             |
-| `todo done <num>` | Mark task as completed  | `todo done 1`           |
-| `note <text>`     | Save a quick note       | `note "Meeting at 3pm"` |
-| `notes list`      | View saved notes        | `notes list`            |
-| `timer <time>`    | Set timer (10s, 5m, 1h) | `timer 25m`             |
-| `alarm <HH:MM>`   | Set alarm (24h)         | `alarm 14:30`           |
+| Command           | Description              | Example                 |
+| ----------------- | ------------------------ | ----------------------- |
+| `todo add <task>` | Add item to Todo list    | `todo add "Buy milk"`   |
+| `todo list`       | Show Todo list           | `todo list`             |
+| `todo done <num>` | Mark task as completed   | `todo done 1`           |
+| `note <text>`     | Save a quick note        | `note "Meeting at 3pm"` |
+| `notes list`      | View saved notes         | `notes list`            |
+| `timer <time>`    | Set timer (10s, 5m, 1h)  | `timer 25m`             |
+| `alarm <HH:MM>`   | Set alarm (24h)          | `alarm 14:30`           |
+| `calc <expr>`     | Evaluate math expression | `calc 10 + 5 * 2`       |
+| `passgen [len]`   | Generate password        | `passgen 16`            |
 
 ### 🌐 Web Search
 
@@ -162,6 +171,7 @@ theme set hacker-amber  # Amber hacker theme
 | `weather <gps>`         | Get weather (use 'gps' for local) | `weather gps`                |
 | `news`                  | Fetch latest news                 | `news`                       |
 | `crypto <symbol>`       | Get crypto prices (BTC, ETH)      | `crypto BTC`                 |
+| `bookmark`              | Manage custom bookmarks           | `bookmark add mysite url`    |
 
 ### 🛠️ System Utilities
 
@@ -188,6 +198,8 @@ theme set hacker-amber  # Amber hacker theme
 | `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`   |
 | `refresh`             | Refresh the terminal       | `refresh`           |
 | `shortcut list`       | View custom shortcuts      | `shortcut list`     |
+| `zen <on\|off>` | Toggle Focus/Zen mode   | `zen on`            |
+| `alias`         | Create command shortcuts| `alias set cls clear`|
 
 ### 💡 Help & Fun
 

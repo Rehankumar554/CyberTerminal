@@ -77,6 +77,7 @@ class BootSequence {
         this.overlay.style.opacity = "0";
         this.overlay.style.pointerEvents = "none";
       }
+      document.dispatchEvent(new Event("boot-finished"));
       return; // Stop execution here
     }
     // --- NEW LOGIC END ---
@@ -118,6 +119,12 @@ class BootSequence {
       this.textElement.textContent += this.messages[this.currentIndex] + "\n";
       this.currentIndex++;
       setTimeout(() => this.showNextMessage(), 150);
+    } else {
+      // <--- YE ELSE BLOCK ADD KAREIN --->
+      // Animation complete signal
+      setTimeout(() => {
+        document.dispatchEvent(new Event("boot-finished"));
+      }, 500);
     }
   }
 }

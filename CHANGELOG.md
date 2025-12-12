@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-12-12
+
+### 🚀 New Features
+
+#### Productivity Tools
+
+- **Calculator (`calc`)**: Added a safe, in-terminal mathematical expression evaluator.
+- **Password Generator (`passgen`)**: Generate secure, random passwords with custom lengths.
+- **Zen Mode (`zen`)**: Toggle focus mode by hiding widgets and centering the terminal.
+
+#### Web & Navigation
+
+- **Bookmark Manager (`bookmark`)**: Save, list, and open custom URLs. Includes smart duplicate detection against system services.
+- **Smart Open (`open`)**: Enhanced `open` command to launch both system services and user bookmarks.
+
+#### System
+
+- **Aliases (`alias`)**: Create custom shortcuts for long or complex commands.
+- **Setup Wizard**: Added a first-time user setup for username configuration.
+- **Network Monitor**: Added real-time internet status (Online/Offline/Speed) to the UI.
+
+### 🐛 Bug Fixes & Improvements
+
+- **Security**: Prevented spaces in usernames during setup.
+- **Math**: Fixed regex issues in the calculator to support spaces and standard operators.
+- **URL Handling**: Improved URL normalization for bookmarks to prevent duplicates.
+- **Responsiveness**: Made Zen Mode responsive (percentage-based width) instead of fixed pixels.
+- **Persistence**: Saved Zen Mode state across sessions.
+
+---
+
 ## [1.0.0] - 2025-12-10
 
 ### 🎉 Initial Release

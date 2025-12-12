@@ -8,8 +8,9 @@ class Terminal {
     this.currentPath = "/home/user";
     this.username = "user";
     this.hostname = "cyberterm";
+    this.isSetupMode = false;
     this.devMode = false;
-    this.services = {};
+    zenEnabled: false, (this.services = {});
     this.commandBuffer = "";
     // Search State
     this.isSearching = false;
@@ -25,6 +26,7 @@ class Terminal {
       opacity: 0.95,
       customPrompt: null,
       startupCmd: null,
+      matrixEnabled: true,
       shortcuts: {}, // e.g. "Ctrl+q": "clear"
     };
 
@@ -46,7 +48,6 @@ class Terminal {
     this.updatePrompt();
     this.setupEventListeners();
     this.loadTips();
-    this.showWelcome();
     this.loadDocs();
     this.loadServices();
 
@@ -58,10 +59,56 @@ class Terminal {
       }, 600);
     }
 
+    const isSetupComplete = localStorage.getItem("cyber_setup_complete");
+
+    if (isSetupComplete) {
+      // NORMAL MODE
+      this.loadUsername(); // Saved username load karein
+      this.updatePrompt();
+      this.loadTips();
+      this.showWelcome();
+      this.runStartupCmd();
+    } else {
+      // SETUP MODE (First Time)
+      this.isSetupMode = true;
+      this.prompt.textContent = ""; // Prompt chupayein
+      this.input.placeholder = "System initializing...";
+      this.input.disabled = true;
+
+      // Boot khatam hone ka wait karein
+      document.addEventListener("boot-finished", () => {
+        this.input.disabled = false;
+        this.input.placeholder = "";
+        this.input.focus();
+
+        this.output.innerHTML = ""; // Screen clear
+        this.addOutput("╔══════════════════════════════════════╗", "success");
+        this.addOutput("║     NEW USER CONFIGURATION           ║", "success");
+        this.addOutput("╚══════════════════════════════════════╝", "success");
+        this.addOutput("\nSystem requires a username to proceed.", "info");
+
+        this.prompt.textContent = "create_user: ";
+      });
+    }
     // Daily tip wala code...
     setTimeout(() => {
       // Agar aapne tips.json bhi lagaya hai to 'loadTips()' call karein
       // Nahi to purana code rakhein
+      if (this.commands["tip.daily"]) {
+        this.commands["tip.daily"].call(this);
+      }
+    }, 500);
+  }
+
+  runStartupCmd() {
+    if (this.settings.startupCmd && this.settings.startupCmd !== "none") {
+      setTimeout(() => {
+        this.executeCommand(this.settings.startupCmd);
+      }, 600);
+    }
+
+    // Daily tip check
+    setTimeout(() => {
       if (this.commands["tip.daily"]) {
         this.commands["tip.daily"].call(this);
       }
@@ -190,9 +237,35 @@ class Terminal {
   applySettings() {
     const size = this.settings.fontSize;
     const opacity = this.settings.opacity;
+    const matrixCanvas = document.getElementById("matrix-canvas");
+    const container = document.querySelector(".container");
+    const widgets = document.querySelector(".widgets-section");
 
     // Check karein ki kya dynamic style tag pehle se maujud hai
     let styleTag = document.getElementById("dynamic-term-style");
+
+    if (matrixCanvas) {
+      // Agar enabled hai to 0.15 opacity, nahi to 0
+      matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
+    }
+
+    if (this.settings.zenEnabled) {
+      // Apply Zen Styles
+      if (widgets) widgets.style.display = "none";
+      if (container) {
+        container.style.width = "70%";
+        container.style.margin = "0 auto";
+        container.style.maxWidth = "none";
+      }
+    } else {
+      // Reset Styles
+      if (widgets) widgets.style.display = "flex";
+      if (container) {
+        container.style.width = "";
+        container.style.margin = "";
+        container.style.maxWidth = "";
+      }
+    }
 
     // Agar nahi hai, to naya banayein
     if (!styleTag) {
@@ -251,6 +324,16 @@ class Terminal {
         // Optionally add to history or just run quietly
         return;
       }
+    }
+
+    if (this.isSetupMode) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const val = this.input.value.trim();
+        this.handleSetupInput(val); // Naya handler call karein
+        this.input.value = "";
+      }
+      return; // Baaki shortcuts block karein
     }
 
     // 1. HANDLE SEARCH MODE (Ctrl + R Active)
@@ -317,6 +400,7 @@ class Terminal {
         this.searchQuery = "";
         this.searchMatchIndex = -1;
         this.originalPrompt = this.prompt.textContent;
+        showToast("Search Mode On");
         this.updateSearchPrompt("success");
         this.input.value = "";
       }
@@ -363,6 +447,7 @@ class Terminal {
     if (e.ctrlKey && e.key === "l") {
       e.preventDefault();
       this.clearScreen();
+      showToast("Screen cleared");
       return;
     }
 
@@ -372,6 +457,7 @@ class Terminal {
       const currentInput = this.input.value;
       this.addOutput(this.prompt.textContent + " " + currentInput + "^C");
       this.input.value = "";
+      showToast("Command cancled");
       return;
     }
 
@@ -487,7 +573,66 @@ class Terminal {
     }
   }
 
+  handleSetupInput(input) {
+    // Validation: Empty check
+    if (!input) {
+      this.addOutput("Error: Username cannot be empty.", "error");
+      return;
+    }
+
+    // Validation: Space check
+    if (input.includes(" ")) {
+      this.addOutput("Error: Username cannot contain spaces.", "error");
+      this.addOutput("Try format like: user, dev, admin_01", "warning");
+      return;
+    }
+
+    // Validation: Length check (Optional)
+    if (input.length > 15) {
+      this.addOutput("Error: Username too long (max 15 chars).", "error");
+      return;
+    }
+
+    // SAVE & PROCEED
+    this.username = input;
+    localStorage.setItem("username", input);
+    localStorage.setItem("cyber_setup_complete", "true");
+
+    this.addOutput(`\nSuccess! User '${input}' created.`, "success");
+    this.addOutput("Initializing user environment...", "info");
+
+    // Delay for effect
+    this.isSetupMode = false;
+    this.input.disabled = true;
+
+    setTimeout(() => {
+      this.input.disabled = false;
+      this.clearScreen();
+      this.updatePrompt(); // Ab prompt me 'input@cyberterm' dikhega
+      this.showWelcome();
+      this.loadTips();
+      this.input.focus();
+    }, 1500);
+  }
+
   handleInput(e) {
+    // --- SETUP MODE: Prevent Spaces ---
+    if (this.isSetupMode) {
+      const val = e.target.value;
+
+      // Agar value mein space hai
+      if (val.includes(" ")) {
+        // Space ko turant remove karein
+        this.input.value = val.replace(/\s/g, "");
+
+        // Warning Toast dikhayein
+        if (typeof showToast === "function") {
+          showToast("Spaces are not allowed in username!");
+        }
+      }
+    }
+
+    // Normal buffer update
     this.commandBuffer = e.target.value;
   }
 
@@ -676,6 +821,23 @@ class Terminal {
     const parts = input.trim().split(/\s+/);
     const cmd = parts[0].toLowerCase();
     const args = parts.slice(1);
+
+    const storedAliases = JSON.parse(
+      localStorage.getItem("userAliases") || "{}"
+    );
+    if (storedAliases[cmd]) {
+      // Alias ki value nikalo (e.g., "ls -la")
+      const realCommandStr = storedAliases[cmd];
+
+      // Asli command aur naye arguments ko mix karo
+      // Example: Agar alias "ll" = "ls -la" hai aur user "ll /home" type kare
+      // To ban jayega: "ls -la /home"
+      const fullCommand = realCommandStr + " " + args.join(" ");
+
+      // Recursively execute karo (taaki naye command ko run kiya ja sake)
+      this.executeSingleCommand(fullCommand);
+      return; // Yahan se return ho jao, aage ka code mat chalao
+    }
 
     if (this.commands[cmd]) {
       // Execute command
@@ -907,6 +1069,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             history: this.history,
             user: this.username,
             theme: this.currentTheme,
+            matrixEnabled: this.settings.matrixEnabled,
             // Capture Widget HTML content
             weatherWidget: document.getElementById("weather-display")
               ? document.getElementById("weather-display").innerHTML
@@ -936,6 +1099,12 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           this.currentPath = s.path;
           this.history = s.history || [];
           this.username = s.user || "user";
+
+          if (typeof s.matrixEnabled !== "undefined") {
+            this.settings.matrixEnabled = s.matrixEnabled;
+            this.saveSettings(); // Global settings update karein
+            this.applySettings(); // Visuals update karein
+          }
 
           // 2. Restore Theme (Updated Logic)
           if (s.theme) {
@@ -2049,32 +2218,48 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 
     open: function (args) {
       if (args.length === 0) {
-        this.addOutput("Usage: open <service_name>", "warning");
-        this.addOutput("Type 'quicklink' to see available services.", "info");
+        this.addOutput("Usage: open <name>", "warning");
+        this.addOutput("Opens a service or saved bookmark.", "info");
         return;
       }
 
-      const serviceName = args[0].toLowerCase();
+      const name = args[0].toLowerCase(); // Case insensitive lookup
 
-      // Check if services are loaded
-      if (Object.keys(this.services).length === 0) {
-        this.addOutput("Error: Services data not loaded yet.", "error");
-        return;
-      }
-
-      if (this.services[serviceName]) {
-        const url = this.services[serviceName];
-        this.addOutput(`Opening ${serviceName}...`, "success");
-        showToast(`Opening ${serviceName}...`);
-        this.addOutput(`URL: ${url}`, "info");
+      // 1. Check System Services
+      if (this.services[name]) {
+        const url = this.services[name];
+        this.addOutput(`Opening Service: ${name}...`, "success");
+        if (typeof showToast === "function") showToast(`Opening ${name}...`);
         window.open(url, "_blank");
-      } else {
-        this.addOutput(`Error: Service '${serviceName}' not found.`, "error");
-        this.addOutput(
-          "Type 'quicklink' to view all available services.",
-          "warning"
-        );
+        return;
       }
+
+      // 2. Check User Bookmarks
+      const bookmarks = JSON.parse(
+        localStorage.getItem("userBookmarks") || "{}"
+      );
+      // Bookmark names might be case sensitive depending on how you saved them,
+      // but let's try direct match first, then lowercase match
+      let targetUrl =
+        bookmarks[name] ||
+        bookmarks[Object.keys(bookmarks).find((k) => k.toLowerCase() === name)];
+
+      if (targetUrl) {
+        this.addOutput(`Opening Bookmark: ${name}...`, "success");
+        if (typeof showToast === "function") showToast(`Opening ${name}...`);
+        window.open(targetUrl, "_blank");
+        return;
+      }
+
+      // 3. Not Found
+      this.addOutput(
+        `Error: '${name}' not found in services or bookmarks.`,
+        "error"
+      );
+      this.addOutput(
+        "Type 'quicklink' for services or 'bookmark list' for bookmarks.",
+        "warning"
+      );
     },
 
     quicklink: function (args) {
@@ -2258,7 +2443,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             this.addOutput("Fetching weather data...", "info");
             showToast("Fetching weather data...");
 
-            const apiKey = "YOUR_WEATHERAPI_KEY_HERE";
+            const apiKey = "794f3ea37db442de8f642856250712";
 
             fetch(
               `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}&aqi=no`
@@ -2431,14 +2616,355 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
     },
 
     matrix: function () {
+      // 1. Toggle the setting
+      this.settings.matrixEnabled = !this.settings.matrixEnabled;
+
+      // 2. Apply Visual Change
       const canvas = document.getElementById("matrix-canvas");
-      const style = canvas.style.opacity;
-      canvas.style.opacity = style === "0" ? "0.15" : "0";
-      this.addOutput(
-        `Matrix effect ${style === "0" ? "enabled" : "disabled"}`,
-        "success"
-      );
-      showToast(`Matrix effect ${style === "0" ? "enabled" : "disabled"}`);
+      if (canvas) {
+        canvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
+      }
+
+      // 3. Save to LocalStorage (Taaki refresh ke baad yaad rahe)
+      this.saveSettings();
+
+      // 4. Feedback
+      const status = this.settings.matrixEnabled ? "enabled" : "disabled";
+      this.addOutput(`Matrix effect ${status}.`, "success");
+
+      if (typeof showToast === "function") {
+        showToast(`Matrix effect ${status}`);
+      }
+    },
+
+    calc: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: calc <expression>", "warning");
+        this.addOutput("Example: calc 10 + 5 * 2", "info");
+        return;
+      }
+
+      try {
+        // Space hata kar expression join karein
+        const expression = args.join("");
+
+        // --- Safe Math Evaluator (No eval) ---
+        const safeEval = (expr) => {
+          // Invalid chars check
+          if (/[^0-9+\-*/().]/.test(expr))
+            throw new Error("Invalid characters");
+
+          const ops = [];
+          const values = [];
+
+          const precedence = (op) => {
+            if (op === "+" || op === "-") return 1;
+            if (op === "*" || op === "/") return 2;
+            return 0;
+          };
+
+          const applyOp = () => {
+            const b = parseFloat(values.pop());
+            const a = parseFloat(values.pop());
+            const op = ops.pop();
+            if (op === "+") values.push(a + b);
+            else if (op === "-") values.push(a - b);
+            else if (op === "*") values.push(a * b);
+            else if (op === "/") values.push(a / b);
+          };
+
+          // Tokenizer: Numbers aur Operators alag karein
+          const tokens = expr.match(/(\d+(\.\d+)?|[\+\-\*\/\(\)])/g);
+          if (!tokens) throw new Error("Empty expression");
+
+          for (let token of tokens) {
+            if (!isNaN(parseFloat(token))) {
+              values.push(token);
+            } else if (token === "(") {
+              ops.push(token);
+            } else if (token === ")") {
+              while (ops.length && ops[ops.length - 1] !== "(") applyOp();
+              ops.pop();
+            } else if (["+", "-", "*", "/"].includes(token)) {
+              while (
+                ops.length &&
+                precedence(ops[ops.length - 1]) >= precedence(token)
+              ) {
+                applyOp();
+              }
+              ops.push(token);
+            }
+          }
+          while (ops.length) applyOp();
+          return values[0];
+        };
+        // -------------------------------------
+
+        const result = safeEval(expression);
+
+        if (result === undefined || isNaN(result) || !isFinite(result)) {
+          throw new Error("Calculation failed");
+        }
+
+        this.addOutput(`${args.join(" ")} = ${result}`, "success");
+      } catch (e) {
+        this.addOutput(`Error: ${e.message}`, "error");
+      }
+    },
+
+    bookmark: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: bookmark <action> [args]", "warning");
+        this.addOutput("Actions: add, remove, list, open", "info");
+        return;
+      }
+
+      const action = args[0];
+      const name = args[1];
+      const urlInput = args[2];
+
+      let bookmarks = JSON.parse(localStorage.getItem("userBookmarks") || "{}");
+
+      // --- HELPER: URL Normalizer for Smart Comparison ---
+      const normalizeUrl = (url) => {
+        try {
+          const fullUrl = url.startsWith("http") ? url : `https://${url}`;
+          const urlObj = new URL(fullUrl);
+          // Remove 'www.' and trailing slash for cleaner comparison
+          return (
+            urlObj.hostname.replace(/^www\./, "") + urlObj.pathname
+          ).replace(/\/$/, "");
+        } catch (e) {
+          return url.replace(/\/$/, ""); // Fallback
+        }
+      };
+
+      if (action === "add") {
+        if (!name || !urlInput) {
+          this.addOutput("Error: Name and URL are required.", "error");
+          return;
+        }
+
+        const finalUrl = urlInput.startsWith("http")
+          ? urlInput
+          : `https://${urlInput}`;
+        const cleanInputUrl = normalizeUrl(finalUrl);
+
+        // 1. Check in Services (Smart Detect)
+        let existingService = null;
+        for (const [svcName, svcUrl] of Object.entries(this.services)) {
+          if (normalizeUrl(svcUrl) === cleanInputUrl) {
+            existingService = svcName;
+            break;
+          }
+        }
+
+        if (existingService) {
+          this.addOutput(`⚠️ URL match found in System Services!`, "warning");
+          this.addOutput(`Already exists as: '${existingService}'`, "info");
+          this.addOutput(
+            `Use 'open ${existingService}' to launch it.`,
+            "success"
+          );
+          return;
+        }
+
+        // 2. Check in Existing Bookmarks (Smart Detect)
+        let existingBookmark = null;
+        for (const [bkName, bkUrl] of Object.entries(bookmarks)) {
+          if (normalizeUrl(bkUrl) === cleanInputUrl) {
+            existingBookmark = bkName;
+            break;
+          }
+        }
+
+        if (existingBookmark) {
+          this.addOutput(
+            `⚠️ Bookmark already exists as '${existingBookmark}'`,
+            "warning"
+          );
+          return;
+        }
+
+        bookmarks[name] = finalUrl;
+        localStorage.setItem("userBookmarks", JSON.stringify(bookmarks));
+        this.addOutput(`🔖 Bookmark saved: ${name} -> ${finalUrl}`, "success");
+        if (typeof showToast === "function") showToast("Bookmark saved");
+      } else if (action === "remove") {
+        if (!name) return this.addOutput("Error: Name required.", "error");
+
+        if (bookmarks[name]) {
+          delete bookmarks[name];
+          localStorage.setItem("userBookmarks", JSON.stringify(bookmarks));
+          this.addOutput(`🗑️ Bookmark '${name}' removed.`, "success");
+        } else {
+          this.addOutput(`Error: Bookmark '${name}' not found.`, "error");
+        }
+      } else if (action === "list") {
+        const keys = Object.keys(bookmarks);
+        if (keys.length === 0) {
+          this.addOutput("No custom bookmarks found.", "info");
+        } else {
+          this.addOutput("\n🔖 YOUR BOOKMARKS:", "info");
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+          keys.forEach((k) =>
+            this.addOutput(`${k.padEnd(20)} -> ${bookmarks[k]}`)
+          );
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        }
+      } else if (action === "open") {
+        // Redirect to main open command
+        this.commands.open.call(this, [name]);
+      } else {
+        this.addOutput(`Unknown action: ${action}`, "error");
+      }
+    },
+
+    passgen: function (args) {
+      // Usage check: Agar user ne length nahi di
+      if (args.length === 0) {
+        this.addOutput("Usage: passgen <length>", "warning");
+        this.addOutput("Example: passgen 16", "info");
+        return;
+      }
+
+      const length = parseInt(args[0]);
+
+      if (isNaN(length) || length < 4 || length > 128) {
+        this.addOutput("Error: Length must be between 4 and 128.", "error");
+        return;
+      }
+
+      const charset =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let password = "";
+
+      // Random password generation
+      for (let i = 0, n = charset.length; i < length; ++i) {
+        password += charset.charAt(Math.floor(Math.random() * n));
+      }
+
+      this.addOutput(`🔑 Generated Password (${length} chars):`, "info");
+      this.addOutput(password, "success");
+
+      // Auto copy to clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard
+          .writeText(password)
+          .then(() => {
+            if (typeof showToast === "function")
+              showToast("Password copied to clipboard!");
+          })
+          .catch(() => {});
+      }
+    },
+
+    zen: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: zen <on|off>", "warning");
+        this.addOutput(
+          "Description: Hides widgets for focused terminal usage.",
+          "info"
+        );
+        return;
+      }
+
+      if (args[0] === "on") {
+        // 1. Update State
+        this.settings.zenEnabled = true;
+
+        // 2. Save to Storage (Persistent)
+        this.saveSettings();
+
+        // 3. Apply Visuals
+        this.applySettings();
+
+        this.addOutput("🧘 Zen mode enabled. Distractions hidden.", "success");
+        if (typeof showToast === "function") showToast("Zen Mode ON");
+      } else if (args[0] === "off") {
+        // 1. Update State
+        this.settings.zenEnabled = false;
+
+        // 2. Save to Storage
+        this.saveSettings();
+
+        // 3. Apply Visuals
+        this.applySettings();
+
+        this.addOutput("Zen mode disabled.", "info");
+        if (typeof showToast === "function") showToast("Zen Mode OFF");
+      } else {
+        this.addOutput("Usage: zen <on|off>", "warning");
+      }
+    },
+
+    alias: function (args) {
+      // Usage check
+      if (args.length === 0) {
+        this.addOutput("Usage: alias <action> [args]", "warning");
+        this.addOutput("Actions:", "info");
+        this.addOutput(
+          "  set <name> <command>  - Create a shortcut (e.g., alias set ll ls -la)"
+        );
+        this.addOutput("  remove <name>         - Remove a shortcut");
+        this.addOutput("  list                  - Show all aliases");
+        return;
+      }
+
+      const action = args[0];
+
+      let aliases = JSON.parse(localStorage.getItem("userAliases") || "{}");
+
+      if (action === "set") {
+        if (args.length < 3) {
+          this.addOutput("Usage: alias set <name> <command string>", "error");
+          return;
+        }
+        const name = args[1];
+        // Baaki ke saare arguments ko jodkar command banao
+        const cmd = args.slice(2).join(" ");
+
+        // Reserved commands ko overwrite hone se bachayein (Optional safety)
+        if (this.commands[name]) {
+          this.addOutput(
+            `Warning: '${name}' is a system command. Overriding it might cause issues.`,
+            "warning"
+          );
+        }
+
+        aliases[name] = cmd;
+        localStorage.setItem("userAliases", JSON.stringify(aliases));
+        this.addOutput(`🔗 Alias set: '${name}' -> '${cmd}'`, "success");
+        if (typeof showToast === "function") showToast("Alias saved");
+      } else if (action === "list") {
+        const keys = Object.keys(aliases);
+        if (keys.length === 0) {
+          this.addOutput("No custom aliases found.", "info");
+        } else {
+          this.addOutput("\n🔗 CUSTOM ALIASES:", "info");
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+          keys.forEach((k) => {
+            this.addOutput(`${k.padEnd(10)} = ${aliases[k]}`);
+          });
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        }
+      } else if (action === "remove") {
+        const name = args[1];
+        if (!name) {
+          this.addOutput("Error: Alias name required.", "error");
+          return;
+        }
+        if (aliases[name]) {
+          delete aliases[name];
+          localStorage.setItem("userAliases", JSON.stringify(aliases));
+          this.addOutput(`Alias '${name}' removed.`, "success");
+          if (typeof showToast === "function") showToast("Alias removed");
+        } else {
+          this.addOutput(`Error: Alias '${name}' not found.`, "error");
+        }
+      } else {
+        this.addOutput(`Unknown action: ${action}`, "error");
+      }
     },
   };
 
