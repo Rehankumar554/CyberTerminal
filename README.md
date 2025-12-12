@@ -17,6 +17,7 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 ## ✨ Features
 
 #### New Tools (v1.1)
+
 - **Calculator**: In-terminal math evaluation (`calc`).
 - **Bookmark Manager**: Save and open your own links (`bookmark`, `open`).
 - **Password Gen**: Create secure passwords instantly (`passgen`).
@@ -173,6 +174,21 @@ theme set hacker-amber  # Amber hacker theme
 | `crypto <symbol>`       | Get crypto prices (BTC, ETH)      | `crypto BTC`                 |
 | `bookmark`              | Manage custom bookmarks           | `bookmark add mysite url`    |
 
+### 🌐 Browser Tab Manager
+
+| Command               | Description                           | Example             |
+| --------------------- | ------------------------------------- | ------------------- |
+| `tabs list [query]`   | List tabs (with optional search)      | `tabs list google`  |
+| `tabs switch <sn>`    | Switch to tab number <sn>             | `tabs switch 2`     |
+| `tabs new [n] [url]`  | Open n new tabs with optional URL     | `tabs new 2 github` |
+| `tabs close <sn...>`  | Close specific tabs (space separated) | `tabs close 1 3 5`  |
+| `tabs close all`      | Close all tabs in the window          | `tabs close all`    |
+| `tabs reload <args>`  | Reload specific or all tabs           | `tabs reload 2`     |
+| `tabs mute/unmute`    | Mute/Unmute audio                     | `tabs mute all`     |
+| `tabs pin/unpin`      | Pin/Unpin tabs                        | `tabs pin 1`        |
+| `tabs discard <args>` | Suspend tabs to free RAM              | `tabs discard all`  |
+| `tabs dedup`          | Remove duplicate open tabs            | `tabs dedup`        |
+
 ### 🛠️ System Utilities
 
 | Command           | Description                       | Example             |
@@ -189,17 +205,17 @@ theme set hacker-amber  # Amber hacker theme
 
 ### ⚙️ Settings & Session
 
-| Command               | Description                | Example             |
-| --------------------- | -------------------------- | ------------------- |
-| `session save <name>` | Save current session state | `session save work` |
-| `session load <name>` | Load a saved session       | `session load work` |
-| `theme set <name>`    | Change theme               | `theme set kali`    |
-| `set fontSize <px>`   | Adjust font size           | `set fontSize 16`   |
-| `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`   |
-| `refresh`             | Refresh the terminal       | `refresh`           |
-| `shortcut list`       | View custom shortcuts      | `shortcut list`     |
-| `zen <on\|off>` | Toggle Focus/Zen mode   | `zen on`            |
-| `alias`         | Create command shortcuts| `alias set cls clear`|
+| Command               | Description                | Example               |
+| --------------------- | -------------------------- | --------------------- |
+| `session save <name>` | Save current session state | `session save work`   |
+| `session load <name>` | Load a saved session       | `session load work`   |
+| `theme set <name>`    | Change theme               | `theme set kali`      |
+| `set fontSize <px>`   | Adjust font size           | `set fontSize 16`     |
+| `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`     |
+| `refresh`             | Refresh the terminal       | `refresh`             |
+| `shortcut list`       | View custom shortcuts      | `shortcut list`       |
+| `zen <on\|off>`       | Toggle Focus/Zen mode      | `zen on`              |
+| `alias`               | Create command shortcuts   | `alias set cls clear` |
 
 ### 💡 Help & Fun
 

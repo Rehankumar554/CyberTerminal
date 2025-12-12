@@ -360,7 +360,11 @@
     "desc": "Manage custom web bookmarks",
     "usage": "bookmark <action> [args]",
     "man": "NAME\n\tbookmark - manage custom web bookmarks\n\nSYNOPSIS\n\tbookmark ACTION [NAME] [URL]\n\nACTIONS\n\tadd <name> <url>   Save a bookmark\n\tremove <name>      Delete a bookmark\n\tlist               Show all bookmarks\n\topen <name>        Open a bookmark",
-    "examples": ["bookmark add mygit github.com/myrepo", "bookmark list", "open mygit"]
+    "examples": [
+      "bookmark add mygit github.com/myrepo",
+      "bookmark list",
+      "open mygit"
+    ]
   },
   "passgen": {
     "desc": "Generate secure passwords",
@@ -379,5 +383,17 @@
     "usage": "alias <action> [name] [command]",
     "man": "NAME\n\talias - manage command aliases\n\nSYNOPSIS\n\talias ACTION [NAME] [COMMAND]\n\nACTIONS\n\tset <name> <cmd>   Create a shortcut\n\tremove <name>      Delete a shortcut\n\tlist               Show all aliases\n\nDESCRIPTION\n\tAllows you to create short names for long commands.",
     "examples": ["alias set cls clear", "alias set ll ls -la", "alias list"]
+  },
+  "tabs": {
+    "desc": "Advanced browser tab manager",
+    "usage": "tabs <action> [args]",
+    "man": "NAME\n\ttabs - advanced browser tab manager\n\nSYNOPSIS\n\ttabs ACTION [ARGS]\n\nDESCRIPTION\n\tControl your browser tabs directly from the terminal. Supports bulk actions, search, and memory management.\n\nACTIONS\n\tlist [query]       List tabs. Optional query filters results.\n\tswitch <sn>        Jump to a specific tab number.\n\tnew [cnt] [url]    Open new tab(s). E.g., 'tabs new 2 google'.\n\tclose <sn...>|all  Close specific tabs (e.g. '1 3') or all.\n\treload <sn...>|all Reload specific tabs or all.\n\tpin/unpin <args>   Pin or unpin tabs.\n\tmute/unmute <args> Mute or unmute tab audio.\n\tdiscard <args>     Suspend tabs to free up RAM.\n\tdedup              Auto-close duplicate tabs.\n\nARGUMENTS\n\tsn                 Serial Number from 'tabs list' (e.g., 1)\n\tall                Apply action to all tabs\n\nEXAMPLES\n\t$ tabs list google\n\t$ tabs new 3 github.com\n\t$ tabs close 1 3 5\n\t$ tabs mute all\n\t$ tabs dedup",
+    "examples": [
+      "tabs list",
+      "tabs new 2 youtube",
+      "tabs close 1 4",
+      "tabs mute all",
+      "tabs dedup"
+    ]
   }
 }

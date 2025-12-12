@@ -49,7 +49,21 @@
     { "cmd": "quicklink", "desc": "List all quick links" },
     { "cmd": "weather <gps>", "desc": "Get weather (use 'gps' for local)" },
     { "cmd": "news", "desc": "Fetch latest news" },
-    { "cmd": "crypto <symbol>", "desc": "Get crypto prices (BTC, ETH)" }
+    { "cmd": "crypto <symbol>", "desc": "Get crypto prices (BTC, ETH)" },
+    {
+      "cmd": "tabs <action> [args]",
+      "desc": "Manage browser tabs (list, switch, close, new)"
+    }
+  ],
+
+  "BROWSER_CONTROL": [
+    { "cmd": "tabs list [query]", "desc": "List open tabs (optional search)" },
+    { "cmd": "tabs switch <sn>", "desc": "Switch to a specific tab" },
+    { "cmd": "tabs new [n] [url]", "desc": "Open new tab(s)" },
+    { "cmd": "tabs close <args>", "desc": "Close specific or all tabs" },
+    { "cmd": "tabs dedup", "desc": "Close duplicate tabs" },
+    { "cmd": "tabs discard <args>", "desc": "Suspend tabs to save RAM" },
+    { "cmd": "tabs mute/pin <args>", "desc": "Mute or Pin tabs" }
   ],
 
   "SYSTEM_UTILITIES": [

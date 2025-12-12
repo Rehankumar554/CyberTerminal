@@ -2987,6 +2987,327 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         this.addOutput(`Unknown action: ${action}`, "error");
       }
     },
+
+    tabs: function (args) {
+      // 1. Chrome API Check
+      if (typeof chrome === "undefined" || !chrome.tabs) {
+        this.addOutput("Error: Chrome Tabs API is not available.", "error");
+        this.addOutput("Ensure 'tabs' permission is in manifest.json", "info");
+        return;
+      }
+
+      if (args.length === 0) {
+        this.addOutput("Usage: tabs <action> [args]", "warning");
+        this.addOutput(
+          "Actions: list, switch, new, close, reload, pin/unpin, mute/unmute, discard, dedup",
+          "info"
+        );
+        return;
+      }
+
+      const action = args[0].toLowerCase();
+      const targetArgs = args.slice(1);
+
+      // --- HELPER: Auto-Fetch Tabs ---
+      const withTabs = (callback) => {
+        chrome.tabs.query({ currentWindow: true }, (tabs) => {
+          if (chrome.runtime.lastError) {
+            this.addOutput(
+              `Error: ${chrome.runtime.lastError.message}`,
+              "error"
+            );
+            return;
+          }
+          // Cache IDs for SN mapping
+          this.tabListCache = tabs.map((t) => t.id);
+          callback(tabs);
+        });
+      };
+
+      // --- HELPER: Process Target Arguments (Supports "all" & "1 3 5") ---
+      const getTargets = (tabs, argList) => {
+        if (argList.length === 0)
+          return { valid: [], invalid: [], isAll: false };
+
+        if (argList[0].toLowerCase() === "all") {
+          return { valid: tabs, invalid: [], isAll: true };
+        }
+
+        const valid = [];
+        const invalid = [];
+
+        argList.forEach((arg) => {
+          const sn = parseInt(arg);
+          if (isNaN(sn) || sn < 1 || sn > tabs.length) {
+            invalid.push(arg);
+          } else {
+            valid.push(tabs[sn - 1]);
+          }
+        });
+
+        return { valid, invalid, isAll: false };
+      };
+
+      // ===========================
+      // 1. LIST TABS (With Search/Filter)
+      // ===========================
+      if (action === "list") {
+        const query = targetArgs.join(" ").toLowerCase();
+
+        withTabs((tabs) => {
+          if (!tabs || tabs.length === 0) {
+            this.addOutput("No open tabs found.", "warning");
+            return;
+          }
+
+          // Filter Logic
+          const displayTabs = query
+            ? tabs.filter(
+                (t) =>
+                  (t.title && t.title.toLowerCase().includes(query)) ||
+                  (t.url && t.url.toLowerCase().includes(query))
+              )
+            : tabs;
+
+          if (displayTabs.length === 0) {
+            this.addOutput(`No tabs found matching '${query}'.`, "warning");
+            return;
+          }
+
+          this.addOutput(
+            `\n🖥️ OPEN TABS (${displayTabs.length}/${tabs.length}):`,
+            "info"
+          );
+          this.addOutput(
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          );
+          this.addOutput("SN. | STS | PIN | MEM | TITLE");
+          this.addOutput(
+            "────┼─────┼─────┼─────┼───────────────────────────────────"
+          );
+
+          displayTabs.forEach((tab) => {
+            // Calculate original SN based on full list
+            const originalIndex = tabs.findIndex((t) => t.id === tab.id);
+            const sn = (originalIndex + 1).toString().padEnd(3);
+
+            const statusIcon = tab.active ? "🟢" : "⚪";
+            const pinIcon = tab.pinned ? "📌" : "  ";
+            const memIcon = tab.discarded ? "💤" : "⚡"; // Sleep vs Active
+
+            let rawTitle = tab.title || "Untitled Tab";
+            const title =
+              rawTitle.length > 40
+                ? rawTitle.substring(0, 37) + "..."
+                : rawTitle;
+
+            this.addOutput(
+              `${sn} | ${statusIcon}  | ${pinIcon}  | ${memIcon}  | ${title}`,
+              tab.active ? "success" : ""
+            );
+          });
+          this.addOutput(
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          );
+          if (query) this.addOutput(`Filtered by: "${query}"`, "info");
+        });
+      }
+
+      // ===========================
+      // 2. NEW TAB (Smart Bulk Open)
+      // ===========================
+      else if (action === "new") {
+        if (targetArgs.length === 0) {
+          chrome.tabs.create({});
+          this.addOutput("New blank tab opened.", "success");
+          return;
+        }
+
+        const tasks = [];
+        let i = 0;
+
+        // Parser Logic for pairs like "2 google" or singles
+        while (i < targetArgs.length) {
+          const current = targetArgs[i];
+          const next = targetArgs[i + 1];
+
+          // Is current a number?
+          if (!isNaN(parseInt(current)) && !current.includes(".")) {
+            const count = parseInt(current);
+            // Is next a URL?
+            if (next && (isNaN(parseInt(next)) || next.includes("."))) {
+              tasks.push({ count: count, url: next });
+              i += 2;
+            } else {
+              tasks.push({ count: count, url: undefined });
+              i += 1;
+            }
+          } else {
+            // Current is URL, assume count 1
+            tasks.push({ count: 1, url: current });
+            i += 1;
+          }
+        }
+
+        let totalCreated = 0;
+        tasks.forEach((task) => {
+          let finalUrl = task.url;
+
+          // Resolve Service Name or URL
+          if (finalUrl) {
+            const lowerKey = finalUrl.toLowerCase();
+            if (this.services && this.services[lowerKey]) {
+              finalUrl = this.services[lowerKey];
+            } else if (!finalUrl.startsWith("http")) {
+              finalUrl = "https://" + finalUrl;
+            }
+          }
+
+          for (let k = 0; k < task.count; k++) {
+            chrome.tabs.create({ url: finalUrl, active: false });
+            totalCreated++;
+          }
+        });
+        this.addOutput(`🚀 Opened ${totalCreated} new tab(s).`, "success");
+      }
+
+      // ===========================
+      // 3. SWITCH TAB
+      // ===========================
+      else if (action === "switch" || action === "goto") {
+        if (targetArgs.length === 0) {
+          this.addOutput("Error: SN required. Example: tabs switch 2", "error");
+          return;
+        }
+        withTabs((tabs) => {
+          const { valid } = getTargets(tabs, [targetArgs[0]]);
+          if (valid.length > 0) {
+            chrome.tabs.update(valid[0].id, { active: true });
+          } else {
+            this.addOutput(`Error: Invalid SN ${targetArgs[0]}`, "error");
+          }
+        });
+      }
+
+      // ===========================
+      // 4. DEDUP (Remove Duplicates)
+      // ===========================
+      else if (action === "dedup" || action === "cleanup") {
+        withTabs((tabs) => {
+          const seenUrls = new Set();
+          const duplicates = [];
+          tabs.forEach((tab) => {
+            if (seenUrls.has(tab.url)) duplicates.push(tab.id);
+            else seenUrls.add(tab.url);
+          });
+
+          if (duplicates.length > 0) {
+            chrome.tabs.remove(duplicates, () => {
+              this.addOutput(
+                `🧹 Closed ${duplicates.length} duplicate tab(s).`,
+                "success"
+              );
+              if (typeof showToast === "function")
+                showToast("Duplicates Cleaned");
+            });
+          } else {
+            this.addOutput("✨ No duplicate tabs found.", "success");
+          }
+        });
+      }
+
+      // ===========================
+      // 5. BULK ACTIONS (Close, Reload, Pin, Mute, Discard)
+      // ===========================
+      else if (
+        [
+          "close",
+          "reload",
+          "pin",
+          "unpin",
+          "mute",
+          "unmute",
+          "discard",
+        ].includes(action)
+      ) {
+        if (targetArgs.length === 0) {
+          this.addOutput(`Usage: tabs ${action} <sn... | all>`, "warning");
+          return;
+        }
+
+        withTabs((tabs) => {
+          const { valid, isAll, invalid } = getTargets(tabs, targetArgs);
+
+          // --- ACTION HANDLERS ---
+          if (action === "close") {
+            if (isAll) {
+              this.addOutput(
+                `⚠️ Closing ALL ${valid.length} tabs...`,
+                "warning"
+              );
+              setTimeout(() => chrome.tabs.remove(valid.map((t) => t.id)), 500);
+              return;
+            }
+            if (valid.length) {
+              chrome.tabs.remove(
+                valid.map((t) => t.id),
+                () => {
+                  this.addOutput(
+                    `🗑️ Closed ${valid.length} tab(s).`,
+                    "success"
+                  );
+                  if (typeof showToast === "function")
+                    showToast(`${valid.length} Tabs Closed`);
+                }
+              );
+            }
+          } else if (action === "reload") {
+            valid.forEach((t) => chrome.tabs.reload(t.id));
+            this.addOutput(`🔄 Reloaded ${valid.length} tabs.`, "success");
+          } else if (action === "pin" || action === "unpin") {
+            const state = action === "pin";
+            valid.forEach((t) => chrome.tabs.update(t.id, { pinned: state }));
+            this.addOutput(
+              `📌 ${state ? "Pinned" : "Unpinned"} ${valid.length} tabs.`,
+              "success"
+            );
+          } else if (action === "mute" || action === "unmute") {
+            const state = action === "mute";
+            valid.forEach((t) => chrome.tabs.update(t.id, { muted: state }));
+            this.addOutput(
+              `${state ? "Muted" : "Unmuted"} ${valid.length} tabs.`,
+              "success"
+            );
+          } else if (action === "discard") {
+            let count = 0;
+            valid.forEach((t) => {
+              if (!t.active && !t.discarded) {
+                chrome.tabs.discard(t.id);
+                count++;
+              }
+            });
+            if (count > 0)
+              this.addOutput(
+                `💤 Discarded ${count} tabs to save RAM.`,
+                "success"
+              );
+            else this.addOutput("No eligible tabs to discard.", "warning");
+          }
+
+          if (invalid.length) {
+            this.addOutput(
+              `Skipped invalid SNs: ${invalid.join(", ")}`,
+              "warning"
+            );
+          }
+        });
+      } else {
+        this.addOutput(
+          `Unknown action: '${action}'. Try 'tabs list'.`,
+          "error"
+        );
+      }
+    },
   };
 
   addOutput(text, className = "") {

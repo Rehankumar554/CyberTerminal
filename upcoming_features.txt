@@ -1,0 +1,26 @@
+# Tabs management
+tab list                    # All open tabs
+tab close <id>              # Close specific tab
+tab close all               # Close all tabs
+tab new <url>               # Open new tab
+tab switch <id>             # Switch to tab
+tab reload                  # Reload current tab
+tab pin                     # Pin tab
+tab mute                    # Mute tab audio
+
+# Bookmarks
+bookmark add <url> <name>   # Add bookmark
+bookmark list               # List bookmarks
+bookmark search "keyword"   # Search bookmarks
+bookmark open <name>        # Open bookmark
+
+# History
+history.browser             # Browser history
+history.browser clear       # Clear browser history
+history.browser search "key" # Search history
+
+# Downloads
+download <url>              # Download file
+download list               # Show downloads
+download pause <id>         # Pause download
+download resume <id>        # Resume download

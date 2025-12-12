@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2025-12-14
+
+### 🌟 New Major Feature: Browser Tab Manager
+
+Added `tabs` command suite to control browser tabs via CLI without a mouse.
+
+- **Listing & Navigation**:
+
+  - `tabs list [query]`: View tabs with ID, Status, Pin, and Audio indicators. Search support added.
+  - `tabs switch <sn>`: Fast switching using Serial Numbers.
+
+- **Creation & Cleanup**:
+
+  - `tabs new`: Smart multi-open (e.g., `tabs new 2 google` opens 2 Google tabs).
+  - `tabs close`: Supports multiple SNs (`1 3 5`) and `all`.
+  - `tabs dedup`: Auto-detects and closes duplicate URLs.
+
+- **State Management**:
+  - `reload`, `pin/unpin`, `mute/unmute`: Bulk support for all/multiple tabs.
+  - `discard`: Memory saver mode to suspend inactive tabs.
+
+### 🛠️ Technical
+
+- Added `"tabs"` permission to `manifest.json`.
+- Implemented Auto-Fetch logic (no need to run `list` before actions).
+
 ## [1.1.0] - 2025-12-12
 
 ### 🚀 New Features

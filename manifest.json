@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Cyber Terminal - Linux Shell",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Level 7 Linux-grade Cyber Terminal for Chrome New Tab",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
 
   "icons": {
     "16": "assets/image/icon.png",
