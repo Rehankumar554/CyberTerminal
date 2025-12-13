@@ -276,7 +276,7 @@ class Terminal {
         this.saveSettings();
 
         if (this.settings.particlesEnabled) {
-          showToast("Power Mode Enabled! ✨");
+          showToast("Power Mode Enabled!");
         } else {
           showToast("Power Mode Disabled");
         }
