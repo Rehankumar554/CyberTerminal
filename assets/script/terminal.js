@@ -14,6 +14,7 @@ class Terminal {
     this.commandBuffer = "";
     // Search State
     this.isSearching = false;
+    this.cmdDocs = {};
     this.searchQuery = "";
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
@@ -63,6 +64,7 @@ class Terminal {
     this.initSettingsUI();
     this.initContextMenu();
     this.initParticles();
+    this.loadDocumentation();
     this.initWormhole();
 
     if (this.settings.startupCmd) {
@@ -114,6 +116,57 @@ class Terminal {
     }, 500);
   }
 
+  async loadDocumentation() {
+    try {
+      // Path check kar lein, agar folder structure alag hai to path badal dein
+      const response = await fetch("assets/jsons/cmd_docs.json");
+      if (!response.ok) throw new Error("Docs not found");
+      this.cmdDocs = await response.json();
+    } catch (error) {
+      console.error("Documentation Load Error:", error);
+      this.cmdDocs = {}; // Fallback empty object
+    }
+  }
+
+  // --- DYNAMIC HELP LIST GENERATOR ---
+  showDynamicHelp() {
+    this.addOutput("---------------------------------------------");
+    this.addOutput("🛡️ CYBERTERM SYSTEMS - COMMAND LIST");
+    this.addOutput("---------------------------------------------");
+
+    // Check if docs are loaded
+    if (!this.cmdDocs || Object.keys(this.cmdDocs).length === 0) {
+      this.addOutput(
+        "⚠️ Documentation data is loading or missing...",
+        "warning"
+      );
+      this.addOutput("Try running 'refresh' command.");
+      return;
+    }
+
+    const keys = Object.keys(this.cmdDocs).sort();
+
+    // Formatting: Sabse lambe command ki length nikalein taaki alignment sahi ho
+    const maxLength =
+      keys.reduce((max, key) => Math.max(max, key.length), 0) + 4;
+
+    keys.forEach((cmd) => {
+      // Safety check: Kabhi kabhi JSON me koi key missing ho sakti hai
+      const desc = this.cmdDocs[cmd]
+        ? this.cmdDocs[cmd].desc
+        : "No description";
+
+      // Spacing create karein (Padding)
+      const space = " ".repeat(maxLength - cmd.length);
+
+      // Output Format: "command    : description"
+      this.addOutput(`${cmd}${space}: ${desc}`);
+    });
+
+    this.addOutput("---------------------------------------------");
+    this.addOutput("Tip: Type 'help <command>' for details.");
+    this.addOutput("Tip: Type 'man <command>' for manual.");
+  }
   // --- UPDATED LOGIC WITH SECURITY WARNING ---
 
   initWormhole() {
@@ -1686,120 +1739,34 @@ class Terminal {
   }
 
   commands = {
-    help: function (args) {
-      if (args && args.length > 0) {
-        const cmd = args[0];
-        if (this.docs[cmd]) {
-          this.addOutput(`\nHelp: ${cmd}`, "info");
-          this.addOutput(`Description: ${this.docs[cmd].desc}`);
-          this.addOutput(`Usage: ${this.docs[cmd].usage}`);
-          this.addOutput(
-            `Type 'man ${cmd}' for full manual or 'examples ${cmd}' for usage.\n`
-          );
-        } else if (this.commands[cmd]) {
-          this.addOutput(
-            `Command '${cmd}' exists but has no detailed documentation.`
-          );
-        } else {
-          this.addOutput(
-            `help: no help topics match '${cmd}'. Try 'help' to see all commands.`,
-            "error"
-          );
-        }
+    help: (args) => {
+      // Case 1: Agar user ne sirf "help" type kiya
+      if (!args || args.length === 0) {
+        this.showDynamicHelp();
         return;
       }
-      const helpText = `
-      Available Commands:
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      
-      FILE SYSTEM:
-        ls [path]              List directory contents
-        cd <path>              Change directory
-        pwd                    Print working directory
-        cat <file>             Display file contents
-        touch <file>           Create new file
-        rm <file>              Remove file
-        mkdir <dir>            Create directory
-        rmdir <dir>            Remove directory
-        cp <src> <dest>        Copy file (-r for recursive)
-        mv <src> <dest>        Move/rename file or directory
-        head <file>            Show first 10 lines (-n for custom)
-        tail <file>            Show last 10 lines (-n for custom)
-        wc <file>              Count lines, words, characters
-      
-      SEARCH & FILTER:
-        find <pattern>         Find files by name/pattern
-        grep "pattern" <file>  Search text in file (-r for dir)
-        ls | grep ".txt"       Filter command output
-      
-      PRODUCTIVITY:
-        todo <action>          Manage Todo list (add, list, done, clear)
-        note <text>            Save a quick note
-        notes list             View saved notes
-        timer <time>           Set timer (e.g., 10s, 5m, 1h)
-        alarm <HH:MM>          Set alarm (24h format)
-        calc <expr>            Evaluate math expression
-        passgen [len]          Generate secure password
-      
-      WEB & SEARCH:
-        google <query>         Search Google
-        youtube <query>        Search YouTube
-        github <query>         Search GitHub
-        stackoverflow <query>  Search StackOverflow
-        wiki <query>           Search Wikipedia
-        map <location>         Open Google Maps
-        translate <text>       Translate text (Google)
-        open <service>         Open site (gmail, chatgpt, etc.)
-        bookmark <action>      Manage custom bookmarks
-        quicklink              List all available quick links
-        weather <gps>          Get Weather (use 'gps' for local)
-        news                   Fetch latest news
-        crypto <symbol>        Get crypto prices (BTC, ETH)
-        fetch <url>            Fetch URL content (JSON/HTML)
-      
-      BROWSER CONTROL:
-        tabs <action>          Manage tabs (list, switch, close, new, dedup)
-        history.browser        Manage browser history (list, search, open)
-        download <action>      Manage downloads (list, pause, resume)
-      
-      SYSTEM & UTILITIES:
-        clear                  Clear terminal screen
-        history                Show command history
-        neofetch               Show system info (ASCII art)
-        date / time            Show current date or time
-        whoami                 Display current user
-        sudo <command>         Execute as superuser (simulation)
-        sys.info               Display hardware/software info
-        sys.log                Show system logs
-        dev.mode.enable        Enable developer debug mode
-      
-      SETTINGS & SESSION:
-        session <action>       Manage sessions (save, load, list)
-        theme set <name>       Change theme (matrix, kali, neon-purple)
-        set <prop> <val>       Set fontSize, opacity, prompt
-        settings <action>      Import/Export/Reset settings
-        refresh                Refresh the terminal
-        alias <action>         Manage command shortcuts
-        shortcut list          View custom keyboard shortcuts
-      
-      HELP & FUN:
-        help [cmd]             Show help menu or specific command info
-        man <cmd>              Read detailed manual page
-        examples <cmd>         Show usage examples
-        tutorial               Start interactive tutorial
-        tip                    Get a random terminal tip
-        matrix                 Toggle Matrix screen effect
-        cowsay <text>          Make the cow speak
-      
-      CHAINING:
-        cmd1 ; cmd2            Execute sequentially
-        cmd1 && cmd2           Execute if first succeeds
-        cmd1 | cmd2            Pipe output (e.g., ls | grep js)
-      
-      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-      Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
-      `;
-      this.addOutput(helpText, "info");
+
+      // Case 2: Agar user ne "help <command>" type kiya
+      const cmdName = args[0].toLowerCase();
+
+      // Check karein ki command JSON me hai ya nahi
+      if (this.cmdDocs[cmdName]) {
+        const doc = this.cmdDocs[cmdName];
+
+        this.addOutput(`----------------------------------------`);
+        this.addOutput(`📘 COMMAND: ${cmdName.toUpperCase()}`, "info");
+        this.addOutput(`----------------------------------------`);
+        this.addOutput(`📝 DESC  : ${doc.desc}`);
+        this.addOutput(`⌨️ USAGE : ${doc.usage}`);
+
+        if (doc.examples && doc.examples.length > 0) {
+          this.addOutput(`💡 EXAMPLES:`);
+          doc.examples.forEach((ex) => this.addOutput(`   > ${ex}`));
+        }
+        this.addOutput(`----------------------------------------`);
+      } else {
+        this.addOutput(`❌ No documentation found for '${cmdName}'.`, "error");
+      }
     },
     // --- SESSION MANAGEMENT ---
 
@@ -2425,37 +2392,44 @@ class Terminal {
       }, timeToWait);
     },
 
-    man: function (args) {
-      if (args.length === 0) {
-        this.addOutput("What manual page do you want?", "warning");
+    man: (args) => {
+      if (!args || args.length === 0) {
+        this.addOutput("Usage: man <command>", "warning");
         return;
       }
 
-      const cmd = args[0];
-      if (this.docs[cmd]) {
-        this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
-        this.addOutput(this.docs[cmd].man);
-        this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", "info");
+      const cmdName = args[0].toLowerCase();
+
+      if (this.cmdDocs[cmdName]) {
+        const doc = this.cmdDocs[cmdName];
+
+        this.addOutput(`----------------------------------------`);
+        this.addOutput(`📄 MANUAL PAGE: ${cmdName}`, "success");
+        this.addOutput(`----------------------------------------`);
+        // "man" text ko print karein
+        this.addOutput(doc.man || "No detailed manual available.");
+        this.addOutput(`----------------------------------------`);
       } else {
-        this.addOutput(`No manual entry for ${cmd}`, "error");
+        this.addOutput(`❌ No manual entry for '${cmdName}'.`, "error");
       }
     },
 
-    examples: function (args) {
-      if (args.length === 0) {
+    // --- EXAMPLES COMMAND ---
+    examples: (args) => {
+      if (!args || args.length === 0) {
         this.addOutput("Usage: examples <command>", "warning");
         return;
       }
 
-      const cmd = args[0];
-      if (this.docs[cmd] && this.docs[cmd].examples) {
-        this.addOutput(`\nExamples for '${cmd}':`, "info");
-        this.docs[cmd].examples.forEach((ex) => {
+      const cmdName = args[0].toLowerCase();
+
+      if (this.cmdDocs[cmdName] && this.cmdDocs[cmdName].examples) {
+        this.addOutput(`💡 Examples for '${cmdName}':`, "info");
+        this.cmdDocs[cmdName].examples.forEach((ex) => {
           this.addOutput(`  $ ${ex}`);
         });
-        this.addOutput(""); // Empty line for spacing
       } else {
-        this.addOutput(`No examples available for ${cmd}`, "warning");
+        this.addOutput(`❌ No examples found for '${cmdName}'.`, "error");
       }
     },
 

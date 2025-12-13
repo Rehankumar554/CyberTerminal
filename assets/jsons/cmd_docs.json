@@ -1,445 +1,526 @@
 {
-  "ls": {
-    "desc": "List directory contents",
-    "usage": "ls [options] [path]",
-    "man": "NAME\n\tls - list directory contents\n\nSYNOPSIS\n\tls [-a] [FILE]...\n\nDESCRIPTION\n\tList information about the FILEs (the current directory by default).\n\nOPTIONS\n\t-a, --all\n\t\tdo not ignore entries starting with .",
-    "examples": ["ls", "ls -a", "ls /home/user/logs"]
+  "help": {
+    "desc": "Display all available commands or get help for a specific command",
+    "usage": "help [command]",
+    "man": "The help command displays a comprehensive list of all available terminal commands organized by category. When used without arguments, it shows the complete command reference. When a specific command name is provided as an argument, it displays detailed information about that command including its description and usage. This is the primary way to discover and learn about terminal functionality.",
+    "examples": ["help", "help ls", "help grep"]
   },
-  "cd": {
-    "desc": "Change the shell working directory",
-    "usage": "cd <path>",
-    "man": "NAME\n\tcd - change directory\n\nSYNOPSIS\n\tcd [dir]\n\nDESCRIPTION\n\tChange the current directory to dir. The default DIR is the value of the HOME shell variable.",
-    "examples": ["cd downloads", "cd ..", "cd /home/user"]
-  },
-  "pwd": {
-    "desc": "Print name of current/working directory",
-    "usage": "pwd",
-    "man": "NAME\n\tpwd - print name of current/working directory\n\nSYNOPSIS\n\tpwd\n\nDESCRIPTION\n\tPrint the full filename of the current working directory.",
-    "examples": ["pwd"]
-  },
-  "cat": {
-    "desc": "Concatenate files and print on the standard output",
-    "usage": "cat <file>",
-    "man": "NAME\n\tcat - concatenate files and print on the standard output\n\nSYNOPSIS\n\tcat [FILE]...\n\nDESCRIPTION\n\tConcatenate FILE(s) to standard output.",
-    "examples": ["cat readme.md", "cat file1.txt file2.txt"]
-  },
-  "touch": {
-    "desc": "Change file timestamps / Create empty file",
-    "usage": "touch <file>",
-    "man": "NAME\n\ttouch - change file timestamps\n\nSYNOPSIS\n\ttouch FILE...\n\nDESCRIPTION\n\tUpdate the access and modification times of each FILE to the current time. If file does not exist, it is created empty.",
-    "examples": ["touch newfile.txt", "touch logs/error.log"]
-  },
-  "rm": {
-    "desc": "Remove files or directories",
-    "usage": "rm <file>",
-    "man": "NAME\n\trm - remove files or directories\n\nSYNOPSIS\n\trm [FILE]...\n\nDESCRIPTION\n\trm removes each specified file. By default, it does not remove directories.",
-    "examples": ["rm old_file.txt", "rm data.json"]
-  },
-  "mkdir": {
-    "desc": "Make directories",
-    "usage": "mkdir <directory>",
-    "man": "NAME\n\tmkdir - make directories\n\nSYNOPSIS\n\tmkdir DIRECTORY...\n\nDESCRIPTION\n\tCreate the DIRECTORY(ies), if they do not already exist.",
-    "examples": ["mkdir photos", "mkdir /home/user/projects"]
-  },
-  "rmdir": {
-    "desc": "Remove empty directories",
-    "usage": "rmdir <directory>",
-    "man": "NAME\n\trmdir - remove empty directories\n\nSYNOPSIS\n\trmdir DIRECTORY...\n\nDESCRIPTION\n\tRemove the DIRECTORY(ies), if they are empty.",
-    "examples": ["rmdir empty_folder"]
-  },
-  "cp": {
-    "desc": "Copy files and directories",
-    "usage": "cp [option] <source> <dest>",
-    "man": "NAME\n\tcp - copy files and directories\n\nSYNOPSIS\n\tcp [OPTION]... SOURCE DEST\n\nDESCRIPTION\n\tCopy SOURCE to DEST.\n\nOPTIONS\n\t-r\tcopy directories recursively",
-    "examples": ["cp file.txt backup.txt", "cp -r /docs /backup/docs"]
-  },
-  "mv": {
-    "desc": "Move (rename) files",
-    "usage": "mv <source> <dest>",
-    "man": "NAME\n\tmv - move (rename) files\n\nSYNOPSIS\n\tmv SOURCE DEST\n\nDESCRIPTION\n\tRename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.",
-    "examples": ["mv file.txt newname.txt", "mv photo.jpg /home/user/pictures/"]
-  },
-  "head": {
-    "desc": "Output the first part of files",
-    "usage": "head [-n lines] <file>",
-    "man": "NAME\n\thead - output the first part of files\n\nSYNOPSIS\n\thead [OPTION]... [FILE]...\n\nDESCRIPTION\n\tPrint the first 10 lines of each FILE to standard output.\n\nOPTIONS\n\t-n NUM\tprint the first NUM lines instead of the first 10",
-    "examples": ["head system.log", "head -n 5 notes.txt"]
-  },
-  "tail": {
-    "desc": "Output the last part of files",
-    "usage": "tail [-n lines] <file>",
-    "man": "NAME\n\ttail - output the last part of files\n\nSYNOPSIS\n\ttail [OPTION]... [FILE]...\n\nDESCRIPTION\n\tPrint the last 10 lines of each FILE to standard output.\n\nOPTIONS\n\t-n NUM\tprint the last NUM lines instead of the last 10",
-    "examples": ["tail error.log", "tail -n 20 debug.txt"]
-  },
-  "wc": {
-    "desc": "Print newline, word, and byte counts",
-    "usage": "wc <file>",
-    "man": "NAME\n\twc - print newline, word, and byte counts for each file\n\nSYNOPSIS\n\twc [FILE]...\n\nDESCRIPTION\n\tPrint newline, word, and byte counts for each FILE.",
-    "examples": ["wc story.txt"]
-  },
-  "find": {
-    "desc": "Search for files in a directory hierarchy",
-    "usage": "find [path] <pattern>",
-    "man": "NAME\n\tfind - search for files in a directory hierarchy\n\nSYNOPSIS\n\tfind [path] [pattern]\n\nDESCRIPTION\n\tSearch for files matching the pattern within the specified path (recursive).",
-    "examples": ["find *.js", "find /home/user *.txt"]
-  },
-  "grep": {
-    "desc": "Print lines that match patterns",
-    "usage": "grep [options] <pattern> <file>",
-    "man": "NAME\n\tgrep - print lines that match patterns\n\nSYNOPSIS\n\tgrep [OPTIONS] PATTERN [FILE...]\n\nDESCRIPTION\n\tSearch for PATTERN in each FILE.\n\nOPTIONS\n\t-r\tRecursive search in directories\n\t-i\tCase insensitive",
+  "session": {
+    "desc": "Save, load, list, or delete terminal sessions",
+    "usage": "session <save|load|list|delete> [name]",
+    "man": "The session command allows you to manage terminal sessions. You can save your current terminal state including path, history, user settings, theme, and widget layout with a custom name. Later, you can restore any saved session to return to that exact state. The 'list' action shows all saved sessions with timestamps, and 'delete' removes a specific session. This is useful for maintaining different work contexts or preserving important terminal states.",
     "examples": [
-      "grep 'error' system.log",
-      "grep -r 'todo' /home/user",
-      "ls | grep '.js'"
+      "session save mywork",
+      "session load mywork",
+      "session list",
+      "session delete mywork"
     ]
+  },
+  "set": {
+    "desc": "Configure terminal settings like font size, opacity, prompt, startup command, or boot sequence",
+    "usage": "set <property> <value>",
+    "man": "The set command is used to customize terminal appearance and behavior. Properties include 'fontSize' (8-40px), 'opacity' (0.0-1.0 for transparency), 'prompt' (custom prompt text or 'default' to reset), 'startupCmd' (command to run on startup or 'none'), and 'boot' (on/off to enable/disable boot sequence). Changes are saved automatically and persist across sessions.",
+    "examples": [
+      "set fontSize 16",
+      "set opacity 0.8",
+      "set prompt cyber>",
+      "set startupCmd neofetch",
+      "set boot off"
+    ]
+  },
+  "refresh": {
+    "desc": "Reload the terminal page",
+    "usage": "refresh",
+    "man": "The refresh command initiates a full page reload, similar to pressing F5 in your browser. It displays a brief message before reloading, giving you time to see the confirmation. This is useful when you want to reset the terminal to a clean state or apply certain configuration changes that require a page refresh.",
+    "examples": ["refresh"]
+  },
+  "reboot": {
+    "desc": "Alias for refresh - reload the terminal page",
+    "usage": "reboot",
+    "man": "The reboot command is functionally identical to the refresh command. It reloads the entire terminal page, resetting the environment. This command provides a more traditional Unix-like terminology for users who prefer 'reboot' over 'refresh'.",
+    "examples": ["reboot"]
+  },
+  "settings": {
+    "desc": "Export, import, or reset terminal settings",
+    "usage": "settings <export|import|reset>",
+    "man": "The settings command manages your terminal configuration. 'export' saves all current settings to a JSON file that you can download. 'import' allows you to upload a previously exported settings file to restore your configuration. 'reset' clears all custom settings and returns the terminal to default values, then automatically refreshes the page. This is useful for backing up your configuration or transferring it between devices.",
+    "examples": ["settings export", "settings import", "settings reset"]
+  },
+  "shortcut": {
+    "desc": "List or set custom keyboard shortcuts",
+    "usage": "shortcut <list|set> [key] [command]",
+    "man": "The shortcut command allows you to create custom keyboard shortcuts for frequently used commands. Use 'list' to see all configured shortcuts. Use 'set' followed by a key combination (like 'Ctrl+T') and a command to create a new shortcut. Key combinations are case-insensitive and can include Ctrl, Alt, and Shift modifiers. Once set, pressing the key combination will execute the associated command.",
+    "examples": [
+      "shortcut list",
+      "shortcut set Ctrl+T clear",
+      "shortcut set Alt+H help"
+    ]
+  },
+  "note": {
+    "desc": "Save a quick note",
+    "usage": "note <text>",
+    "man": "The note command allows you to quickly save text notes within the terminal. All arguments are combined into a single note entry with a timestamp. Notes are stored persistently in browser storage and can be viewed later using the 'notes list' command. This is useful for jotting down quick reminders, URLs, or any information you want to keep handy.",
+    "examples": [
+      "note Remember to update server config",
+      "note API key: xyz123abc"
+    ]
+  },
+  "notes": {
+    "desc": "List all saved notes or clear them",
+    "usage": "notes <list|clear>",
+    "man": "The notes command manages your saved notes collection. 'list' displays all notes with their timestamps and sequential numbers. 'clear' deletes all saved notes permanently. Each note shows when it was created, making it easy to track when you saved specific information. Notes persist across terminal sessions.",
+    "examples": ["notes list", "notes clear"]
+  },
+  "todo": {
+    "desc": "Manage todo list - add, list, mark done, or clear tasks",
+    "usage": "todo <add|list|done|clear> [args]",
+    "man": "The todo command provides a simple task management system. 'add' creates a new task with the provided text. 'list' shows all tasks with checkboxes indicating completion status. 'done' followed by a task number marks that task as complete. 'clear' removes completed tasks by default, or use 'clear all' to remove everything. Tasks are numbered for easy reference and persist across sessions.",
+    "examples": [
+      "todo add Fix login bug",
+      "todo list",
+      "todo done 1",
+      "todo clear",
+      "todo clear all"
+    ]
+  },
+  "timer": {
+    "desc": "Set a countdown timer or stop active timer",
+    "usage": "timer <duration|stop>",
+    "man": "The timer command sets a countdown timer that will notify you when the time is up. Duration can be specified in seconds (s), minutes (m), or hours (h). For example, '10s', '5m', or '1h'. When the timer expires, you'll receive a visual notification, browser alert, and audio beep. Use 'timer stop' to cancel an active timer. Only one timer can be active at a time.",
+    "examples": ["timer 25m", "timer 10s", "timer 1h", "timer stop"]
+  },
+  "alarm": {
+    "desc": "Set an alarm for a specific time",
+    "usage": "alarm <HH:MM>",
+    "man": "The alarm command sets an alarm to go off at a specific time using 24-hour format. If the specified time has already passed today, the alarm will be set for the next day. When the alarm time arrives, you'll receive a visual notification, browser alert, and audio beep. The command displays how many hours and minutes until the alarm will trigger.",
+    "examples": ["alarm 14:30", "alarm 09:00", "alarm 23:45"]
+  },
+  "remind": {
+    "desc": "Set reminders - one-time or recurring (like water drinking reminder)",
+    "usage": "remind <time> <task> OR remind <off|drink water>",
+    "man": "The remind command sets up reminders. For one-time reminders, specify a duration (like '10m', '1h') followed by the task description. For recurring reminders, use 'remind drink water' to set up a hydration reminder every 30 minutes. Use 'remind off' to stop all active reminders. Multiple reminders can be active simultaneously, and they persist until cancelled or triggered.",
+    "examples": [
+      "remind 10m Check server logs",
+      "remind 1h Meeting with team",
+      "remind drink water",
+      "remind off"
+    ]
+  },
+  "man": {
+    "desc": "Display detailed manual page for a command",
+    "usage": "man <command>",
+    "man": "The man command displays comprehensive documentation for the specified command. It shows the full manual entry including detailed description, usage patterns, options, and behavior. This is more detailed than the brief help text and is similar to Unix/Linux man pages. If no manual entry exists for the command, an error message is displayed.",
+    "examples": ["man ls", "man grep", "man cd"]
+  },
+  "examples": {
+    "desc": "Show usage examples for a command",
+    "usage": "examples <command>",
+    "man": "The examples command displays practical usage examples for the specified command. This helps you understand how to use a command in real scenarios. Each example shows the exact syntax you can type. If no examples are available for the command, a warning message is displayed. This is particularly useful when learning new commands or exploring advanced features.",
+    "examples": ["examples grep", "examples find", "examples cp"]
+  },
+  "tutorial": {
+    "desc": "Start interactive tutorial on terminal basics",
+    "usage": "tutorial [topic]",
+    "man": "The tutorial command provides guided lessons on using the terminal. Without arguments or with 'start', it shows an overview of available lessons. 'tutorial commands' teaches basic file operations like creating directories and files. 'tutorial shortcuts' covers keyboard shortcuts for efficient terminal use. The tutorial is interactive and designed for beginners to learn step-by-step.",
+    "examples": [
+      "tutorial",
+      "tutorial start",
+      "tutorial commands",
+      "tutorial shortcuts"
+    ]
+  },
+  "tip": {
+    "desc": "Get a random terminal tip",
+    "usage": "tip",
+    "man": "The tip command displays a random helpful tip about using the terminal. Tips cover various features, shortcuts, and best practices. Each time you run the command, you'll see a different tip. There's also a 'tip.daily' internal function that automatically shows one tip per day when you first open the terminal.",
+    "examples": ["tip"]
+  },
+  "tip.daily": {
+    "desc": "Internal function that shows one tip per day automatically",
+    "usage": "tip.daily",
+    "man": "This is an internal function that automatically displays a random tip once per day when the terminal starts. It checks localStorage to see if a tip has already been shown today, and only displays a new one if it hasn't. This ensures users get helpful information without being overwhelmed by tips on every session.",
+    "examples": []
   },
   "clear": {
     "desc": "Clear the terminal screen",
     "usage": "clear",
-    "man": "NAME\n\tclear - clear the terminal screen\n\nSYNOPSIS\n\tclear\n\nDESCRIPTION\n\tClears your screen if this is possible, including its scrollback buffer.",
+    "man": "The clear command removes all output from the terminal screen, giving you a clean slate. This is useful when the screen gets cluttered with too much output. You can also use the keyboard shortcut Ctrl+L to clear the screen. The command history is preserved even after clearing.",
     "examples": ["clear"]
   },
   "echo": {
-    "desc": "Display a line of text",
-    "usage": "echo [text...]",
-    "man": "NAME\n\techo - display a line of text\n\nSYNOPSIS\n\techo [STRING]...\n\nDESCRIPTION\n\tEcho the STRING(s) to standard output.",
-    "examples": ["echo Hello World", "echo 'System Check'"]
+    "desc": "Display text or message",
+    "usage": "echo <text>",
+    "man": "The echo command prints all provided arguments as text output to the terminal. It combines all arguments with spaces and displays them as a single line. This is useful for displaying messages, testing output, or creating simple text displays. Echo is a fundamental command available in most terminals.",
+    "examples": ["echo Hello World", "echo Testing output"]
   },
   "date": {
-    "desc": "Print the system date",
+    "desc": "Display current date",
     "usage": "date",
-    "man": "NAME\n\tdate - print the system date\n\nSYNOPSIS\n\tdate\n\nDESCRIPTION\n\tDisplay the current system date.",
+    "man": "The date command displays the current date in the system's locale format. It shows the day of the week, month, day, and year. This is a quick way to check today's date without leaving the terminal.",
     "examples": ["date"]
   },
   "time": {
-    "desc": "Print the system time",
+    "desc": "Display current time",
     "usage": "time",
-    "man": "NAME\n\ttime - print the system time\n\nSYNOPSIS\n\ttime\n\nDESCRIPTION\n\tDisplay the current system time.",
+    "man": "The time command displays the current time in the system's locale format. It shows hours, minutes, and seconds along with AM/PM notation where applicable. This is a quick way to check the current time without leaving the terminal.",
     "examples": ["time"]
   },
   "whoami": {
-    "desc": "Print effective userid",
+    "desc": "Display current username",
     "usage": "whoami",
-    "man": "NAME\n\twhoami - print effective userid\n\nSYNOPSIS\n\twhoami\n\nDESCRIPTION\n\tPrint the user name associated with the current effective user ID.",
+    "man": "The whoami command displays the currently logged-in username. This is the username you set during initial terminal setup or changed later. It's useful for confirming your identity when working with multiple terminal sessions or users.",
     "examples": ["whoami"]
   },
   "uptime": {
-    "desc": "Tell how long the system has been running",
+    "desc": "Show how long the system has been running",
     "usage": "uptime",
-    "man": "NAME\n\tuptime - tell how long the system has been running\n\nSYNOPSIS\n\tuptime\n\nDESCRIPTION\n\tDisplay the current time, and how long the system has been running since the page loaded.",
+    "man": "The uptime command displays how long the terminal session has been active since the page was loaded. It calculates the time elapsed from when the page first loaded to the current moment and presents it in a human-readable format.",
     "examples": ["uptime"]
   },
   "history": {
-    "desc": "Display command history",
+    "desc": "Show command history or clear it",
     "usage": "history [-c]",
-    "man": "NAME\n\thistory - display command history\n\nSYNOPSIS\n\thistory [-c]\n\nDESCRIPTION\n\tDisplay the list of commands you have typed.\n\nOPTIONS\n\t-c\tClear the history list",
+    "man": "The history command displays a numbered list of all commands you've entered in this session and previous sessions. Each command is shown with its history number. Use 'history -c' to clear all command history. History persists across sessions and is saved in browser storage. You can navigate through history using Up/Down arrow keys.",
     "examples": ["history", "history -c"]
   },
+  "ls": {
+    "desc": "List directory contents",
+    "usage": "ls [-a] [path]",
+    "man": "The ls command lists files and directories in the specified path or current directory. Directories are shown with a trailing slash. Use the -a or --all flag to show hidden files (those starting with a dot). Without a path argument, it lists the current directory. The output is color-coded with directories in blue and files in green.",
+    "examples": ["ls", "ls -a", "ls /home/user", "ls --all"]
+  },
+  "cd": {
+    "desc": "Change current directory",
+    "usage": "cd [path]",
+    "man": "The cd command changes your current working directory. You can use absolute paths (starting with /) or relative paths. Special paths include '..' to go up one directory, '.' for current directory, and '~' for home directory. Without arguments, cd returns you to your home directory. The prompt updates to show your new location.",
+    "examples": ["cd /home", "cd ..", "cd projects", "cd"]
+  },
   "sudo": {
-    "desc": "Execute a command as another user",
+    "desc": "Execute command with superuser privileges (simulated)",
     "usage": "sudo <command>",
-    "man": "NAME\n\tsudo - execute a command as another user\n\nSYNOPSIS\n\tsudo COMMAND\n\nDESCRIPTION\n\tAllows a permitted user to execute a command as the superuser (root). Note: This is a simulation.",
-    "examples": ["sudo rm -rf /system", "sudo apt-get update"]
+    "man": "The sudo command simulates running a command with superuser/administrator privileges. It displays a password prompt (simulated) and then executes the specified command. This is a simulation for educational purposes and doesn't actually elevate privileges. It provides a realistic terminal experience similar to Unix/Linux systems.",
+    "examples": ["sudo rm important.txt", "sudo mkdir /system"]
   },
-  "sys.info": {
-    "desc": "Display system information",
-    "usage": "sys.info",
-    "man": "NAME\n\tsys.info - display system information\n\nSYNOPSIS\n\tsys.info\n\nDESCRIPTION\n\tDisplays details about the browser, platform, and screen resolution.",
-    "examples": ["sys.info"]
+  "pwd": {
+    "desc": "Print current working directory path",
+    "usage": "pwd",
+    "man": "The pwd command displays the full absolute path of your current working directory. This helps you understand where you are in the file system hierarchy. It's particularly useful when navigating through multiple directories or when you need to reference your current location in commands.",
+    "examples": ["pwd"]
   },
-  "sys.log": {
-    "desc": "View system logs",
-    "usage": "sys.log",
-    "man": "NAME\n\tsys.log - view system logs\n\nSYNOPSIS\n\tsys.log\n\nDESCRIPTION\n\tDisplays the internal simulated kernel and boot logs.",
-    "examples": ["sys.log"]
+  "cat": {
+    "desc": "Display file contents",
+    "usage": "cat <file>",
+    "man": "The cat command reads and displays the entire contents of the specified file. It prints the file content to the terminal output. If the file doesn't exist, an error message is shown. Cat is useful for quickly viewing text files, configuration files, or any readable content without opening an editor.",
+    "examples": ["cat readme.txt", "cat /home/user/config.json"]
   },
-  "neofetch": {
-    "desc": "System information tool",
-    "usage": "neofetch",
-    "man": "NAME\n\tneofetch - a command-line system information tool\n\nSYNOPSIS\n\tneofetch\n\nDESCRIPTION\n\tDisplays information about your operating system, software and hardware in an aesthetic and visually pleasing way.",
-    "examples": ["neofetch"]
+  "touch": {
+    "desc": "Create a new empty file",
+    "usage": "touch <file>",
+    "man": "The touch command creates a new empty file with the specified name in the current directory. If a file with that name already exists, the command will fail with an error. This is the primary way to create new files in the terminal. After creation, you can edit the file or add content using other commands.",
+    "examples": ["touch newfile.txt", "touch script.js"]
   },
-  "todo": {
-    "desc": "Manage a simple todo list",
-    "usage": "todo <add|list|done|clear> [args]",
-    "man": "NAME\n\ttodo - manage a simple todo list\n\nSYNOPSIS\n\ttodo [ACTION] [ARGS]\n\nACTIONS\n\tadd <text>   Add a new task\n\tlist         Show all tasks\n\tdone <id>    Mark task <id> as complete\n\tclear [all]  Remove completed tasks (or all)",
+  "rm": {
+    "desc": "Remove/delete a file",
+    "usage": "rm <file>",
+    "man": "The rm command permanently deletes the specified file from the current directory. This action cannot be undone. If the file doesn't exist, an error message is displayed. Use this command carefully as deleted files cannot be recovered. For directories, use the rmdir command instead.",
+    "examples": ["rm oldfile.txt", "rm temp.log"]
+  },
+  "mkdir": {
+    "desc": "Create a new directory",
+    "usage": "mkdir <directory>",
+    "man": "The mkdir command creates a new directory with the specified name in the current location. If a directory with that name already exists, the command fails with an error. You can then use 'cd' to enter the directory or create files inside it. Directory names should not contain special characters or spaces.",
+    "examples": ["mkdir projects", "mkdir backup"]
+  },
+  "rmdir": {
+    "desc": "Remove an empty directory",
+    "usage": "rmdir <directory>",
+    "man": "The rmdir command deletes the specified directory. The directory must be empty - if it contains files or subdirectories, the command will fail. This is a safety feature to prevent accidental deletion of important data. If you need to delete a directory and its contents, you must first remove all files inside it.",
+    "examples": ["rmdir oldproject", "rmdir temp"]
+  },
+  "cp": {
+    "desc": "Copy files or directories",
+    "usage": "cp [-r] <source> <destination>",
+    "man": "The cp command copies files or directories from source to destination. For single files, use 'cp source dest'. For directories, use the -r (recursive) flag: 'cp -r source dest'. The destination can be a new name or a path. If copying within the same directory, you must provide a different name. The original file remains unchanged.",
     "examples": [
-      "todo add Buy milk",
-      "todo list",
-      "todo done 1",
-      "todo clear all"
+      "cp file.txt backup.txt",
+      "cp -r folder1 folder2",
+      "cp document.pdf /home/user/docs/"
     ]
   },
-  "note": {
-    "desc": "Quickly save a note",
-    "usage": "note <text>",
-    "man": "NAME\n\tnote - quickly save a note\n\nSYNOPSIS\n\tnote TEXT\n\nDESCRIPTION\n\tSaves a quick text note to local storage. Use 'notes' to view them.",
-    "examples": ["note Meeting at 5PM", "note Idea for new app"]
+  "mv": {
+    "desc": "Move or rename files and directories",
+    "usage": "mv <source> <destination>",
+    "man": "The mv command moves files or directories from one location to another, or renames them if the destination is in the same directory. Unlike cp, this removes the original file from its source location. Both files and directories can be moved/renamed with the same command. The operation is atomic - either it fully succeeds or fails.",
+    "examples": [
+      "mv oldname.txt newname.txt",
+      "mv file.txt /home/user/documents/",
+      "mv folder1 folder2"
+    ]
   },
-  "notes": {
-    "desc": "Manage saved notes",
-    "usage": "notes <list|clear>",
-    "man": "NAME\n\tnotes - manage saved notes\n\nSYNOPSIS\n\tnotes [ACTION]\n\nACTIONS\n\tlist    List all saved notes (default)\n\tclear   Delete all notes",
-    "examples": ["notes", "notes list", "notes clear"]
+  "head": {
+    "desc": "Display first lines of a file",
+    "usage": "head [-n <number>] <file>",
+    "man": "The head command displays the first 10 lines of a file by default. Use the -n flag followed by a number to specify a different number of lines. For example, 'head -n 20 file.txt' shows the first 20 lines. This is useful for previewing large files or checking file headers without viewing the entire content.",
+    "examples": ["head file.txt", "head -n 5 log.txt", "head -n 1 data.csv"]
   },
-  "timer": {
-    "desc": "Set a countdown timer",
-    "usage": "timer <duration>",
-    "man": "NAME\n\ttimer - set a countdown timer\n\nSYNOPSIS\n\ttimer [DURATION] | stop\n\nDESCRIPTION\n\tSets a timer for the specified duration. Notifies via alert and sound when done.\n\nFORMATS\n\t10s (seconds), 5m (minutes), 1h (hours)",
-    "examples": ["timer 30s", "timer 15m", "timer stop"]
+  "tail": {
+    "desc": "Display last lines of a file",
+    "usage": "tail [-n <number>] <file>",
+    "man": "The tail command displays the last 10 lines of a file by default. Use the -n flag followed by a number to specify a different number of lines. For example, 'tail -n 20 file.txt' shows the last 20 lines. This is particularly useful for viewing log files or checking the end of large documents.",
+    "examples": [
+      "tail file.txt",
+      "tail -n 15 error.log",
+      "tail -n 5 output.txt"
+    ]
   },
-  "alarm": {
-    "desc": "Set a daily alarm",
-    "usage": "alarm <HH:MM>",
-    "man": "NAME\n\talarm - set a daily alarm\n\nSYNOPSIS\n\talarm HH:MM\n\nDESCRIPTION\n\tSets an alarm for a specific time in 24-hour format. If time has passed, sets for the next day.",
-    "examples": ["alarm 08:30", "alarm 23:00"]
+  "wc": {
+    "desc": "Count lines, words, and characters in a file",
+    "usage": "wc <file>",
+    "man": "The wc (word count) command displays statistics about the specified file. It shows three numbers: line count, word count, and character count, followed by the filename. This is useful for analyzing text files, checking document length, or validating file content.",
+    "examples": ["wc document.txt", "wc script.js"]
   },
-  "session": {
-    "desc": "Manage terminal sessions",
-    "usage": "session <save|load|list|delete> [name]",
-    "man": "NAME\n\tsession - manage terminal sessions\n\nSYNOPSIS\n\tsession ACTION [NAME]\n\nDESCRIPTION\n\tSave and restore terminal state (history, path, theme, etc.).\n\nACTIONS\n\tsave <name>   Save current state\n\tload <name>   Restore a saved state\n\tlist          Show saved sessions\n\tdelete <name> Delete a session",
-    "examples": ["session save work", "session load work", "session list"]
+  "find": {
+    "desc": "Search for files by name or pattern",
+    "usage": "find <pattern> OR find <path> <pattern>",
+    "man": "The find command searches for files and directories matching the specified pattern. The pattern can include wildcards (* for multiple characters, ? for single character). You can optionally specify a starting path; otherwise, it searches from the current directory recursively. Results show the full path and type (file or directory) of each match with appropriate icons.",
+    "examples": ["find *.txt", "find /home/user *.js", "find test*"]
+  },
+  "grep": {
+    "desc": "Search for text patterns in files",
+    "usage": "grep [-r] [-i] \"pattern\" <file|path>",
+    "man": "The grep command searches for text matching a pattern within files. Use quotes around patterns with spaces. The -r flag enables recursive search through directories. The -i flag makes the search case-insensitive. Without -r, it searches a single file. Results show line numbers and the matching lines. This is essential for finding specific content in large files or codebases.",
+    "examples": [
+      "grep \"error\" log.txt",
+      "grep -r \"function\" /home/user/project",
+      "grep -i \"warning\" system.log"
+    ]
   },
   "theme": {
-    "desc": "Change terminal theme",
+    "desc": "Change terminal color theme",
     "usage": "theme set <name>",
-    "man": "NAME\n\ttheme - change terminal theme\n\nSYNOPSIS\n\ttheme set NAME\n\nDESCRIPTION\n\tChanges the color scheme of the terminal.\n\nTHEMES\n\tmatrix, kali, ubuntu, neon-purple, hacker-amber",
-    "examples": ["theme set kali", "theme set neon-purple"]
-  },
-  "set": {
-    "desc": "Configure terminal settings",
-    "usage": "set <property> <value>",
-    "man": "NAME\n\tset - configure terminal settings\n\nSYNOPSIS\n\tset PROPERTY VALUE\n\nPROPERTIES\n\tfontSize <px>   Set font size (8-40)\n\topacity <0-1>   Set background opacity\n\tprompt <text>   Set custom prompt string\n\tstartupCmd <cmd> Command to run on start",
-    "examples": ["set fontSize 16", "set opacity 0.8", "set prompt default"]
+    "man": "The theme command changes the terminal's visual color scheme. Available themes include 'matrix' (green on black), 'kali' (Kali Linux style), 'ubuntu' (Ubuntu terminal), 'neon-purple' (purple neon style), and 'hacker-amber' (amber monochrome). The theme change is immediate and persists across sessions. Each theme provides a different aesthetic experience while maintaining functionality.",
+    "examples": ["theme set matrix", "theme set kali", "theme set neon-purple"]
   },
   "open": {
-    "desc": "Open external services",
-    "usage": "open <service>",
-    "man": "NAME\n\topen - open external services\n\nSYNOPSIS\n\topen SERVICE\n\nDESCRIPTION\n\tOpens a predefined service URL in a new tab. Use 'quicklink' to see available services.",
-    "examples": ["open gmail", "open youtube", "open chatgpt"]
+    "desc": "Open a service, website, or saved bookmark",
+    "usage": "open <name>",
+    "man": "The open command launches websites, services, or bookmarks in a new browser tab. It first checks system services (like gmail, github, chatgpt), then checks user-created bookmarks. The lookup is case-insensitive. If the name isn't found in either location, an error is displayed with suggestions to use 'quicklink' or 'bookmark list' commands. This provides quick access to frequently visited sites.",
+    "examples": ["open gmail", "open github", "open mybookmark"]
+  },
+  "quicklink": {
+    "desc": "List all available quick link services",
+    "usage": "quicklink [search-term]",
+    "man": "The quicklink command displays all available system services that can be opened with the 'open' command. Services are loaded from services.json and include popular websites and tools. You can optionally provide a search term to filter the list. Each service is shown with its name and URL. The list is alphabetically sorted for easy browsing.",
+    "examples": ["quicklink", "quicklink google"]
   },
   "google": {
     "desc": "Search Google",
     "usage": "google <query>",
-    "man": "NAME\n\tgoogle - search Google\n\nSYNOPSIS\n\tgoogle QUERY\n\nDESCRIPTION\n\tOpens a Google search for the specified query in a new tab.",
-    "examples": ["google javascript tutorial", "google best linux distros"]
+    "man": "The google command performs a Google search with your query in a new browser tab. All arguments are combined into the search query. This provides quick web search access directly from the terminal without manually opening a browser and typing in the search box.",
+    "examples": ["google javascript tutorial", "google best practices"]
   },
   "youtube": {
     "desc": "Search YouTube",
     "usage": "youtube <query>",
-    "man": "NAME\n\tyoutube - search YouTube\n\nSYNOPSIS\n\tyoutube QUERY\n\nDESCRIPTION\n\tOpens a YouTube search for the specified query in a new tab.",
-    "examples": ["youtube lo-fi music", "youtube coding patterns"]
-  },
-  "weather": {
-    "desc": "Get weather information",
-    "usage": "weather [gps]",
-    "man": "NAME\n\tweather - get weather information\n\nSYNOPSIS\n\tweather [gps]\n\nDESCRIPTION\n\tFetches current weather. Use 'gps' argument to use your current location, otherwise defaults to API default.",
-    "examples": ["weather", "weather gps"]
-  },
-  "matrix": {
-    "desc": "Toggle Matrix rain effect",
-    "usage": "matrix",
-    "man": "NAME\n\tmatrix - toggle Matrix rain effect\n\nSYNOPSIS\n\tmatrix\n\nDESCRIPTION\n\tEnables or disables the background digital rain visual effect.",
-    "examples": ["matrix"]
-  },
-  "cowsay": {
-    "desc": "Configurable speaking cow",
-    "usage": "cowsay <text>",
-    "man": "NAME\n\tcowsay - configurable speaking cow\n\nSYNOPSIS\n\tcowsay TEXT\n\nDESCRIPTION\n\tGenerates an ASCII picture of a cow saying something.",
-    "examples": ["cowsay Hello World", "cowsay I am a terminal"]
-  },
-  "help": {
-    "desc": "Display help information",
-    "usage": "help [command]",
-    "man": "NAME\n\thelp - display help information\n\nSYNOPSIS\n\thelp [COMMAND]\n\nDESCRIPTION\n\tDisplay general help or detailed help for a specific command.",
-    "examples": ["help", "help ls"]
-  },
-  "man": {
-    "desc": "Format and display the on-line manual pages",
-    "usage": "man <command>",
-    "man": "NAME\n\tman - format and display the on-line manual pages\n\nSYNOPSIS\n\tman COMMAND\n\nDESCRIPTION\n\tShows the detailed manual page for a command, including synopsis and options.",
-    "examples": ["man grep", "man ls"]
+    "man": "The youtube command searches YouTube for videos matching your query and opens the results in a new browser tab. All arguments are combined into the search query. This is useful for quickly finding video tutorials, music, or any YouTube content without leaving the terminal.",
+    "examples": ["youtube programming tutorials", "youtube cosmic relaxation"]
   },
   "github": {
-    "desc": "Search GitHub",
+    "desc": "Search GitHub repositories",
     "usage": "github <query>",
-    "man": "NAME\n\tgithub - search GitHub\n\nSYNOPSIS\n\tgithub QUERY\n\nDESCRIPTION\n\tSearches GitHub repositories for the query.",
-    "examples": ["github react", "github terminal-js"]
+    "man": "The github command searches GitHub for repositories, code, or users matching your query. Results open in a new browser tab showing GitHub's search results page. This is perfect for quickly finding open-source projects, code examples, or developer profiles.",
+    "examples": ["github react components", "github terminal emulator"]
   },
   "stackoverflow": {
     "desc": "Search StackOverflow",
-    "usage": "stackoverflow <query>",
-    "man": "NAME\n\tstackoverflow - search StackOverflow\n\nSYNOPSIS\n\tstackoverflow QUERY\n\nDESCRIPTION\n\tSearches StackOverflow for questions matching the query.",
-    "examples": ["stackoverflow center div", "stackoverflow js array methods"]
+    "usage": "stackoverflow <question>",
+    "man": "The stackoverflow command searches StackOverflow for questions and answers related to your query. Results open in a new tab. This is invaluable for developers looking for solutions to programming problems, code examples, or technical discussions.",
+    "examples": [
+      "stackoverflow javascript promises",
+      "stackoverflow python list comprehension"
+    ]
   },
-  "translate": {
-    "desc": "Translate text via Google",
-    "usage": "translate <text> [lang-pair]",
-    "man": "NAME\n\ttranslate - translate text via Google\n\nSYNOPSIS\n\ttranslate TEXT [SOURCE-TARGET]\n\nDESCRIPTION\n\tTranslates text. Optional language pair (e.g., en-es, en-hi). Default is auto-detect to English.",
-    "examples": ["translate hello world", "translate hello world en-hi"]
+  "wiki": {
+    "desc": "Search Wikipedia",
+    "usage": "wiki <topic>",
+    "man": "The wiki command searches Wikipedia for articles about the specified topic. It opens Wikipedia's search results in a new browser tab. This is useful for quick fact-checking, research, or learning about any topic covered by Wikipedia.",
+    "examples": ["wiki quantum computing", "wiki history of internet"]
   },
   "map": {
-    "desc": "Open location in Google Maps",
+    "desc": "Open Google Maps for a location",
     "usage": "map <location>",
-    "man": "NAME\n\tmap - open location in Google Maps\n\nSYNOPSIS\n\tmap LOCATION\n\nDESCRIPTION\n\tOpens Google Maps showing the specified location.",
-    "examples": ["map New York", "map Eiffel Tower"]
+    "man": "The map command opens Google Maps in a new tab, searching for the specified location. You can provide addresses, city names, landmarks, or any location query that Google Maps understands. This is useful for quickly looking up directions or exploring locations.",
+    "examples": [
+      "map New York",
+      "map Eiffel Tower Paris",
+      "map 123 Main Street"
+    ]
+  },
+  "translate": {
+    "desc": "Translate text using Google Translate",
+    "usage": "translate <text> [lang-code]",
+    "man": "The translate command opens Google Translate with your text in a new browser tab. Optionally specify a language code (like 'hi', 'es', 'fr') or language pair (like 'en-hi') as the last argument. If no language is specified, Google Translate will auto-detect the source language and default to English translation. The format 'en-hi' means translate from English to Hindi.",
+    "examples": [
+      "translate hello world hi",
+      "translate buenos dias en-es",
+      "translate bonjour"
+    ]
+  },
+  "weather": {
+    "desc": "Get current weather information",
+    "usage": "weather [gps]",
+    "man": "The weather command fetches current weather data including temperature, conditions, humidity, and wind speed. Use 'weather gps' to get weather for your current GPS location (requires location permission). Without arguments, it attempts to fetch weather based on stored location data. Results are displayed in the terminal and also update the weather widget. Data is fetched from weatherapi.com.",
+    "examples": ["weather", "weather gps"]
   },
   "crypto": {
     "desc": "Get cryptocurrency prices",
-    "usage": "crypto <symbol>",
-    "man": "NAME\n\tcrypto - get cryptocurrency prices\n\nSYNOPSIS\n\tcrypto [SYMBOL]\n\nDESCRIPTION\n\tFetches current price of a cryptocurrency. Default is BTC.",
-    "examples": ["crypto", "crypto ETH", "crypto DOGE"]
+    "usage": "crypto [symbol]",
+    "man": "The crypto command fetches current cryptocurrency prices. Without arguments, it defaults to Bitcoin (BTC). You can specify any cryptocurrency symbol like ETH, BTC, LTC, etc. The price is displayed in USD. This uses the apiManager to fetch real-time price data from cryptocurrency APIs.",
+    "examples": ["crypto", "crypto BTC", "crypto ETH"]
   },
   "news": {
     "desc": "Fetch latest news headlines",
     "usage": "news",
-    "man": "NAME\n\tnews - fetch latest news headlines\n\nSYNOPSIS\n\tnews\n\nDESCRIPTION\n\tFetches top news headlines from external API.",
+    "man": "The news command retrieves the latest news headlines from a news API. It displays article titles with links to the full stories. This provides quick access to current events without leaving the terminal. The number of articles displayed depends on the API configuration.",
     "examples": ["news"]
   },
   "quote": {
-    "desc": "Get a random quote",
+    "desc": "Get an inspirational quote",
     "usage": "quote",
-    "man": "NAME\n\tquote - get a random quote\n\nSYNOPSIS\n\tquote\n\nDESCRIPTION\n\tDisplays a random inspirational quote.",
+    "man": "The quote command fetches a random inspirational or motivational quote along with its author. Quotes are retrieved from a quotation API and displayed in an elegant format. This is a nice way to get some inspiration or wisdom during your terminal session.",
     "examples": ["quote"]
   },
-  "shortcut": {
-    "desc": "Manage custom keyboard shortcuts",
-    "usage": "shortcut <list|set> [key] [cmd]",
-    "man": "NAME\n\tshortcut - manage custom keyboard shortcuts\n\nSYNOPSIS\n\tshortcut list\n\tshortcut set KEY_COMBO COMMAND\n\nDESCRIPTION\n\tDefine custom key combinations to trigger specific commands.",
-    "examples": ["shortcut list", "shortcut set Ctrl+Q clear"]
+  "sys.info": {
+    "desc": "Display system information",
+    "usage": "sys.info",
+    "man": "The sys.info command shows detailed information about the browser and system environment. This includes browser name and version, operating system, screen resolution, available memory, CPU cores, language settings, and other technical details. The information is fetched from the systemMonitor module and displayed in a formatted table.",
+    "examples": ["sys.info"]
   },
-  "settings": {
-    "desc": "Import/Export terminal settings",
-    "usage": "settings <export|import|reset>",
-    "man": "NAME\n\tsettings - manage terminal settings\n\nSYNOPSIS\n\tsettings ACTION\n\nDESCRIPTION\n\tExport settings to JSON file, import from JSON, or reset to defaults.",
-    "examples": ["settings export", "settings import"]
+  "sys.log": {
+    "desc": "Show system event logs",
+    "usage": "sys.log",
+    "man": "The sys.log command displays recent system events and activity logs maintained by the terminal. Logs include various system operations, errors, warnings, and informational messages. This is useful for debugging or understanding what actions have occurred during your session.",
+    "examples": ["sys.log"]
   },
   "dev.mode.enable": {
-    "desc": "Enable developer mode",
+    "desc": "Enable developer debug mode",
     "usage": "dev.mode.enable",
-    "man": "NAME\n\tdev.mode.enable - enable developer mode\n\nSYNOPSIS\n\tdev.mode.enable\n\nDESCRIPTION\n\tEnables verbose debugging logs in the console.",
+    "man": "The dev.mode.enable command activates developer mode, which enables additional debugging information and verbose logging. This is intended for developers or advanced users who need to troubleshoot issues or understand internal terminal operations. Once enabled, you'll see more detailed information about command execution and system events.",
     "examples": ["dev.mode.enable"]
   },
-  "quicklink": {
-    "desc": "List available quick links",
-    "usage": "quicklink [filter]",
-    "man": "NAME\n\tquicklink - list available quick links\n\nSYNOPSIS\n\tquicklink [FILTER]\n\nDESCRIPTION\n\tLists all services available for the 'open' command. Optional filter searches by name.",
-    "examples": ["quicklink", "quicklink google"]
+  "neofetch": {
+    "desc": "Display system information with ASCII art",
+    "usage": "neofetch",
+    "man": "The neofetch command displays system information in a visually appealing format with ASCII art logo. It shows details like username, hostname, operating system (CyberTerm Linux), kernel version, uptime, and shell version. This command mimics the popular neofetch utility found in Linux systems and provides a stylish way to view system specs.",
+    "examples": ["neofetch"]
   },
-  "tutorial": {
-    "desc": "Start interactive tutorial",
-    "usage": "tutorial [topic]",
-    "man": "NAME\n\ttutorial - start interactive tutorial\n\nSYNOPSIS\n\ttutorial [start|commands|shortcuts]\n\nDESCRIPTION\n\tGuides the user through terminal features.",
-    "examples": ["tutorial", "tutorial shortcuts"]
+  "cowsay": {
+    "desc": "Make an ASCII cow speak your message",
+    "usage": "cowsay <text>",
+    "man": "The cowsay command displays your message in a speech bubble with an ASCII art cow. If no text is provided, the cow says 'Moo!' by default. This is a fun, whimsical command based on the classic Unix cowsay program. It's perfect for adding humor to your terminal experience or making announcements in a creative way.",
+    "examples": ["cowsay Hello World", "cowsay Terminal is awesome"]
   },
-  "examples": {
-    "desc": "Show examples for a command",
-    "usage": "examples <command>",
-    "man": "NAME\n\texamples - show examples for a command\n\nSYNOPSIS\n\texamples COMMAND\n\nDESCRIPTION\n\tDisplays usage examples for the specified command.",
-    "examples": ["examples grep", "examples tar"]
-  },
-  "wiki": {
-    "desc": "Search Wikipedia",
-    "usage": "wiki <query>",
-    "man": "NAME\n\twiki - search Wikipedia\n\nSYNOPSIS\n\twiki QUERY\n\nDESCRIPTION\n\tOpens a Wikipedia search for the query.",
-    "examples": ["wiki linux", "wiki quantum physics"]
-  },
-  "refresh": {
-    "desc": "Reload the current browser tab",
-    "usage": "refresh",
-    "man": "NAME\n\trefresh - reload current browser tab\n\nSYNOPSIS\n\trefresh\n\nDESCRIPTION\n\tReloads the currently active browser tab to update the page content.",
-    "examples": ["refresh"]
+  "matrix": {
+    "desc": "Toggle Matrix rain effect on/off",
+    "usage": "matrix",
+    "man": "The matrix command toggles the iconic Matrix-style falling characters animation in the background. When enabled, green characters cascade down the screen behind the terminal text, creating a cyberpunk aesthetic. The setting is saved and persists across sessions. Toggle it on for atmosphere or off for a cleaner look.",
+    "examples": ["matrix"]
   },
   "calc": {
     "desc": "Evaluate mathematical expressions",
     "usage": "calc <expression>",
-    "man": "NAME\n\tcalc - in-terminal calculator\n\nSYNOPSIS\n\tcalc EXPRESSION\n\nDESCRIPTION\n\tEvaluates a mathematical expression and prints the result. Supports basic operators (+, -, *, /, ()).\n\nEXAMPLES\n\tcalc 10 + 5\n\tcalc (100 * 2) / 5",
-    "examples": ["calc 2 + 2", "calc 10 * (5 + 2)"]
+    "man": "The calc command evaluates mathematical expressions and displays the result. It supports basic operations (+, -, *, /), parentheses for order of operations, and decimal numbers. The expression is parsed safely without using eval() for security. Spaces in the expression are optional. Invalid expressions or characters will result in an error message.",
+    "examples": ["calc 10 + 5 * 2", "calc (15/ 4", "calc 100 - 25"]
   },
   "bookmark": {
-    "desc": "Manage custom web bookmarks",
-    "usage": "bookmark <action> [args]",
-    "man": "NAME\n\tbookmark - manage custom web bookmarks\n\nSYNOPSIS\n\tbookmark ACTION [NAME] [URL]\n\nACTIONS\n\tadd <name> <url>   Save a bookmark\n\tremove <name>      Delete a bookmark\n\tlist               Show all bookmarks\n\topen <name>        Open a bookmark",
+    "desc": "Manage custom bookmarks",
+    "usage": "bookmark <add|remove|list|open> [name] [url]",
+    "man": "The bookmark command manages your personal bookmark collection. 'add' saves a new bookmark with a name and URL (http/https is optional). 'remove' deletes a bookmark by name. 'list' shows all saved bookmarks. 'open' launches a bookmark in a new tab. Before adding, the command checks if the URL already exists in system services or other bookmarks to prevent duplicates. Bookmarks persist across sessions.",
     "examples": [
-      "bookmark add mygit github.com/myrepo",
+      "bookmark add mysite example.com",
       "bookmark list",
-      "open mygit"
+      "bookmark open mysite",
+      "bookmark remove mysite"
     ]
   },
   "passgen": {
-    "desc": "Generate secure passwords",
-    "usage": "passgen [length]",
-    "man": "NAME\n\tpassgen - secure password generator\n\nSYNOPSIS\n\tpassgen [LENGTH]\n\nDESCRIPTION\n\tGenerates a random, secure password of the specified length (default 12). Automatically copies to clipboard.",
-    "examples": ["passgen", "passgen 24"]
+    "desc": "Generate a secure random password",
+    "usage": "passgen <length>",
+    "man": "The passgen command generates cryptographically secure random passwords. Specify the desired length (4-128 characters). The password includes uppercase, lowercase, numbers, and special characters for maximum security. Generated passwords are automatically copied to your clipboard for easy pasting. This is useful for creating strong passwords for accounts and services.",
+    "examples": ["passgen 16", "passgen 32", "passgen 12"]
   },
   "alias": {
-    "desc": "Create custom command shortcuts",
-    "usage": "alias <action> [name] [command]",
-    "man": "NAME\n\talias - manage command aliases\n\nSYNOPSIS\n\talias ACTION [NAME] [COMMAND]\n\nACTIONS\n\tset <name> <cmd>   Create a shortcut\n\tremove <name>      Delete a shortcut\n\tlist               Show all aliases\n\nDESCRIPTION\n\tAllows you to create short names for long commands.",
-    "examples": ["alias set cls clear", "alias set ll ls -la", "alias list"]
-  },
-  "tabs": {
-    "desc": "Advanced browser tab manager",
-    "usage": "tabs <action> [args]",
-    "man": "NAME\n\ttabs - advanced browser tab manager\n\nSYNOPSIS\n\ttabs ACTION [ARGS]\n\nDESCRIPTION\n\tControl your browser tabs directly from the terminal. Supports bulk actions, search, and memory management.\n\nACTIONS\n\tlist [query]       List tabs. Optional query filters results.\n\tswitch <sn>        Jump to a specific tab number.\n\tnew [cnt] [url]    Open new tab(s). E.g., 'tabs new 2 google'.\n\tclose <sn...>|all  Close specific tabs (e.g. '1 3') or all.\n\treload <sn...>|all Reload specific tabs or all.\n\tpin/unpin <args>   Pin or unpin tabs.\n\tmute/unmute <args> Mute or unmute tab audio.\n\tdiscard <args>     Suspend tabs to free up RAM.\n\tdedup              Auto-close duplicate tabs.\n\nARGUMENTS\n\tsn                 Serial Number from 'tabs list' (e.g., 1)\n\tall                Apply action to all tabs\n\nEXAMPLES\n\t$ tabs list google\n\t$ tabs new 3 github.com\n\t$ tabs close 1 3 5\n\t$ tabs mute all\n\t$ tabs dedup",
+    "desc": "Create, list, or remove command shortcuts",
+    "usage": "alias <set|list|remove> [name] [command]",
+    "man": "The alias command creates custom shortcuts for frequently used commands or command combinations. 'set' creates a new alias - specify a short name and the full command it should execute. 'list' shows all defined aliases. 'remove' deletes an alias by name. Aliases can include arguments. For example, 'alias set ll ls -la' creates an 'll' shortcut for detailed directory listing. Aliases persist across sessions.",
     "examples": [
-      "tabs list",
-      "tabs new 2 youtube",
-      "tabs close 1 4",
-      "tabs mute all",
-      "tabs dedup"
+      "alias set ll ls -la",
+      "alias set c clear",
+      "alias list",
+      "alias remove ll"
     ]
   },
   "fetch": {
-    "desc": "Fetch resources from the network",
-    "usage": "fetch <url>",
-    "man": "NAME\n\tfetch - fetch resources\n\nSYNOPSIS\n\tfetch URL\n\nDESCRIPTION\n\tFetch displays the content of a URL. Automatically formats JSON output.",
+    "desc": "Fetch content from a URL",
+    "usage": "fetch <url> [-m method]",
+    "man": "The fetch command retrieves content from the specified URL and displays it in the terminal. If the URL doesn't start with http/https, it's automatically prefixed with https://. The command shows the HTTP status code and determines the content type. JSON responses are formatted with proper indentation. Text responses are shown up to 500 characters to avoid overwhelming the terminal. This is useful for testing APIs or quickly viewing web content.",
     "examples": [
-      "fetch https://api.github.com/users/github",
-      "fetch google.com"
+      "fetch api.github.com/users/octocat",
+      "fetch example.com",
+      "fetch https://jsonplaceholder.typicode.com/posts/1"
+    ]
+  },
+  "tabs": {
+    "desc": "Manage browser tabs - list, switch, create, close, and more",
+    "usage": "tabs <action> [args]",
+    "man": "The tabs command provides comprehensive browser tab management using Chrome Extension APIs. Actions include: 'list' (show all tabs with status indicators), 'switch/goto' (activate a specific tab by number), 'new' (create blank tabs or open URLs - supports bulk creation like 'tabs new 5 github.com'), 'close' (close tabs by number/range/all), 'reload' (refresh tabs), 'pin/unpin' (pin tabs), 'mute/unmute' (control audio), 'discard' (free RAM by unloading inactive tabs), 'dedup' (remove duplicate tabs). Supports ranges like '1-5' and multiple targets like '1 3 5'. Requires Chrome tabs permission.",
+    "examples": [
+      "tabs list",
+      "tabs switch 3",
+      "tabs new github.com",
+      "tabs new 5",
+      "tabs close 1-5",
+      "tabs close all",
+      "tabs pin 1",
+      "tabs reload 2 4 6",
+      "tabs dedup"
     ]
   },
   "history.browser": {
-    "desc": "Manage browser history",
-    "usage": "history.browser <action> [args]",
-    "man": "NAME\n\thistory.browser - manage browser history\n\nSYNOPSIS\n\thistory.browser [list|search|open|rm|stats|clear]\n\nDESCRIPTION\n\tInteract with Chrome's history API to list, search, or delete history items.",
+    "desc": "Manage browser history - list, search, open, or delete",
+    "usage": "history.browser <list|search|open|rm|clear|stats> [args]",
+    "man": "The history.browser command manages your browser's history using Chrome Extension APIs. 'list' shows recent history (optionally specify count like 'list 50'). 'search' finds history entries containing specific text. 'open' opens history items in new tabs (supports ranges like '1-5'). 'rm/delete' removes specific history entries. 'clear' wipes all history. 'stats' analyzes and shows your top 10 most visited sites. Results display with serial numbers, dates, times, and titles. Requires Chrome history permission.",
     "examples": [
       "history.browser list",
-      "history.browser search google",
-      "history.browser stats"
+      "history.browser list 30",
+      "history.browser search github",
+      "history.browser open 1",
+      "history.browser open 1-3",
+      "history.browser rm 5",
+      "history.browser stats",
+      "history.browser clear"
     ]
   },
   "download": {
-    "desc": "Manage downloads",
-    "usage": "download <action> [args]",
-    "man": "NAME\n\tdownload - manage downloads\n\nSYNOPSIS\n\tdownload [url|list|pause|resume|cancel|clear]\n\nDESCRIPTION\n\tStart file downloads or manage existing ones with a live progress bar.",
+    "desc": "Manage browser downloads - start, list, pause, resume, monitor progress",
+    "usage": "download <url|list|progress|pause|resume|cancel|open|show|clear> [args]",
+    "man": "The download command manages browser downloads using Chrome Extension APIs. Provide a URL to start downloading a file with live progress monitoring. 'list' shows all downloads with status and progress bars. 'progress' shows live tracking for all active downloads. 'pause/resume/cancel' control specific downloads by number/range. 'open' opens downloaded files, 'show' reveals them in file manager. 'clear' removes completed downloads from the list. Supports ranges like '1-5' and 'all' for bulk operations. Downloads show real-time speed and progress with visual bars. Requires Chrome downloads permission.",
     "examples": [
       "download https://example.com/file.zip",
       "download list",
-      "download pause 1"
+      "download progress",
+      "download pause 1",
+      "download resume 1-3",
+      "download cancel all",
+      "download open 1",
+      "download show 2",
+      "download clear"
     ]
-  },
-  "tip": {
-    "desc": "Show a random tip",
-    "usage": "tip",
-    "man": "NAME\n\ttip - show a random tip\n\nSYNOPSIS\n\ttip\n\nDESCRIPTION\n\tDisplays a helpful tip about using the terminal commands and shortcuts.",
-    "examples": ["tip"]
   },
   "wormhole": {
-    "desc": "Secure Smartphone-to-Terminal Chat Bridge",
+    "desc": "Start or disconnect secure chat channel with another device",
     "usage": "wormhole [disconnect]",
-    "man": "NAME\n\twormhole - Quantum Link Protocol\n\nSYNOPSIS\n\twormhole\n\twormhole disconnect\n\nDESCRIPTION\n\tGenerates a QR code to establish a real-time, encrypted chat channel with your smartphone. Supports text transfer and live chatting.\n\tUse 'disconnect' to terminate the session.",
+    "man": "The wormhole command creates an encrypted peer-to-peer chat channel between devices using ntfy.sh as the relay server. Running 'wormhole' generates a unique QR code and link that another device can scan/click to join the chat. A security warning is shown before accepting connections. Once connected, you can send text messages in real-time. Type 'disconnect' in chat or use 'wormhole disconnect' to end the session. Messages show timestamps and the channel uses end-to-end encryption. Perfect for secure file sharing or quick messages between your devices.",
     "examples": ["wormhole", "wormhole disconnect"]
-  },
-  "remind": {
-    "desc": "Chronos Smart Reminder & Alarm System",
-    "usage": "remind <time> <message> | remind drink water | remind off",
-    "man": "NAME\n\tremind - Productivity Timer\n\nSYNOPSIS\n\tremind <duration>[s/m/h] <text>\n\tremind drink water\n\tremind off\n\nDESCRIPTION\n\tSets a background timer with audio and visual alerts.\n\t- 'drink water': Starts a recurring 30-min hydration loop.\n\t- 'off': Cancels ALL active reminders immediately.",
-    "examples": [
-      "remind 20m Take a break",
-      "remind 45s Check Server",
-      "remind drink water",
-      "remind off"
-    ]
   }
 }
