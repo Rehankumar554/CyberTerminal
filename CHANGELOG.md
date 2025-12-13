@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Changelog
 
+## [Unreleased] - 2025-12-13
+
+### Added
+
+- **Feat(Wormhole):** Implemented QR-based Chat System using `ntfy.sh`. Added Warning Screen, Timestamping, and Echo-Cancellation.
+- **Feat(Chronos):** Added `remind` command with support for seconds/minutes/hours.
+- **Feat(Health):** Added `remind drink water` recurring hydration protocol.
+- **Feat(Intel):** Added `status` command for IP, Location, and Weather details.
+- **UI:** Added Chat Interface, Warning Modal, and Title-Bar flashing for alerts.
+
+### Changed
+
+- Refactored `terminal.js` to support smart command parsing.
+- Updated CSS for Cyberpunk-style Chat and Modal windows.
+
 ## [v1.3.0] - 2025-12-13
 
 ### 🚀 Added

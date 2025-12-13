@@ -424,5 +424,22 @@
     "usage": "tip",
     "man": "NAME\n\ttip - show a random tip\n\nSYNOPSIS\n\ttip\n\nDESCRIPTION\n\tDisplays a helpful tip about using the terminal commands and shortcuts.",
     "examples": ["tip"]
+  },
+  "wormhole": {
+    "desc": "Secure Smartphone-to-Terminal Chat Bridge",
+    "usage": "wormhole [disconnect]",
+    "man": "NAME\n\twormhole - Quantum Link Protocol\n\nSYNOPSIS\n\twormhole\n\twormhole disconnect\n\nDESCRIPTION\n\tGenerates a QR code to establish a real-time, encrypted chat channel with your smartphone. Supports text transfer and live chatting.\n\tUse 'disconnect' to terminate the session.",
+    "examples": ["wormhole", "wormhole disconnect"]
+  },
+  "remind": {
+    "desc": "Chronos Smart Reminder & Alarm System",
+    "usage": "remind <time> <message> | remind drink water | remind off",
+    "man": "NAME\n\tremind - Productivity Timer\n\nSYNOPSIS\n\tremind <duration>[s/m/h] <text>\n\tremind drink water\n\tremind off\n\nDESCRIPTION\n\tSets a background timer with audio and visual alerts.\n\t- 'drink water': Starts a recurring 30-min hydration loop.\n\t- 'off': Cancels ALL active reminders immediately.",
+    "examples": [
+      "remind 20m Take a break",
+      "remind 45s Check Server",
+      "remind drink water",
+      "remind off"
+    ]
   }
 }

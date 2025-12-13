@@ -16,6 +16,12 @@ A fully functional, Linux-grade terminal emulator that replaces your Chrome New 
 
 ## ✨ Features
 
+### 🚀 New Advanced Modules
+
+- **🌀 Wormhole Protocol**: A real-time, cross-device Chat System. Scan a QR code to instantly connect your phone and terminal. Features secure handshake, timestamped chat, and disconnect commands.
+- **⏳ Chronos System**: A smart reminder utility. Supports standard timers (`remind 10m`) and a specialized **Hydration Protocol** (`remind drink water`) that alerts you every 30 mins.
+- **📡 Intel HUD**: One-command system status report (`status`). Fetches your Public IP, ISP, Geo-Location, and ASCII Weather report instantly.
+
 ### 🌐 Advanced Browser Tab Manager (v1.2.0)
 
 Control your browser tabs entirely from the keyboard without touching the mouse.
