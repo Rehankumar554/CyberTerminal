@@ -50,6 +50,7 @@ class Terminal {
     this.loadTips();
     this.loadDocs();
     this.loadServices();
+    this.initSettingsUI();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
@@ -98,6 +99,86 @@ class Terminal {
         this.commands["tip.daily"].call(this);
       }
     }, 500);
+  }
+
+  initSettingsUI() {
+    const modal = document.getElementById("settings-modal");
+    const btn = document.getElementById("settings-btn");
+    const closeBtn = document.getElementById("close-settings");
+
+    // Inputs
+    const themeSelect = document.getElementById("setting-theme");
+    const fontRange = document.getElementById("setting-font");
+    const fontDisplay = document.getElementById("font-val");
+    const opacityRange = document.getElementById("setting-opacity");
+    const opacityDisplay = document.getElementById("opacity-val");
+    const matrixCheck = document.getElementById("setting-matrix");
+
+    // Open Modal logic
+    if (btn) {
+      btn.addEventListener("click", () => {
+        // Load current values
+        themeSelect.value = this.currentTheme;
+        fontRange.value = this.settings.fontSize;
+        fontDisplay.textContent = this.settings.fontSize;
+        opacityRange.value = this.settings.opacity;
+        opacityDisplay.textContent = this.settings.opacity;
+        matrixCheck.checked = this.settings.matrixEnabled;
+
+        modal.classList.remove("modal-hidden");
+      });
+    }
+
+    // Close Modal logic
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        modal.classList.add("modal-hidden");
+        this.input.focus(); // Return focus to terminal
+      });
+    }
+
+    // Real-time Updates
+    themeSelect.addEventListener("change", (e) => {
+      const newTheme = e.target.value;
+
+      // --- FIX: Direct access to global variable (Safe Check) ---
+      if (typeof themeManager !== "undefined") {
+        themeManager.setTheme(newTheme);
+      } else if (window.themeManager) {
+        window.themeManager.setTheme(newTheme);
+      } else {
+        console.warn("ThemeManager not loaded");
+      }
+
+      this.currentTheme = newTheme;
+      this.saveSettings();
+    });
+
+    fontRange.addEventListener("input", (e) => {
+      const val = parseInt(e.target.value);
+      fontDisplay.textContent = val;
+      this.settings.fontSize = val;
+      this.applySettings();
+      this.saveSettings();
+    });
+
+    opacityRange.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      opacityDisplay.textContent = val;
+      this.settings.opacity = val;
+      this.applySettings();
+      this.saveSettings();
+    });
+
+    matrixCheck.addEventListener("change", (e) => {
+      this.settings.matrixEnabled = e.target.checked;
+      this.saveSettings();
+
+      const canvas = document.getElementById("matrix-canvas");
+      if (canvas) {
+        canvas.style.opacity = this.settings.matrixEnabled ? "0.7" : "0";
+      }
+    });
   }
 
   runStartupCmd() {
@@ -632,17 +713,14 @@ class Terminal {
     }, 1500);
   }
 
+  // Existing handleInput ko isse replace karein
   handleInput(e) {
+    const val = e.target.value;
+
     // --- SETUP MODE: Prevent Spaces ---
     if (this.isSetupMode) {
-      const val = e.target.value;
-
-      // Agar value mein space hai
       if (val.includes(" ")) {
-        // Space ko turant remove karein
         this.input.value = val.replace(/\s/g, "");
-
-        // Warning Toast dikhayein
         if (typeof showToast === "function") {
           showToast("Spaces are not allowed in username!");
         }
@@ -650,7 +728,32 @@ class Terminal {
     }
 
     // Normal buffer update
-    this.commandBuffer = e.target.value;
+    this.commandBuffer = val;
+
+    // --- SYNTAX HIGHLIGHTING CALL ---
+    this.checkSyntax(val);
+  }
+
+  // Ye naya method Terminal class ke andar add karein
+  checkSyntax(input) {
+    if (!input.trim()) {
+      this.input.classList.remove("input-valid", "input-invalid");
+      return;
+    }
+
+    const firstWord = input.trim().split(" ")[0].toLowerCase();
+
+    // Check against Commands & Aliases
+    const aliases = JSON.parse(localStorage.getItem("userAliases") || "{}");
+    const isValid = this.commands[firstWord] || aliases[firstWord];
+
+    if (isValid) {
+      this.input.classList.add("input-valid");
+      this.input.classList.remove("input-invalid");
+    } else {
+      this.input.classList.add("input-invalid");
+      this.input.classList.remove("input-valid");
+    }
   }
 
   navigateHistory(direction) {

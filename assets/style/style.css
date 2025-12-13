@@ -502,3 +502,368 @@ pre {
   background: var(--text-primary);
   color: #000;
 }
+
+/* --- Syntax Highlighting --- */
+.input-valid {
+  color: #00ff00 !important; /* Green for valid commands */
+  text-shadow: 0 0 5px #00ff00;
+}
+
+.input-invalid {
+  color: #ff4444 !important; /* Red for invalid commands */
+  text-shadow: 0 0 5px #ff4444;
+}
+
+/* --- Header Integrated Settings Button --- */
+#settings-btn.settings-header-btn {
+  /* Reset positioning */
+  position: static;
+
+  /* Match other header buttons */
+  width: 26px; /* Thoda sa chauda taaki icon fit aaye */
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px; /* Thoda gap baaki buttons se */
+
+  /* Base styles inherited from .control-btn, bas border adjust karein */
+  border: 1px solid var(--border-color);
+  background: transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Image Styling inside Header */
+#settings-btn.settings-header-btn img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 2px var(--text-primary)); /* Neon Glow */
+  opacity: 0.8;
+  transition: all 0.2s;
+}
+
+/* Hover Effect */
+#settings-btn.settings-header-btn:hover {
+  background: var(--text-primary);
+  box-shadow: 0 0 10px var(--text-primary);
+}
+
+#settings-btn.settings-header-btn:hover img {
+  filter: brightness(0); /* Black icon on hover (like others) */
+  opacity: 1;
+}
+
+/* Modal Styles */
+#settings-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.modal-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  width: 350px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px var(--shadow-color);
+  transform: translateY(0);
+  transition: transform 0.3s;
+}
+
+.modal-hidden .modal-content {
+  transform: translateY(-50px);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  color: var(--text-primary);
+  margin: 0;
+}
+
+#close-settings {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.setting-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.checkbox-group {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+label {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+select,
+input[type="range"] {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 5px;
+  border-radius: 4px;
+  accent-color: var(--text-primary);
+}
+
+/* --- Custom Toggle Switch (Checkbox Wrapper 7) --- */
+.checkbox-wrapper-7 .tgl {
+  display: none;
+}
+.checkbox-wrapper-7 .tgl,
+.checkbox-wrapper-7 .tgl:after,
+.checkbox-wrapper-7 .tgl:before,
+.checkbox-wrapper-7 .tgl *,
+.checkbox-wrapper-7 .tgl *:after,
+.checkbox-wrapper-7 .tgl *:before,
+.checkbox-wrapper-7 .tgl + .tgl-btn {
+  box-sizing: border-box;
+}
+.checkbox-wrapper-7 .tgl::-moz-selection,
+.checkbox-wrapper-7 .tgl:after::-moz-selection,
+.checkbox-wrapper-7 .tgl:before::-moz-selection,
+.checkbox-wrapper-7 .tgl *::-moz-selection,
+.checkbox-wrapper-7 .tgl *:after::-moz-selection,
+.checkbox-wrapper-7 .tgl *:before::-moz-selection,
+.checkbox-wrapper-7 .tgl + .tgl-btn::-moz-selection,
+.checkbox-wrapper-7 .tgl::selection,
+.checkbox-wrapper-7 .tgl:after::selection,
+.checkbox-wrapper-7 .tgl:before::selection,
+.checkbox-wrapper-7 .tgl *::selection,
+.checkbox-wrapper-7 .tgl *:after::selection,
+.checkbox-wrapper-7 .tgl *:before::selection,
+.checkbox-wrapper-7 .tgl + .tgl-btn::selection {
+  background: none;
+}
+.checkbox-wrapper-7 .tgl + .tgl-btn {
+  outline: 0;
+  display: block;
+  width: 2.4em; /* SIZE REDUCED: 4em -> 2.4em */
+  height: 1.2em; /* SIZE REDUCED: 2em -> 1.2em */
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+.checkbox-wrapper-7 .tgl + .tgl-btn:after,
+.checkbox-wrapper-7 .tgl + .tgl-btn:before {
+  position: relative;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+}
+.checkbox-wrapper-7 .tgl + .tgl-btn:after {
+  left: 0;
+}
+.checkbox-wrapper-7 .tgl + .tgl-btn:before {
+  display: none;
+}
+.checkbox-wrapper-7 .tgl:checked + .tgl-btn:after {
+  left: 50%;
+}
+
+.checkbox-wrapper-7 .tgl-ios + .tgl-btn {
+  background: rgba(255, 255, 255, 0.1); /* Slightly transparent background */
+  border-radius: 2em;
+  padding: 2px;
+  transition: all 0.4s ease;
+  border: 1px solid var(--border-color); /* Theme border color */
+}
+.checkbox-wrapper-7 .tgl-ios + .tgl-btn:after {
+  border-radius: 2em;
+  background: #fff;
+  transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    padding 0.3s ease, margin 0.3s ease;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 0 rgba(0, 0, 0, 0.08);
+}
+.checkbox-wrapper-7 .tgl-ios + .tgl-btn:hover:after {
+  will-change: padding;
+}
+.checkbox-wrapper-7 .tgl-ios + .tgl-btn:active {
+  box-shadow: inset 0 0 0 2em #e8eae9;
+}
+.checkbox-wrapper-7 .tgl-ios + .tgl-btn:active:after {
+  padding-right: 0.8em;
+}
+.checkbox-wrapper-7 .tgl-ios:checked + .tgl-btn {
+  background: var(--text-primary); /* Use Theme Color (Green/Blue/etc) */
+  border-color: var(--text-primary);
+}
+.checkbox-wrapper-7 .tgl-ios:checked + .tgl-btn:active {
+  box-shadow: none;
+}
+.checkbox-wrapper-7 .tgl-ios:checked + .tgl-btn:active:after {
+  margin-left: -0.8em;
+}
+
+/* --- Custom Cyber Dropdown --- */
+.cyber-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.cyber-select-wrapper select {
+  width: 100%;
+  /* Default Arrow Hide Karo */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* Cyber Glass Style */
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 1px;
+
+  padding: 8px 12px;
+  padding-right: 35px; /* Arrow ke liye jagah */
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover & Focus State: Neon Glow */
+.cyber-select-wrapper select:hover,
+.cyber-select-wrapper select:focus {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 15px var(--shadow-color); /* Glow Effect */
+}
+
+/* Custom Animated Arrow (CSS Triangle) */
+.cyber-select-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 0;
+  height: 0;
+
+  /* Triangle Shape */
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--text-primary); /* Theme color arrow */
+
+  transform: translateY(-50%);
+  pointer-events: none; /* Click through to select */
+  transition: transform 0.3s ease;
+}
+
+/* Jab dropdown active ho, arrow ghum jaye */
+.cyber-select-wrapper:focus-within::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Options ke liye Dark Background (Browsers mein limited styling hoti hai) */
+.cyber-select-wrapper select option {
+  background: #000;
+  color: var(--text-primary);
+  padding: 10px;
+}
+
+/* --- Custom Cyber Range Slider --- */
+input[type="range"] {
+  -webkit-appearance: none; /* Default style remove karo */
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  margin: 10px 0;
+  border: none;
+}
+
+/* Track Styling (Chrome/Safari/Edge) */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.5); /* Dark Glass Background */
+  border: 1px solid var(--border-color); /* Theme Border */
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8); /* Depth Effect */
+}
+
+/* Thumb Styling (Chrome/Safari/Edge) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  background: var(--text-primary); /* Theme Color (Neon) */
+  border: 2px solid #000; /* Contrast Border */
+  border-radius: 50%; /* Perfect Circle */
+  cursor: pointer;
+  margin-top: -7px; /* Center align (Track height 6px hai, Thumb 18px) */
+  box-shadow: 0 0 10px var(--shadow-color); /* Glow Effect */
+  transition: all 0.2s ease;
+}
+
+/* Hover Effect: Thumb Bada aur Bright Hoga */
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px var(--text-primary);
+  background: #fff; /* White center for extra brightness */
+}
+
+/* Firefox Track Support */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Firefox Thumb Support */
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  background: var(--text-primary);
+  border: 2px solid #000;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--shadow-color);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px var(--text-primary);
+  background: #fff;
+}
