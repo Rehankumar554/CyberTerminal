@@ -54,6 +54,7 @@ class Terminal {
     this.loadTips();
     this.loadDocs();
     this.loadServices();
+    this.initFileExplorer();
     this.initSettingsUI();
 
     if (this.settings.startupCmd) {
@@ -401,6 +402,93 @@ class Terminal {
     } else {
       const path = this.currentPath === "/home/user" ? "~" : this.currentPath;
       this.prompt.textContent = `${this.username}@${this.hostname}:${path}$`;
+    }
+  }
+
+  // 1. Initialize File Explorer
+  initFileExplorer() {
+    this.updateFileExplorerWidget();
+  }
+
+  // 2. Update/Render Logic (Fixed: Removed Quotes)
+  updateFileExplorerWidget() {
+    const container = document.getElementById("file-list");
+    if (!container) return;
+
+    try {
+      // Current path se files fetch karein
+      const items = fileSystem.listDirectory(this.currentPath);
+
+      container.innerHTML = ""; // Clear previous list
+
+      if (items.length === 0) {
+        container.innerHTML =
+          '<div style="padding:10px; color:#666; text-align:center; font-style:italic;">(Empty Directory)</div>';
+        return;
+      }
+
+      // Sort: Folders pehle, fir Files
+      items.sort((a, b) => {
+        if (a.type === b.type) return a.name.localeCompare(b.name);
+        return a.type === "directory" ? -1 : 1;
+      });
+
+      // ".." (Go Back) Option add karein (agar root mein nahi hain)
+      if (this.currentPath !== "/") {
+        const upDiv = document.createElement("div");
+        upDiv.className = "file-item is-directory";
+        upDiv.innerHTML = `<span class="file-icon">⤴️</span><span class="file-name">..</span>`;
+        upDiv.onclick = () => this.executeCommand("cd ..");
+        container.appendChild(upDiv);
+      }
+
+      // Items Render Karein
+      items.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = `file-item ${
+          item.type === "directory" ? "is-directory" : ""
+        }`;
+
+        // Icons based on type
+        const icon = item.type === "directory" ? "📁" : "📄";
+
+        div.innerHTML = `
+        <div style="display:flex; align-items:center; flex:1; overflow:hidden;">
+          <span class="file-icon">${icon}</span>
+          <span class="file-name">${item.name}</span>
+        </div>
+        <div class="file-actions">
+          <button class="delete-btn" title="Delete">❌</button>
+        </div>
+      `;
+
+        // Click Event: Open File/Folder
+        div.onclick = (e) => {
+          // Agar delete button par click kiya to open mat karo
+          if (e.target.closest(".delete-btn")) return;
+
+          if (item.type === "directory") {
+            // FIX: Removed quotes around item.name
+            this.executeCommand(`cd ${item.name}`);
+          } else {
+            // FIX: Removed quotes around item.name
+            this.executeCommand(`cat ${item.name}`);
+          }
+        };
+
+        // Delete Event
+        const delBtn = div.querySelector(".delete-btn");
+        delBtn.onclick = (e) => {
+          e.stopPropagation(); // Bubble up roko
+          const cmd = item.type === "directory" ? "rmdir" : "rm";
+          // FIX: Removed quotes around item.name
+          this.executeCommand(`${cmd} ${item.name}`);
+        };
+
+        container.appendChild(div);
+      });
+    } catch (e) {
+      container.innerHTML = `<div style="color:red; padding:10px;">Error: ${e.message}</div>`;
     }
   }
 
@@ -925,6 +1013,7 @@ class Terminal {
     }
 
     this.scrollToBottom();
+    this.updateFileExplorerWidget();
   }
 
   // --- ERROR HANDLING HELPERS ---

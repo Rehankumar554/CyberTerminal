@@ -891,24 +891,99 @@ input[type="range"]:hover::-moz-range-thumb {
   height: 100%;
   z-index: 1; /* Ghost peeche rahega */
   pointer-events: none; /* Clicks pass-through to input */
-  
+
   /* Text Styling Match (Very Important) */
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   padding: 0; /* Match input padding if any */
-  
+
   white-space: pre; /* Spaces maintain karne ke liye */
   overflow: hidden;
 }
 
 /* User ka typed text (Invisible rahega taaki overlap na dikhe) */
 .ghost-hidden {
-  color: transparent; 
+  color: transparent;
 }
 
 /* Suggestion text (Grey color) */
 .ghost-suggestion {
   color: #999; /* Dim Grey */
   opacity: 0.7;
+}
+
+/* --- File Explorer Widget Styles --- */
+.file-list-container {
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: "Fira Code", monospace;
+}
+
+.file-list-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-item:hover {
+  background: rgba(0, 255, 0, 0.1);
+  padding-left: 12px; /* Slight shift effect */
+}
+
+/* Icons */
+.file-icon {
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+.is-directory .file-name {
+  color: var(--text-secondary); /* Directories alag color mein */
+  font-weight: bold;
+}
+
+/* Delete Button (Hidden by default, shown on hover) */
+.file-actions {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.file-item:hover .file-actions {
+  opacity: 1;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 5px red); /* Red Glow */
 }

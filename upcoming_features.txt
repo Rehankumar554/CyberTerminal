@@ -22,7 +22,4 @@
      Current System Monitor sirf progress bars dikhata hai.
      Ise replace karke Canvas-based Rolling Line Charts lagayein jo CPU/RAM usage ka pichle 60 seconds ka graph plot karein. Yeh bahut "Sci-Fi" lagta hai.
 
- Interactive File Explorer Widget:
-     Terminal ke alawa, ek widget ho jo current directory ke files ko list kare. User uspar click karke file open ya delete kar sake.
-
 ---
