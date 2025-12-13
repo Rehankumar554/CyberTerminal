@@ -19,6 +19,10 @@ class Terminal {
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
 
+    this.pendingFirstMessage = null;
+
+    this.assets = {};
+
     this.activeReminders = [];
 
     // Constructor ke andar add karein
@@ -50,7 +54,9 @@ class Terminal {
     this.init();
   }
 
-  init() {
+  async init() {
+    await this.loadResources();
+
     this.loadSettings(); // 1. Settings load karein
     this.applySettings(); // 2. Visuals apply karein (font/opacity)
     this.loadHistory();
@@ -105,6 +111,11 @@ class Terminal {
 
         this.prompt.textContent = "create_user: ";
       });
+
+      // Agar boot sequence off hai settings me, to manually trigger karein
+      if (this.settings.skipBoot) {
+        document.dispatchEvent(new Event("boot-finished"));
+      }
     }
     // Daily tip wala code...
     setTimeout(() => {
@@ -114,6 +125,35 @@ class Terminal {
         this.commands["tip.daily"].call(this);
       }
     }, 500);
+  }
+
+  async loadResources() {
+    // Empty objects initialize karein taaki undefined error na aaye
+    this.assets = {
+      ascii: {},
+      tutorials: {},
+      config: {},
+    };
+
+    try {
+      // Parallel Fetching (Fastest way)
+      const [asciiRes, tutorialsRes, configRes] = await Promise.all([
+        fetch("assets/jsons/ascii.json"),
+        fetch("assets/jsons/tutorials.json"),
+        fetch("assets/jsons/config.json"),
+      ]);
+
+      if (asciiRes.ok) this.assets.ascii = await asciiRes.json();
+      if (tutorialsRes.ok) this.assets.tutorials = await tutorialsRes.json();
+      if (configRes.ok) this.assets.config = await configRes.json();
+    } catch (e) {
+      console.error("Resource Load Failed:", e);
+      // Fallback agar JSON load na ho
+      this.assets.ascii = {
+        welcome:
+          "⚠️ Network Error: ASCII Art could not be loaded.\nWelcome to CyberTerm.",
+      };
+    }
   }
 
   async loadDocumentation() {
@@ -263,66 +303,87 @@ class Terminal {
     this.wormholeEventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+
+        // Sirf 'message' events ko process karein
         if (data.event === "message") {
-          if (data.title === "TERM_ME") return; // Ignore self
+          // === FIX: TAG CHECKING LOGIC ===
+          // Check karein ki kya ye message humne hi bheja hai (Tag: self_sent)
+          if (data.tags && data.tags.includes("self_sent")) {
+            console.log("Ignoring self-sent message"); // Debugging ke liye
+            return;
+          }
 
           const msg = data.message;
 
-          // === LOGIC CHANGE HERE ===
-          // Agar Scanner khula hai, to Chat par nahi, WARNING par jao
-          if (scanScreen.style.display !== "none") {
-            scanScreen.style.display = "none"; // QR Hatao
-            warningScreen.style.display = "flex"; // Warning Dikhao ⚠️
+          // ... (Aapka purana logic: Scanner check, Warning check etc.) ...
 
-            if (this.playKeySound) this.playKeySound("error"); // Alert Sound
-            return; // Chat screen abhi nahi khulegi, user ke decision ka wait karegi
+          // 1. Scanner Check
+          // 1. Scanner Check
+          if (scanScreen.style.display !== "none") {
+            scanScreen.style.display = "none";
+            warningScreen.style.display = "flex";
+
+            // ⭐ FIRST MESSAGE SAVE KARO
+            this.pendingFirstMessage = msg;
+
+            if (this.playKeySound) this.playKeySound("error");
+            return;
           }
 
-          // Agar Warning screen khuli hai, to background messages ko ignore karo
-          // jab tak user YES na bole.
+          // 2. Warning Check
           if (warningScreen.style.display !== "none") {
             return;
           }
 
-          // ... Baaki ka chat logic same ...
+          // 3. Disconnect Logic
           if (msg.trim().toLowerCase() === "disconnect") {
             this.addChatMessage("Remote user disconnected.", "system");
             setTimeout(() => this.endChatSession(), 1500);
             return;
           }
+
+          // 4. Show Message
           this.addChatMessage(msg, "received");
           if (this.playKeySound) this.playKeySound("key");
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Wormhole Error:", e);
+      }
     };
   }
 
-  // --- NEW HELPER: Start Chat Only After Acceptance ---
   proceedToChat() {
     document.getElementById("wormhole-warning-screen").style.display = "none";
     document.getElementById("wormhole-chat-screen").style.display = "flex";
 
+    // ⭐ RESTORE FIRST MESSAGE
+    if (this.pendingFirstMessage) {
+      this.addChatMessage(this.pendingFirstMessage, "received");
+      this.pendingFirstMessage = null;
+    }
+
     document.getElementById("chat-input").focus();
+
     if (typeof showToast === "function")
       showToast("Secure Handshake Complete 🟢");
 
-    // Update Header Status
     const chatHeaderTitle = document.querySelector(".chat-title");
     if (chatHeaderTitle) chatHeaderTitle.innerHTML = "🟢 LIVE CONNECTION";
   }
 
-  // Send Message to ntfy server
   sendToWormhole(text) {
     if (!this.wormholeId) return;
+
     fetch(`https://ntfy.sh/${this.wormholeId}`, {
       method: "POST",
       body: text,
-      headers: { Title: "CyberTerminal Chat" }, // Optional Header
+      headers: {
+        Tags: "self_sent", // ⭐ MOST IMPORTANT
+        Title: "CyberTerminal", // Optional
+      },
     }).catch((err) => console.error("Send failed", err));
   }
 
-  // Add Message bubble to UI
-  // Add Message bubble to UI with Timestamp
   addChatMessage(text, type) {
     const history = document.getElementById("chat-history");
     const div = document.createElement("div");
@@ -343,19 +404,6 @@ class Terminal {
 
     history.appendChild(div);
     history.scrollTop = history.scrollHeight; // Auto scroll
-  }
-
-  // Send Message to ntfy server
-  sendToWormhole(text) {
-    if (!this.wormholeId) return;
-
-    fetch(`https://ntfy.sh/${this.wormholeId}`, {
-      method: "POST",
-      body: text,
-      headers: {
-        Title: "CyberTerminal", // <--- YE TAG IMPORTANCE HAI (Identity Mark)
-      },
-    }).catch((err) => console.error("Send failed", err));
   }
 
   endChatSession() {
@@ -2435,48 +2483,20 @@ class Terminal {
 
     tutorial: function (args) {
       const topic = args[0] || "start";
+      const tutorials = this.assets.tutorials || {};
 
-      switch (topic) {
-        case "start":
-          this.addOutput("\n🎓 CyberTerm Interactive Tutorial", "success");
-          this.addOutput(
-            "Welcome! This tutorial will guide you through the basics."
-          );
-          this.addOutput("Please follow the steps below:\n");
-          this.addOutput(
-            '1. Type "tutorial commands" to learn basic file operations.'
-          );
-          this.addOutput(
-            '2. Type "tutorial shortcuts" to learn keyboard hacks.'
-          );
-          this.addOutput('3. Type "help" at any time to see all tools.\n');
-          break;
-
-        case "commands":
-          this.addOutput("\n📁 Lesson 1: File System", "info");
-          this.addOutput("The file system is a tree of directories and files.");
-          this.addOutput("• Create a folder:  mkdir myfolder");
-          this.addOutput("• Go inside it:     cd myfolder");
-          this.addOutput("• Create a file:    touch hello.txt");
-          this.addOutput("• List contents:    ls");
-          this.addOutput("• Read file:        cat hello.txt");
-          this.addOutput("\nTry creating a file now!");
-          break;
-
-        case "shortcuts":
-          this.addOutput("\n⌨️ Lesson 2: Keyboard Shortcuts", "info");
-          this.addOutput("Become a power user with these keys:");
-          this.addOutput("• Tab:        Autocomplete filenames/commands");
-          this.addOutput("• Up/Down:    Navigate command history");
-          this.addOutput("• Ctrl + L:   Clear the screen");
-          this.addOutput("• Ctrl + C:   Cancel current command (simulation)");
-          break;
-
-        default:
-          this.addOutput(
-            `Tutorial topic '${topic}' not found. Try 'tutorial start'.`,
-            "error"
-          );
+      if (tutorials[topic]) {
+        // Tutorials JSON is an array of strings
+        tutorials[topic].forEach((line) => {
+          // Basic formatting check
+          const style = line.startsWith("\n") ? "success" : "info";
+          this.addOutput(line, style);
+        });
+      } else {
+        this.addOutput(
+          `Tutorial topic '${topic}' not found. Try 'tutorial start'.`,
+          "error"
+        );
       }
     },
 
@@ -3369,41 +3389,30 @@ class Terminal {
     },
 
     neofetch: function () {
-      const ascii = `
-     ██████╗██╗   ██╗██████╗ ███████╗██████╗ 
-    ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗
-    ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝
-    ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗
-    ╚██████╗   ██║   ██████╔╝███████╗██║  ██║
-     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝
-      ████████╗███████╗██████╗ ███╗   ███╗
-      ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║
-         ██║   █████╗  ██████╔╝██╔████╔██║
-         ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║
-         ██║   ███████╗██║  ██║██║ ╚═╝ ██║
-         ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝
-`;
-      this.addOutput(ascii, "success");
+      const art = this.assets.ascii?.neofetch || "Neofetch Art Missing";
+      const conf = this.assets.config || {};
+
+      this.addOutput(art, "success");
       this.addOutput(`User: ${this.username}@${this.hostname}`);
-      this.addOutput(`OS: CyberTerm Linux`);
-      this.addOutput(`Kernel: 5.15.0-cyber`);
+      this.addOutput(`OS: ${conf.systemName || "CyberTerm Linux"}`);
+      this.addOutput(`Kernel: ${conf.kernel || "Unknown"}`);
       this.addOutput(`Uptime: ${systemMonitor.getUptime()}`);
       this.addOutput(`Shell: cybershell v1.0`);
     },
 
     cowsay: function (args) {
       const text = args.join(" ") || "Moo!";
-      const ascii = `
+      // Basic cow template from JSON, replace placeholder if needed,
+      // or construct dynamically if JSON only has the cow art.
+      // Let's assume JSON has the cow body.
+      const cowBody = this.assets.ascii?.cow || " (oo) ";
+
+      const bubble = `
  ${"_".repeat(text.length + 2)}
 < ${text} >
- ${"-".repeat(text.length + 2)}
-        \\   ^__^
-         \\  (oo)\\_______
-            (__)\\       )\\/\\
-                ||----w |
-                ||     ||
-`;
-      this.addOutput(ascii);
+ ${"-".repeat(text.length + 2)}`;
+
+      this.addOutput(bubble + cowBody);
     },
 
     matrix: function () {
@@ -4601,31 +4610,17 @@ class Terminal {
   }
 
   showWelcome() {
-    const welcome = `
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║   ██████╗██╗   ██╗██████╗ ███████╗██████╗                   ║
-║  ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗                  ║
-║  ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝                  ║
-║  ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗                  ║
-║  ╚██████╗   ██║   ██████╔╝███████╗██║  ██║                  ║
-║   ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝                  ║
-║    ████████╗███████╗██████╗ ███╗   ███╗                     ║
-║    ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║                     ║
-║       ██║   █████╗  ██████╔╝██╔████╔██║                     ║
-║       ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║                     ║
-║       ██║   ███████╗██║  ██║██║ ╚═╝ ██║                     ║
-║       ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝                     ║
-║                                                               ║
-║             Level 7 Linux-Grade Cyber Terminal                ║
-║                    Version 1.0.0                              ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
+    // JSON se ASCII art lein
+    const art = this.assets.ascii?.welcome || "Welcome to CyberTerm";
+    this.addOutput(art, "success");
 
-Welcome to CyberTerm - Advanced Terminal Environment
-Type 'help' for available commands
-`;
-    this.addOutput(welcome, "success");
+    // Config se version lein
+    if (this.assets.config) {
+      this.addOutput(
+        `System: ${this.assets.config.systemName} v${this.assets.config.version}`,
+        "info"
+      );
+    }
   }
 }
 

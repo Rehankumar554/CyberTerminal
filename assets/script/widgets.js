@@ -177,16 +177,37 @@ class WidgetManager {
   }
 
   initWeather() {
-    // Hardcoded API key - replace with your own WeatherAPI key
-    const API_KEY = "794f3ea37db442de8f642856250712";
-
-    // Automatically get GPS location on load
-    this.getGPSLocation(API_KEY);
+    // OLD: const API_KEY = "hardcoded...";
+    // NEW: Use APIManager's config logic or fetch config directly.
+    // Behtar hai hum APIManager ke through hi data lein.
 
     // Refresh weather every 30 minutes
+    this.refreshWeatherData();
     setInterval(() => {
-      this.getGPSLocation(API_KEY);
+      this.refreshWeatherData();
     }, 1800000);
+  }
+
+  async refreshWeatherData() {
+    document.getElementById("weather-display").innerHTML =
+      '<div style="text-align:center;padding:20px;">Getting data...</div>';
+
+    // apiManager se data maange (wo internally config use karega)
+    const data = await apiManager.getWeather();
+
+    if (data) {
+      const html = `
+           <div id="weather-temp">${data.temp}°C</div>
+           <div id="weather-desc">${data.description}</div>
+           <div id="weather-humidity">Humidity: ${data.humidity}%</div>
+           <div id="weather-location">${data.city}, ${data.country}</div>
+         `;
+      document.getElementById("weather-display").innerHTML = html;
+      systemMonitor.addLog(`Weather updated: ${data.city}`);
+    } else {
+      document.getElementById("weather-display").innerHTML =
+        '<div style="text-align:center;color:#ff6600;">Weather Unavailable</div>';
+    }
   }
 
   getGPSLocation(apiKey) {
@@ -255,20 +276,27 @@ class WidgetManager {
       });
   }
 
-  initQuote() {
-    this.fetchQuote();
-    // Refresh quote every hour
-    setInterval(() => this.fetchQuote(), 3600000);
+  async initQuote() {
+    // Directly ask APIManager (which loads from JSON)
+    const quote = await apiManager.getQuote();
+    if (quote) {
+      const qt = document.getElementById("quote-text");
+      const qa = document.getElementById("quote-author");
+      if (qt) qt.textContent = `"${quote.content}"`;
+      if (qa) qa.textContent = `— ${quote.author}`;
+    }
+    setInterval(() => this.initQuote(), 3600000);
   }
+
+  // --- REPLACE THIS METHOD IN WidgetManager CLASS ---
 
   async fetchQuote() {
     try {
-      // JSON file se quotes fetch karein
-      // Ensure karein ki file 'assets/jsons/quotes.json' location par ho
+      // 1. Fetch from your quote.json
       const response = await fetch("assets/jsons/quote.json");
 
       if (!response.ok) {
-        throw new Error("Failed to load quotes.json");
+        throw new Error("Failed to load quote.json");
       }
 
       const quotes = await response.json();
@@ -277,39 +305,30 @@ class WidgetManager {
         throw new Error("Quotes list is empty");
       }
 
-      // Random quote select karein
+      // 2. Select Random Quote
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-      // DOM Update karein
+      // 3. Update DOM Elements
       const quoteTextEl = document.getElementById("quote-text");
       const quoteAuthorEl = document.getElementById("quote-author");
 
-      if (quoteTextEl) {
-        quoteTextEl.textContent = `"${randomQuote.content}"`;
-      }
-      if (quoteAuthorEl) {
-        quoteAuthorEl.textContent = `— ${randomQuote.author}`;
-      }
+      // Note: Aapke JSON me keys "content" aur "author" hain
+      if (quoteTextEl) quoteTextEl.textContent = `"${randomQuote.content}"`;
+      if (quoteAuthorEl) quoteAuthorEl.textContent = `— ${randomQuote.author}`;
 
-      // System Log update
+      // Log update (Optional)
       if (typeof systemMonitor !== "undefined") {
-        systemMonitor.addLog("Quote updated");
+        systemMonitor.addLog("Quote updated from file");
       }
     } catch (error) {
-      console.error("Quote Fetch Error:", error);
+      console.error("Widget Quote Error:", error);
 
-      // Fallback (Agar file load na ho to default quote dikhayein)
-      const fallbackQuote = {
-        content: "The only way to do great work is to love what you do.",
-        author: "Steve Jobs",
-      };
-
+      // Fallback UI update
       const quoteTextEl = document.getElementById("quote-text");
       const quoteAuthorEl = document.getElementById("quote-author");
 
-      if (quoteTextEl) quoteTextEl.textContent = `"${fallbackQuote.content}"`;
-      if (quoteAuthorEl)
-        quoteAuthorEl.textContent = `— ${fallbackQuote.author}`;
+      if (quoteTextEl) quoteTextEl.textContent = `"Keep pushing forward."`;
+      if (quoteAuthorEl) quoteAuthorEl.textContent = `— System`;
     }
   }
 

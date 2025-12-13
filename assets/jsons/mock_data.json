@@ -1,0 +1,35 @@
+{
+  "news": [
+    { "title": "AI Models Reshape Coding", "url": "#", "source": "Tech Today" },
+    {
+      "title": "Quantum Computing Breakthrough",
+      "url": "#",
+      "source": "Science Daily"
+    },
+    { "title": "Open Source Growth in 2025", "url": "#", "source": "Dev News" }
+  ],
+  "quotes": [
+    {
+      "content": "The only way to do great work is to love what you do.",
+      "author": "Steve Jobs"
+    },
+    {
+      "content": "Code is like humor. When you have to explain it, it's bad.",
+      "author": "Cory House"
+    },
+    {
+      "content": "Simplicity is the soul of efficiency.",
+      "author": "Austin Freeman"
+    }
+  ],
+  "jokes": [
+    {
+      "setup": "Why do programmers prefer dark mode?",
+      "punchline": "Because light attracts bugs!"
+    },
+    {
+      "setup": "How many programmers does it take to change a light bulb?",
+      "punchline": "None. It's a hardware problem!"
+    }
+  ]
+}

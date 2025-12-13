@@ -1,0 +1,28 @@
+{
+  "start": [
+    "\n🎓 CyberTerm Interactive Tutorial",
+    "Welcome! This tutorial will guide you through the basics.",
+    "Please follow the steps below:\n",
+    "1. Type 'tutorial commands' to learn basic file operations.",
+    "2. Type 'tutorial shortcuts' to learn keyboard hacks.",
+    "3. Type 'help' at any time to see all tools.\n"
+  ],
+  "commands": [
+    "\n📁 Lesson 1: File System",
+    "The file system is a tree of directories and files.",
+    "• Create a folder:  mkdir myfolder",
+    "• Go inside it:     cd myfolder",
+    "• Create a file:    touch hello.txt",
+    "• List contents:    ls",
+    "• Read file:        cat hello.txt",
+    "\nTry creating a file now!"
+  ],
+  "shortcuts": [
+    "\n⌨️ Lesson 2: Keyboard Shortcuts",
+    "Become a power user with these keys:",
+    "• Tab:        Autocomplete filenames/commands",
+    "• Up/Down:    Navigate command history",
+    "• Ctrl + L:   Clear the screen",
+    "• Ctrl + C:   Cancel current command (simulation)"
+  ]
+}
