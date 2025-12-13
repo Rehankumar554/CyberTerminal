@@ -223,26 +223,115 @@
 
     <div id="context-menu" class="context-menu">
       <div class="menu-item" data-action="copy">
-        <img src="assets/image/content_copy.svg" alt="Copy"> Copy
+        <img src="assets/image/content_copy.svg" alt="Copy" /> Copy
       </div>
       <div class="menu-item" data-action="paste">
-        <img src="assets/image/content_paste.svg" alt="Paste"> Paste
+        <img src="assets/image/content_paste.svg" alt="Paste" /> Paste
       </div>
       <div class="menu-divider"></div>
       <div class="menu-item" data-action="clear">
-        <img src="assets/image/cleaning_services.svg" alt="Clear"> Clear
+        <img src="assets/image/cleaning_services.svg" alt="Clear" /> Clear
         Terminal
       </div>
       <div class="menu-item" data-action="refresh">
-        <img src="assets/image/refresh.svg" alt="Refresh System"> Refresh System
+        <img src="assets/image/refresh.svg" alt="Refresh System" /> Refresh
+        System
       </div>
       <div class="menu-divider"></div>
       <div class="menu-item" data-action="fullscreen">
-        <img src="assets/image/fullscreen.svg" alt="Toggle"> Toggle
-        Fullscreen
+        <img src="assets/image/fullscreen.svg" alt="Toggle" /> Toggle Fullscreen
       </div>
       <div class="menu-item" data-action="settings">
-        <img src="assets/image/settings.png" alt="Settings"> Settings
+        <img src="assets/image/settings.png" alt="Settings" /> Settings
+      </div>
+    </div>
+
+    <div id="wormhole-modal" class="wormhole-modal">
+      <div id="wormhole-scan-screen" class="wormhole-content">
+        <h2 class="wormhole-title">⚡ SECURE CHAT UPLINK ⚡</h2>
+        <p class="wormhole-hint">Scan QR or Click Link to Connect</p>
+
+        <div id="qr-container">
+          <div class="qr-loading">Generating Frequency...</div>
+        </div>
+
+        <div class="wormhole-link-box">
+          <span>Link: </span
+          ><a id="wormhole-link" href="#" target="_blank">Generating...</a>
+        </div>
+
+        <div class="wormhole-status" id="wormhole-status">
+          Waiting for user...
+        </div>
+        <button id="close-wormhole-btn">[ CANCEL ]</button>
+      </div>
+
+      <div
+        id="wormhole-warning-screen"
+        class="wormhole-content"
+        style="display: none; border-color: #ff3333"
+      >
+        <h2 class="wormhole-title" style="color: #ff3333">⚠️ SECURITY ALERT</h2>
+
+        <div class="warning-body" style="text-align: left; margin: 15px 0">
+          <p style="color: var(--text-primary); margin-bottom: 10px">
+            End-to-End Encryption is
+            <span style="color: #ff3333">NOT</span> guaranteed.
+          </p>
+          <ul
+            style="
+              font-size: 13px;
+              color: var(--text-secondary);
+              padding-left: 20px;
+              line-height: 1.6;
+            "
+          >
+            <li>Do NOT share Passwords or API Keys.</li>
+            <li>Do NOT share Bank Details or OTPs.</li>
+            <li>Do NOT share Personal Photos.</li>
+          </ul>
+          <p style="margin-top: 15px; font-size: 12px; color: #ffcc00">
+            This channel is public. Proceed only for general text transfer.
+          </p>
+        </div>
+
+        <div
+          class="warning-buttons"
+          style="display: flex; gap: 15px; width: 100%"
+        >
+          <button id="warning-deny-btn" class="danger-btn">
+            NO (DISCONNECT)
+          </button>
+          <button id="warning-accept-btn" class="success-btn">
+            YES (I UNDERSTAND)
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="wormhole-chat-screen"
+        class="wormhole-chat-interface"
+        style="display: none"
+      >
+        <div class="chat-header">
+          <span class="chat-title">🟢 LIVE CONNECTION</span>
+          <button id="chat-minimize-btn">_</button>
+        </div>
+
+        <div id="chat-history" class="chat-history">
+          <div class="chat-msg system">Encrypted channel established.</div>
+          <div class="chat-msg system">Type "disconnect" to end session.</div>
+        </div>
+
+        <div class="chat-input-wrapper">
+          <input
+            type="text"
+            id="chat-input"
+            placeholder="Type a message..."
+            autocomplete="off"
+          />
+          <button id="chat-send-btn">SEND</button>
+        </div>
       </div>
     </div>
 

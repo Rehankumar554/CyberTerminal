@@ -10,13 +10,15 @@ class Terminal {
     this.hostname = "cyberterm";
     this.isSetupMode = false;
     this.devMode = false;
-
+    this.wormholeEventSource = null; // Connection track karne ke liye
     this.commandBuffer = "";
     // Search State
     this.isSearching = false;
     this.searchQuery = "";
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
+
+    this.activeReminders = [];
 
     // Constructor ke andar add karein
     this.ghostInput = document.getElementById("ghost-input");
@@ -61,6 +63,7 @@ class Terminal {
     this.initSettingsUI();
     this.initContextMenu();
     this.initParticles();
+    this.initWormhole();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
@@ -109,6 +112,215 @@ class Terminal {
         this.commands["tip.daily"].call(this);
       }
     }, 500);
+  }
+
+  // --- UPDATED LOGIC WITH SECURITY WARNING ---
+
+  initWormhole() {
+    // 1. Existing Listeners
+    document
+      .getElementById("close-wormhole-btn")
+      .addEventListener("click", () => this.endChatSession());
+    document
+      .getElementById("chat-minimize-btn")
+      .addEventListener("click", () => this.endChatSession());
+
+    // 2. New Warning Button Listeners
+    document
+      .getElementById("warning-deny-btn")
+      .addEventListener("click", () => {
+        this.addOutput("[SYSTEM] Connection rejected by user.", "error");
+        this.endChatSession(); // Turant Disconnect & Close
+      });
+
+    document
+      .getElementById("warning-accept-btn")
+      .addEventListener("click", () => {
+        this.proceedToChat(); // Warning Hatao -> Chat Dikhao
+      });
+
+    // Chat Send Logic (Same as before)
+    const sendBtn = document.getElementById("chat-send-btn");
+    const input = document.getElementById("chat-input");
+
+    const sendMessage = () => {
+      const text = input.value.trim();
+      if (!text) return;
+      this.sendToWormhole(text);
+      this.addChatMessage(text, "sent");
+      input.value = "";
+      if (text.toLowerCase() === "disconnect") {
+        setTimeout(() => this.endChatSession(), 1000);
+      }
+    };
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  }
+
+  // --- MAIN START FUNCTION ---
+  async startWormhole() {
+    if (this.wormholeEventSource) this.wormholeEventSource.close();
+
+    const modal = document.getElementById("wormhole-modal");
+    const scanScreen = document.getElementById("wormhole-scan-screen");
+    const warningScreen = document.getElementById("wormhole-warning-screen");
+    const chatScreen = document.getElementById("wormhole-chat-screen");
+
+    // UI Reset (Show Scanner, Hide Warning & Chat)
+    modal.style.display = "flex";
+    scanScreen.style.display = "flex";
+    warningScreen.style.display = "none";
+    chatScreen.style.display = "none";
+
+    document.getElementById("wormhole-status").textContent =
+      "Initializing Channel...";
+
+    // Clean History
+    document.getElementById("chat-history").innerHTML = `
+      <div class="chat-msg system">Encrypted channel established.</div>
+      <div class="chat-msg system">Type "disconnect" to end session.</div>
+  `;
+
+    // Generate ID & Connect
+    this.wormholeId = "cyberterm_" + Math.random().toString(36).substr(2, 9);
+    const channelUrl = `https://ntfy.sh/${this.wormholeId}`;
+
+    // QR & Link Code (Same as before)
+    document.getElementById(
+      "qr-container"
+    ).innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+      channelUrl
+    )}" class="qr-image">`;
+    document.getElementById("wormhole-link").href = channelUrl;
+    document.getElementById("wormhole-link").textContent = channelUrl;
+
+    this.wormholeEventSource = new EventSource(`${channelUrl}/sse`);
+
+    this.wormholeEventSource.onopen = () => {
+      const statusEl = document.getElementById("wormhole-status");
+      if (statusEl) {
+        statusEl.textContent = "● Online. Waiting for user to join...";
+        statusEl.classList.add("status-active");
+      }
+    };
+
+    this.wormholeEventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === "message") {
+          if (data.title === "TERM_ME") return; // Ignore self
+
+          const msg = data.message;
+
+          // === LOGIC CHANGE HERE ===
+          // Agar Scanner khula hai, to Chat par nahi, WARNING par jao
+          if (scanScreen.style.display !== "none") {
+            scanScreen.style.display = "none"; // QR Hatao
+            warningScreen.style.display = "flex"; // Warning Dikhao ⚠️
+
+            if (this.playKeySound) this.playKeySound("error"); // Alert Sound
+            return; // Chat screen abhi nahi khulegi, user ke decision ka wait karegi
+          }
+
+          // Agar Warning screen khuli hai, to background messages ko ignore karo
+          // jab tak user YES na bole.
+          if (warningScreen.style.display !== "none") {
+            return;
+          }
+
+          // ... Baaki ka chat logic same ...
+          if (msg.trim().toLowerCase() === "disconnect") {
+            this.addChatMessage("Remote user disconnected.", "system");
+            setTimeout(() => this.endChatSession(), 1500);
+            return;
+          }
+          this.addChatMessage(msg, "received");
+          if (this.playKeySound) this.playKeySound("key");
+        }
+      } catch (e) {}
+    };
+  }
+
+  // --- NEW HELPER: Start Chat Only After Acceptance ---
+  proceedToChat() {
+    document.getElementById("wormhole-warning-screen").style.display = "none";
+    document.getElementById("wormhole-chat-screen").style.display = "flex";
+
+    document.getElementById("chat-input").focus();
+    if (typeof showToast === "function")
+      showToast("Secure Handshake Complete 🟢");
+
+    // Update Header Status
+    const chatHeaderTitle = document.querySelector(".chat-title");
+    if (chatHeaderTitle) chatHeaderTitle.innerHTML = "🟢 LIVE CONNECTION";
+  }
+
+  // Send Message to ntfy server
+  sendToWormhole(text) {
+    if (!this.wormholeId) return;
+    fetch(`https://ntfy.sh/${this.wormholeId}`, {
+      method: "POST",
+      body: text,
+      headers: { Title: "CyberTerminal Chat" }, // Optional Header
+    }).catch((err) => console.error("Send failed", err));
+  }
+
+  // Add Message bubble to UI
+  // Add Message bubble to UI with Timestamp
+  addChatMessage(text, type) {
+    const history = document.getElementById("chat-history");
+    const div = document.createElement("div");
+    div.className = `chat-msg ${type}`;
+
+    // 1. Get Current Time (HH:MM AM/PM)
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // 2. HTML Structure (Msg + Time)
+    div.innerHTML = `
+    <div class="msg-content">${text}</div>
+    <div class="msg-time">${timeString}</div>
+  `;
+
+    history.appendChild(div);
+    history.scrollTop = history.scrollHeight; // Auto scroll
+  }
+
+  // Send Message to ntfy server
+  sendToWormhole(text) {
+    if (!this.wormholeId) return;
+
+    fetch(`https://ntfy.sh/${this.wormholeId}`, {
+      method: "POST",
+      body: text,
+      headers: {
+        Title: "CyberTerminal", // <--- YE TAG IMPORTANCE HAI (Identity Mark)
+      },
+    }).catch((err) => console.error("Send failed", err));
+  }
+
+  endChatSession() {
+    const modal = document.getElementById("wormhole-modal");
+    modal.style.display = "none";
+
+    // Update Chat Header Status (Red/Offline)
+    const chatHeaderTitle = document.querySelector(".chat-title");
+    if (chatHeaderTitle) chatHeaderTitle.innerHTML = "🔴 DISCONNECTED";
+
+    if (this.wormholeEventSource) {
+      this.wormholeEventSource.close();
+      this.wormholeEventSource = null;
+    }
+
+    this.addOutput("[SYSTEM] Chat session ended.", "warning");
+    if (typeof showToast === "function") showToast("Disconnected 🔌");
+    this.input.focus();
   }
 
   initParticles() {
@@ -186,6 +398,140 @@ class Terminal {
         size: Math.random() * 2 + 1,
       });
     }
+  }
+
+  // --- CHRONOS (SMART REMINDER SYSTEM) ---
+
+  // --- CHRONOS (UNIVERSAL REMINDER SYSTEM) ---
+
+  setReminder(args) {
+    if (!args || args.length === 0) {
+      this.addOutput(
+        "Usage: remind <time> <task> OR 'remind drink water'",
+        "warning"
+      );
+      return;
+    }
+
+    const commandType = args[0].toLowerCase();
+    const fullMessage = args.join(" ").toLowerCase();
+
+    // === CASE 1: STOP EVERYTHING (remind off) ===
+    if (commandType === "off") {
+      this.stopAllReminders();
+      return;
+    }
+
+    // === CASE 2: DRINK WATER PROTOCOL (Recurring) ===
+    if (fullMessage.includes("drink water") && !args[0].match(/\d/)) {
+      this.addOutput("💧 HYDRATION PROTOCOL INITIATED.", "success");
+      this.addOutput("Reminder set for every 30 minutes.");
+      this.addOutput("Type 'remind off' to stop all timers.");
+
+      const intervalTime = 30 * 60 * 1000; // 30 Minutes
+
+      const timerId = setInterval(() => {
+        this.triggerAlarm("💧 TIME TO HYDRATE! DRINK WATER NOW.");
+      }, intervalTime);
+
+      // List me add karein (Type: Interval)
+      this.activeReminders.push({ id: timerId, type: "interval" });
+      return;
+    }
+
+    // === CASE 3: NORMAL ONE-TIME REMINDER ===
+    const timeStr = args[0].toLowerCase();
+    const message = args.slice(1).join(" ");
+
+    let duration = 0;
+    let unit = "";
+
+    if (timeStr.includes("s")) {
+      duration = parseInt(timeStr) * 1000;
+      unit = "seconds";
+    } else if (timeStr.includes("m")) {
+      duration = parseInt(timeStr) * 60 * 1000;
+      unit = "minutes";
+    } else if (timeStr.includes("h")) {
+      duration = parseInt(timeStr) * 60 * 60 * 1000;
+      unit = "hours";
+    } else {
+      this.addOutput("Invalid format. Try: remind 10m Check Server", "error");
+      return;
+    }
+
+    if (isNaN(duration)) {
+      this.addOutput("Invalid number provided.", "error");
+      return;
+    }
+
+    this.addOutput(
+      `[SYSTEM] Timer set for ${parseInt(timeStr)} ${unit}.`,
+      "info"
+    );
+
+    // One-time timeout set karein
+    const timerId = setTimeout(() => {
+      this.triggerAlarm(message);
+    }, duration);
+
+    // List me add karein (Type: Timeout)
+    this.activeReminders.push({ id: timerId, type: "timeout" });
+  }
+
+  // --- HELPER: Stop ALL Reminders ---
+  stopAllReminders() {
+    if (this.activeReminders.length === 0) {
+      this.addOutput("No active reminders found.", "warning");
+      return;
+    }
+
+    // Loop through ALL saved timers and kill them
+    let count = 0;
+    this.activeReminders.forEach((reminder) => {
+      if (reminder.type === "interval") {
+        clearInterval(reminder.id);
+      } else {
+        clearTimeout(reminder.id);
+      }
+      count++;
+    });
+
+    // List ko khali kar do
+    this.activeReminders = [];
+
+    this.addOutput(
+      `🚫 SYSTEM HALT: Stopped ${count} active timer(s).`,
+      "error"
+    );
+    this.addOutput("All reminders have been cancelled.");
+  }
+
+  // --- ALARM TRIGGER (Same as before) ---
+  triggerAlarm(message) {
+    this.playKeySound("error");
+    setTimeout(() => this.playKeySound("error"), 200);
+    setTimeout(() => this.playKeySound("error"), 400);
+
+    this.addOutput("---------------------------------");
+    this.addOutput(`🚨 ALERT: ${message.toUpperCase()}`, "warning");
+    this.addOutput("---------------------------------");
+
+    if (typeof showToast === "function") showToast(`⏰ ${message}`);
+
+    // Flash Title
+    const originalTitle = document.title;
+    let count = 0;
+    let blinkInterval = setInterval(() => {
+      document.title =
+        document.title === "🚨 ALERT!" ? originalTitle : "🚨 ALERT!";
+      count++;
+      if (count > 10) {
+        // 5 second baad auto stop title blink
+        clearInterval(blinkInterval);
+        document.title = originalTitle;
+      }
+    }, 500);
   }
 
   initContextMenu() {
@@ -4248,6 +4594,19 @@ class Terminal {
         "Usage: download <url> | progress | list | pause <id>",
         "warning"
       );
+    },
+
+    wormhole: function (args) {
+      if (args && args[0] === "disconnect") {
+        this.manualDisconnectWormhole();
+      } else {
+        this.startWormhole();
+      }
+    },
+
+    // Is format ko use karein:
+    remind: function (args) {
+      this.setReminder(args);
     },
   };
 
