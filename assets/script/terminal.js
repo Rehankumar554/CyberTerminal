@@ -31,8 +31,11 @@ class Terminal {
       customPrompt: null,
       startupCmd: null,
       matrixEnabled: true,
+      particlesEnabled: true,
       shortcuts: {}, // e.g. "Ctrl+q": "clear"
     };
+
+    this.particles = [];
 
     this.currentTheme = "matrix"; // Default theme tracker
 
@@ -56,6 +59,8 @@ class Terminal {
     this.loadServices();
     this.initFileExplorer();
     this.initSettingsUI();
+    this.initContextMenu();
+    this.initParticles();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
@@ -106,6 +111,134 @@ class Terminal {
     }, 500);
   }
 
+  initParticles() {
+    this.particleCanvas = document.getElementById("particle-canvas");
+    this.pCtx = this.particleCanvas.getContext("2d");
+
+    // Resize Handler
+    const resize = () => {
+      this.particleCanvas.width = window.innerWidth;
+      this.particleCanvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", resize);
+    resize();
+
+    // Animation Loop
+    const animate = () => {
+      if (!this.settings.particlesEnabled) {
+        this.pCtx.clearRect(
+          0,
+          0,
+          this.particleCanvas.width,
+          this.particleCanvas.height
+        );
+        requestAnimationFrame(animate);
+        return;
+      }
+
+      this.pCtx.clearRect(
+        0,
+        0,
+        this.particleCanvas.width,
+        this.particleCanvas.height
+      );
+
+      for (let i = 0; i < this.particles.length; i++) {
+        const p = this.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.02;
+        p.vy += 0.1; // Gravity
+
+        this.pCtx.fillStyle = `rgba(${p.color}, ${p.life})`;
+        this.pCtx.beginPath();
+        this.pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        this.pCtx.fill();
+
+        if (p.life <= 0) {
+          this.particles.splice(i, 1);
+          i--;
+        }
+      }
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }
+
+  spawnParticles() {
+    if (!this.settings.particlesEnabled) return;
+
+    const inputRect = this.input.getBoundingClientRect();
+    // Estimate cursor position (Rough calculation for monospaced font)
+    const charWidth = this.settings.fontSize * 0.6;
+    const cursorX = inputRect.left + this.input.selectionStart * charWidth + 10;
+    const cursorY = inputRect.top + inputRect.height / 2;
+
+    // Create Sparks
+    for (let i = 0; i < 5; i++) {
+      this.particles.push({
+        x: cursorX,
+        y: cursorY,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        life: 1,
+        color: "0, 255, 0", // Green sparks
+        size: Math.random() * 2 + 1,
+      });
+    }
+  }
+
+  initContextMenu() {
+    const menu = document.getElementById("context-menu");
+
+    // Show Menu
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      const x = e.clientX;
+      const y = e.clientY;
+      menu.style.display = "block";
+      menu.style.left = `${x}px`;
+      menu.style.top = `${y}px`;
+    });
+
+    // Hide Menu
+    document.addEventListener("click", () => (menu.style.display = "none"));
+
+    // Handle Actions
+    menu.querySelectorAll(".menu-item").forEach((item) => {
+      item.addEventListener("click", async () => {
+        const action = item.getAttribute("data-action");
+        switch (action) {
+          case "copy":
+            const sel = window.getSelection().toString();
+            if (sel) navigator.clipboard.writeText(sel);
+            break;
+          case "paste":
+            try {
+              const text = await navigator.clipboard.readText();
+              this.input.value += text;
+              this.input.focus();
+            } catch (e) {}
+            break;
+          case "clear":
+            this.executeCommand("clear");
+            break;
+          case "refresh":
+            location.reload();
+            break;
+          case "fullscreen":
+            if (!document.fullscreenElement)
+              document.documentElement.requestFullscreen();
+            else if (document.exitFullscreen) document.exitFullscreen();
+            break;
+          case "settings":
+            document.getElementById("settings-btn").click();
+            break;
+        }
+      });
+    });
+  }
+
   initSettingsUI() {
     const modal = document.getElementById("settings-modal");
     const btn = document.getElementById("settings-btn");
@@ -118,6 +251,7 @@ class Terminal {
     const opacityRange = document.getElementById("setting-opacity");
     const opacityDisplay = document.getElementById("opacity-val");
     const matrixCheck = document.getElementById("setting-matrix");
+    const particlesCheck = document.getElementById("setting-particles");
 
     // Open Modal logic
     if (btn) {
@@ -129,8 +263,23 @@ class Terminal {
         opacityRange.value = this.settings.opacity;
         opacityDisplay.textContent = this.settings.opacity;
         matrixCheck.checked = this.settings.matrixEnabled;
+        particlesCheck.checked = this.settings.particlesEnabled;
 
         modal.classList.remove("modal-hidden");
+      });
+    }
+
+    // Toggle Listener
+    if (particlesCheck) {
+      particlesCheck.addEventListener("change", (e) => {
+        this.settings.particlesEnabled = e.target.checked;
+        this.saveSettings();
+
+        if (this.settings.particlesEnabled) {
+          showToast("Power Mode Enabled! ✨");
+        } else {
+          showToast("Power Mode Disabled");
+        }
       });
     }
 
@@ -873,6 +1022,7 @@ class Terminal {
 
     // --- GHOST TEXT UPDATE ---
     this.updateGhost(val);
+    this.spawnParticles();
   }
 
   // Ye naya method Terminal class ke andar add karein
@@ -1346,6 +1496,7 @@ class Terminal {
             history: this.history,
             user: this.username,
             theme: this.currentTheme,
+            particlesEnabled: this.settings.particlesEnabled,
             matrixEnabled: this.settings.matrixEnabled,
             widgetLayout: {
               collapsed: isCollapsed,
@@ -1402,6 +1553,11 @@ class Terminal {
             } catch (e) {
               console.error("Failed to restore theme:", e);
             }
+          }
+
+          if (typeof s.particlesEnabled !== "undefined") {
+            this.settings.particlesEnabled = s.particlesEnabled;
+            this.saveSettings(); // Update localStorage
           }
 
           if (s.widgetLayout) {

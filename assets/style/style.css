@@ -1183,3 +1183,82 @@ input[type="range"]:hover::-moz-range-thumb {
   padding-top: 5px;
   letter-spacing: 1px;
 }
+
+/* --- Custom Context Menu --- */
+.context-menu {
+  position: absolute;
+  display: none;
+  z-index: 9999;
+  background: rgba(10, 14, 39, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 0 15px var(--shadow-color), 0 5px 10px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  min-width: 180px;
+  padding: 5px 0;
+  animation: menuFadeIn 0.2s ease-out;
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.menu-item {
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+/* Context Menu Image Icons Styling */
+.menu-item img {
+  width: 16px; /* Icon size fix */
+  height: 16px;
+  object-fit: contain;
+
+  /* Icon ko Theme Color mein tint karna (Assuming black SVG) */
+  /* Agar icons colored hain to ye filter hata dein */
+  filter: drop-shadow(0 0 0 var(--text-primary));
+  opacity: 0.9;
+  transition: all 0.2s;
+}
+
+/* Hover State */
+.menu-item:hover img {
+  /* Hover karne par Icon White ho jaye (Text ke saath match kare) */
+  filter: brightness(0) invert(1);
+  opacity: 1;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+  opacity: 0.5;
+}
+
+/* Particles Canvas */
+#particle-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Click-through */
+  z-index: 9999; /* Top most layer */
+}
