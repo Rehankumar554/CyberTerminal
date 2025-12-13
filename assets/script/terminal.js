@@ -18,6 +18,10 @@ class Terminal {
     this.searchMatchIndex = -1;
     this.originalPrompt = "";
 
+    // Constructor ke andar add karein
+    this.ghostInput = document.getElementById("ghost-input");
+    this.currentSuggestion = "";
+
     this.activeTimer = null; // Timer track karne ke liye
     this.activeAlarm = null; // Alarm track karne ke liye
 
@@ -401,6 +405,17 @@ class Terminal {
   }
 
   handleKeyDown(e) {
+    // --- INTELLISENSE ACCEPT (Right Arrow) ---
+    if (e.key === "ArrowRight" && this.currentSuggestion) {
+      // Agar cursor line ke end pe hai, tabhi accept karein (Optional, but standard behavior)
+      if (this.input.selectionStart === this.input.value.length) {
+        e.preventDefault();
+        this.input.value = this.currentSuggestion;
+        this.updateGhost(this.input.value); // Re-calc ghost (usually clears it)
+        this.checkSyntax(this.input.value); // Update syntax color
+        return;
+      }
+    }
     // --- CUSTOM SHORTCUTS CHECK ---
     // Key generate karo: e.g. "Ctrl+k", "Alt+m"
     let keyCombo = "";
@@ -532,10 +547,20 @@ class Terminal {
       return;
     }
 
-    // 3. AUTOCOMPLETE (Tab)
+    // 3. AUTOCOMPLETE (Tab) - Updated with Ghost Text Support
     if (e.key === "Tab") {
       e.preventDefault();
-      this.autocomplete();
+
+      // Priority 1: Agar Ghost Suggestion (Grey text) dikh raha hai, to use accept karo
+      if (this.currentSuggestion) {
+        this.input.value = this.currentSuggestion;
+        this.updateGhost(this.input.value); // Ghost text ko clear/update karo
+        this.checkSyntax(this.input.value); // Color update karo (Green/Red)
+      }
+      // Priority 2: Agar Ghost text nahi hai, to standard autocomplete try karo
+      else {
+        this.autocomplete();
+      }
       return;
     }
 
@@ -671,6 +696,49 @@ class Terminal {
     }
   }
 
+  updateGhost(input) {
+    // Reset if empty
+    if (!input || input.trim() === "") {
+      this.ghostInput.innerHTML = "";
+      this.currentSuggestion = "";
+      return;
+    }
+
+    // 1. Search in History (Reverse - Latest first)
+    // Avoid exact match (user already typed it)
+    const historyMatch = [...this.history]
+      .reverse()
+      .find((cmd) => cmd.startsWith(input) && cmd !== input);
+
+    // 2. Search in Commands (Fallback)
+    // Commands keys nikalo + Aliases
+    const commands = Object.keys(this.commands);
+    const aliases = Object.keys(
+      JSON.parse(localStorage.getItem("userAliases") || "{}")
+    );
+    const allCmds = [...commands, ...aliases];
+
+    const commandMatch = allCmds.find(
+      (cmd) => cmd.startsWith(input) && cmd !== input
+    );
+
+    // Priority: History > Command
+    const match = historyMatch || commandMatch;
+
+    if (match) {
+      this.currentSuggestion = match;
+      // HTML Trick: User text invisible + Suggestion visible
+      // Note: Hum input value ko safe encode kar rahe hain taaki HTML break na ho
+      const invisiblePart = input.replace(/ /g, "&nbsp;");
+      const visiblePart = match.slice(input.length);
+
+      this.ghostInput.innerHTML = `<span class="ghost-hidden">${invisiblePart}</span><span class="ghost-suggestion">${visiblePart}</span>`;
+    } else {
+      this.ghostInput.innerHTML = "";
+      this.currentSuggestion = "";
+    }
+  }
+
   handleSetupInput(input) {
     // Validation: Empty check
     if (!input) {
@@ -730,8 +798,11 @@ class Terminal {
     // Normal buffer update
     this.commandBuffer = val;
 
-    // --- SYNTAX HIGHLIGHTING CALL ---
+    // Syntax Highlighting (Existing)
     this.checkSyntax(val);
+
+    // --- GHOST TEXT UPDATE ---
+    this.updateGhost(val);
   }
 
   // Ye naya method Terminal class ke andar add karein

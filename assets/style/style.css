@@ -800,6 +800,7 @@ input[type="range"] {
 
 /* --- Custom Cyber Range Slider --- */
 input[type="range"] {
+  appearance: none;
   -webkit-appearance: none; /* Default style remove karo */
   width: 100%;
   background: transparent;
@@ -866,4 +867,48 @@ input[type="range"]:hover::-moz-range-thumb {
   transform: scale(1.2);
   box-shadow: 0 0 20px var(--text-primary);
   background: #fff;
+}
+
+/* --- Ghost Text / Intellisense Styling --- */
+.cmd-wrapper {
+  position: relative;
+  flex: 1; /* Take remaining width */
+  display: flex;
+}
+
+#input {
+  position: relative;
+  z-index: 2; /* Input upar rahega */
+  background: transparent !important;
+  width: 100%;
+}
+
+#ghost-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Ghost peeche rahega */
+  pointer-events: none; /* Clicks pass-through to input */
+  
+  /* Text Styling Match (Very Important) */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0; /* Match input padding if any */
+  
+  white-space: pre; /* Spaces maintain karne ke liye */
+  overflow: hidden;
+}
+
+/* User ka typed text (Invisible rahega taaki overlap na dikhe) */
+.ghost-hidden {
+  color: transparent; 
+}
+
+/* Suggestion text (Grey color) */
+.ghost-suggestion {
+  color: #999; /* Dim Grey */
+  opacity: 0.7;
 }

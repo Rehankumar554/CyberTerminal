@@ -97,13 +97,16 @@
           <div id="output"></div>
           <div class="input-line">
             <span class="prompt" id="prompt">user@cyberterm:~$</span>
-            <input
-              type="text"
-              id="input"
-              autocomplete="off"
-              spellcheck="false"
-              autofocus
-            />
+            <div class="cmd-wrapper">
+              <div id="ghost-input"></div>
+              <input
+                type="text"
+                id="input"
+                autocomplete="off"
+                spellcheck="false"
+                autofocus
+              />
+            </div>
           </div>
         </div>
       </div>
