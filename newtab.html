@@ -165,21 +165,22 @@
         </div>
 
         <div class="widget system-widget">
-          <div class="widget-title">SYSTEM MONITOR</div>
+          <div class="widget-title">SYSTEM MONITOR (60s)</div>
           <div class="widget-content">
-            <div class="system-item">
-              <span>CPU:</span> <span id="cpu-usage">0%</span>
+            <div class="chart-legend">
+              <span class="legend-item cpu"
+                >CPU: <span id="cpu-val">0%</span></span
+              >
+              <span class="legend-item ram"
+                >RAM: <span id="ram-val">0%</span></span
+              >
             </div>
-            <div class="system-bar">
-              <div id="cpu-bar" class="bar-fill"></div>
+
+            <div class="canvas-container">
+              <canvas id="sys-canvas"></canvas>
             </div>
-            <div class="system-item">
-              <span>RAM:</span> <span id="ram-usage">0%</span>
-            </div>
-            <div class="system-bar">
-              <div id="ram-bar" class="bar-fill"></div>
-            </div>
-            <div class="system-item">
+
+            <div class="system-footer">
               <span>UPTIME:</span> <span id="uptime-display">0:00:00</span>
             </div>
           </div>

@@ -1114,3 +1114,48 @@ input[type="range"]:hover::-moz-range-thumb {
   border-top: 2px solid var(--text-primary);
   box-shadow: 0 -5px 10px var(--shadow-color);
 }
+
+/* --- Live System Charts (Sci-Fi) --- */
+.chart-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.legend-item.cpu {
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+}
+.legend-item.ram {
+  color: #00d9ff;
+  text-shadow: 0 0 5px #00d9ff;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100px; /* Graph height */
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#sys-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.system-footer {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: right;
+  border-top: 1px solid var(--border-color);
+  padding-top: 5px;
+  letter-spacing: 1px;
+}

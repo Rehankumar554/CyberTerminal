@@ -431,25 +431,99 @@ class WidgetManager {
     }
   }
 
+  // 3. GRAPHICAL SYSTEM MONITOR (Canvas)
   initSystemMonitor() {
-    const updateStats = () => {
-      const cpu = systemMonitor.getCpuUsage();
-      const ram = systemMonitor.getRamUsage();
-      const uptime = systemMonitor.getUptime();
+    const canvas = document.getElementById("sys-canvas");
+    if (!canvas) return;
 
-      document.getElementById("cpu-usage").textContent = `${cpu}%`;
-      document.getElementById("cpu-bar").style.width = `${cpu}%`;
+    const ctx = canvas.getContext("2d");
 
-      document.getElementById("ram-usage").textContent = `${ram}%`;
-      document.getElementById("ram-bar").style.width = `${ram}%`;
-
-      document.getElementById("uptime-display").textContent = uptime;
+    // Canvas sizing setup (to handle blurriness on High DPI screens)
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
     };
 
-    updateStats();
-    setInterval(updateStats, 2000);
-  }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas(); // Initial call
 
+    const updateCharts = () => {
+      // 1. Clear Canvas
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // 2. Draw Sci-Fi Grid (Background)
+      ctx.strokeStyle = "rgba(0, 255, 0, 0.05)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      // Vertical lines
+      for (let x = 0; x < w; x += 20) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+      }
+      // Horizontal lines
+      for (let y = 0; y < h; y += 20) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+      }
+      ctx.stroke();
+
+      // 3. Helper Function to Draw Line
+      const drawLine = (data, color) => {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = "round";
+
+        // Data plotting logic
+        const step = w / (data.length - 1 || 1); // X spacing
+
+        data.forEach((val, index) => {
+          const x = index * step;
+          const y = h - (val / 100) * h; // 0-100 scale mapping
+
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+
+        ctx.stroke();
+
+        // Add Glow Effect
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = color;
+        ctx.stroke();
+        ctx.shadowBlur = 0; // Reset for next drawing
+      };
+
+      // 4. Fetch Data from System.js
+      const cpuData = systemMonitor.cpuHistory; // Array [10, 20, 15...]
+      const ramData = systemMonitor.ramHistory;
+
+      // 5. Draw Lines (RAM first so CPU is on top)
+      if (ramData.length) drawLine(ramData, "#00d9ff"); // Blue for RAM
+      if (cpuData.length) drawLine(cpuData, "#00ff00"); // Green for CPU
+
+      // 6. Update Text Values
+      const lastCpu = cpuData[cpuData.length - 1] || 0;
+      const lastRam = ramData[ramData.length - 1] || 0;
+
+      const cpuEl = document.getElementById("cpu-val");
+      const ramEl = document.getElementById("ram-val");
+      const upEl = document.getElementById("uptime-display");
+
+      if (cpuEl) cpuEl.textContent = Math.round(lastCpu) + "%";
+      if (ramEl) ramEl.textContent = Math.round(lastRam) + "%";
+      if (upEl) upEl.textContent = systemMonitor.getUptime();
+    };
+
+    // Update Animation Loop (1 FPS is enough as data updates every 2s)
+    setInterval(updateCharts, 1000);
+
+    // Initial draw
+    updateCharts();
+  }
   initLogs() {
     const logsDisplay = document.getElementById("logs-display");
 
