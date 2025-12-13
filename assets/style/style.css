@@ -987,3 +987,130 @@ input[type="range"]:hover::-moz-range-thumb {
   transform: scale(1.2);
   filter: drop-shadow(0 0 5px red); /* Red Glow */
 }
+
+/* --- Draggable & Collapsible Sidebar --- */
+
+/* --- Draggable & Collapsible Sidebar --- */
+
+/* Toggle Button Container - Full height strip */
+#widget-toggle-btn {
+  /* Placement & Sizing */
+  width: 24px; /* Button area width */
+  align-self: stretch; /* Full height taken from flex container */
+  margin: 0;
+  padding: 0;
+
+  /* Flex layout for lines and handle */
+  display: flex;
+  flex-direction: column; /* Top line, handle, bottom line stacked vertically */
+  align-items: center;
+  justify-content: center;
+
+  /* Reset base styles */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 90;
+  overflow: visible; /* Handle shadow ke liye */
+}
+
+/* Top & Bottom Lines (Pseudo-elements) */
+#widget-toggle-btn::before,
+#widget-toggle-btn::after {
+  content: "";
+  width: 2px; /* Thickness of the vertical line */
+  flex-grow: 1; /* Fill available vertical space */
+  background: var(--border-color);
+  opacity: 0.5; /* Subtle line */
+  transition: all 0.3s ease;
+}
+
+/* The Center "Handle" or "Slider" Thumb */
+.toggle-handle {
+  height: 40px; /* Height of the middle handle part */
+  width: 100%; /* Fill the button width (24px) */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Handle Styling (Glass/Cyber look) */
+  background: rgba(0, 0, 0, 0.6); /* Dark glass background */
+  border: 1px solid var(--border-color);
+  border-radius: 4px; /* Slightly rounded corners like a slider thumb */
+
+  color: var(--text-secondary);
+  font-size: 18px;
+  font-family: monospace;
+  margin: 5px 0; /* Space between lines and handle */
+
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Hover Effects */
+#widget-toggle-btn:hover .toggle-handle {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 10px var(--shadow-color); /* Neon glow on handle */
+}
+
+#widget-toggle-btn:hover::before,
+#widget-toggle-btn:hover::after {
+  opacity: 1; /* Lines become brighter on hover */
+  background: var(--text-primary);
+}
+
+/* ... (Baaki .widgets-section logic same rahega) ... */
+
+/* Collapsed State Logic (FIXED) */
+.widgets-section {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease,
+    padding 0.3s ease, margin 0.3s ease;
+
+  /* FIX: Scroll wapas lane ke liye */
+  overflow-y: auto;
+  overflow-x: hidden; /* Horizontal scroll roko animation ke dauran */
+
+  /* Smooth scrolling */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+/* Jab collapsed ho, tabhi overflow hidden karo */
+.widgets-section.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden; /* Content hide karne ke liye */
+}
+
+/* Button Rotation when Collapsed */
+.sidebar-closed #widget-toggle-btn {
+  transform: rotate(180deg);
+}
+
+/* Drag & Drop Visuals */
+.widget {
+  cursor: grab; /* Hand cursor for draggable items */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.widget:active {
+  cursor: grabbing;
+}
+
+.widget.dragging {
+  opacity: 0.5;
+  border: 1px dashed var(--text-primary);
+  transform: scale(0.98);
+}
+
+.widget.drag-over {
+  border-top: 2px solid var(--text-primary);
+  box-shadow: 0 -5px 10px var(--shadow-color);
+}

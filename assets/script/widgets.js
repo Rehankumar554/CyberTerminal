@@ -12,6 +12,144 @@ class WidgetManager {
     this.initCrypto();
     this.initSystemMonitor();
     this.initLogs();
+
+    this.setupCollapsible();
+    this.setupDragAndDrop();
+    this.loadWidgetState();
+  }
+
+  // 1. COLLAPSIBLE SIDEBAR LOGIC
+  setupCollapsible() {
+    const btn = document.getElementById("widget-toggle-btn");
+    const sidebar = document.querySelector(".widgets-section");
+    const container = document.querySelector(".container");
+
+    if (!btn || !sidebar) return;
+
+    btn.onclick = () => {
+      sidebar.classList.toggle("collapsed");
+      container.classList.toggle("sidebar-closed"); // For button rotation
+
+      // Save State
+      const settings = JSON.parse(
+        localStorage.getItem("terminalSettings") || "{}"
+      );
+      settings.widgetsCollapsed = sidebar.classList.contains("collapsed");
+      localStorage.setItem("terminalSettings", JSON.stringify(settings));
+    };
+  }
+
+  // 2. DRAG & DROP LOGIC
+  setupDragAndDrop() {
+    const container = document.querySelector(".widgets-section");
+    let draggedItem = null;
+
+    // Har widget ko draggable banao
+    const widgets = document.querySelectorAll(".widget");
+    widgets.forEach((widget) => {
+      widget.setAttribute("draggable", "true");
+
+      // ID check (Persistence ke liye zaroori hai)
+      if (!widget.id) {
+        // Agar ID nahi hai to class se banao (fallback)
+        widget.id = "w_" + widget.className.split(" ")[1];
+      }
+
+      widget.addEventListener("dragstart", (e) => {
+        draggedItem = widget;
+        setTimeout(() => widget.classList.add("dragging"), 0);
+      });
+
+      widget.addEventListener("dragend", () => {
+        widget.classList.remove("dragging");
+        draggedItem = null;
+
+        // Remove visuals
+        document
+          .querySelectorAll(".widget")
+          .forEach((w) => w.classList.remove("drag-over"));
+
+        // Save New Order
+        this.saveWidgetOrder();
+      });
+
+      // Drag Over Effect
+      widget.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (widget !== draggedItem) {
+          widget.classList.add("drag-over");
+        }
+      });
+
+      widget.addEventListener("dragleave", () => {
+        widget.classList.remove("drag-over");
+      });
+
+      // Drop Logic
+      widget.addEventListener("drop", (e) => {
+        e.preventDefault();
+        widget.classList.remove("drag-over");
+        if (draggedItem && draggedItem !== widget) {
+          // Logic to swap/insert
+          const allWidgets = [...container.querySelectorAll(".widget")];
+          const curIndex = allWidgets.indexOf(draggedItem);
+          const dropIndex = allWidgets.indexOf(widget);
+
+          if (curIndex < dropIndex) {
+            container.insertBefore(draggedItem, widget.nextSibling);
+          } else {
+            container.insertBefore(draggedItem, widget);
+          }
+        }
+      });
+    });
+  }
+
+  // 3. PERSISTENCE METHODS (SAVE/LOAD)
+  saveWidgetOrder() {
+    const container = document.querySelector(".widgets-section");
+    const order = [...container.querySelectorAll(".widget")].map((w) => w.id);
+
+    const settings = JSON.parse(
+      localStorage.getItem("terminalSettings") || "{}"
+    );
+    settings.widgetOrder = order;
+    localStorage.setItem("terminalSettings", JSON.stringify(settings));
+  }
+
+  loadWidgetState() {
+    const settings = JSON.parse(
+      localStorage.getItem("terminalSettings") || "{}"
+    );
+    const container = document.querySelector(".widgets-section");
+    const mainContainer = document.querySelector(".container");
+
+    // A. Restore Collapsed State
+    if (settings.widgetsCollapsed) {
+      container.classList.add("collapsed");
+      mainContainer.classList.add("sidebar-closed");
+    }
+
+    // B. Restore Order
+    if (settings.widgetOrder && settings.widgetOrder.length > 0) {
+      const currentWidgets = [...container.querySelectorAll(".widget")];
+      const widgetMap = {};
+
+      // Map current widgets by ID
+      currentWidgets.forEach((w) => {
+        // Ensure ID logic matches setupDragAndDrop
+        const id = w.id || "w_" + w.className.split(" ")[1];
+        w.id = id;
+        widgetMap[id] = w;
+      });
+
+      // Re-append in saved order
+      settings.widgetOrder.forEach((id) => {
+        if (widgetMap[id]) {
+          container.appendChild(widgetMap[id]);
+        }
+      });
+    }
   }
 
   initClock() {

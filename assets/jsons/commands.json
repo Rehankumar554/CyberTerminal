@@ -88,7 +88,6 @@
     { "cmd": "set fontSize <px>", "desc": "Adjust font size" },
     { "cmd": "set opacity <0-1>", "desc": "Adjust transparency" },
     { "cmd": "refresh", "desc": "Refresh the terminal" },
-    { "cmd": "zen <on|off>", "desc": "Toggle Zen/Focus mode" },
     { "cmd": "alias <act>", "desc": "Manage command shortcuts" },
     { "cmd": "shortcut list", "desc": "View custom shortcuts" }
   ],

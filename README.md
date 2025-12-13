@@ -31,7 +31,6 @@ Control your browser tabs entirely from the keyboard without touching the mouse.
 - **Calculator**: In-terminal math evaluation (`calc`).
 - **Bookmark Manager**: Save and open your own links (`bookmark`, `open`).
 - **Password Gen**: Create secure passwords instantly (`passgen`).
-- **Zen Mode**: Hide widgets for focused work (`zen`).
 - **Aliases**: Create your own command shortcuts (`alias`).
 
 ### 🖥️ Terminal Emulator
@@ -249,7 +248,6 @@ theme set hacker-amber  # Amber hacker theme
 | `set opacity <0-1>`   | Adjust transparency        | `set opacity 0.9`     |
 | `refresh`             | Refresh the terminal       | `refresh`             |
 | `shortcut list`       | View custom shortcuts      | `shortcut list`       |
-| `zen <on\|off>`       | Toggle Focus/Zen mode      | `zen on`              |
 | `alias`               | Create command shortcuts   | `alias set cls clear` |
 
 ### 💡 Help & Fun

@@ -10,7 +10,7 @@ class Terminal {
     this.hostname = "cyberterm";
     this.isSetupMode = false;
     this.devMode = false;
-    zenEnabled: false, (this.services = {});
+
     this.commandBuffer = "";
     // Search State
     this.isSearching = false;
@@ -334,24 +334,6 @@ class Terminal {
       // Agar enabled hai to 0.15 opacity, nahi to 0
       // matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.15" : "0";
       matrixCanvas.style.opacity = this.settings.matrixEnabled ? "0.7" : "0";
-    }
-
-    if (this.settings.zenEnabled) {
-      // Apply Zen Styles
-      if (widgets) widgets.style.display = "none";
-      if (container) {
-        container.style.width = "70%";
-        container.style.margin = "0 auto";
-        container.style.maxWidth = "none";
-      }
-    } else {
-      // Reset Styles
-      if (widgets) widgets.style.display = "flex";
-      if (container) {
-        container.style.width = "";
-        container.style.margin = "";
-        container.style.maxWidth = "";
-      }
     }
 
     // --- DYNAMIC CSS INJECTION ---
@@ -1301,7 +1283,6 @@ class Terminal {
         set <prop> <val>       Set fontSize, opacity, prompt
         settings <action>      Import/Export/Reset settings
         refresh                Refresh the terminal
-        zen <on|off>           Toggle Zen/Focus mode
         alias <action>         Manage command shortcuts
         shortcut list          View custom keyboard shortcuts
       
@@ -1351,6 +1332,13 @@ class Terminal {
             return;
           }
 
+          // 1. Get Widget State Manually
+          const widgetSection = document.querySelector(".widgets-section");
+          const widgetOrder = [...document.querySelectorAll(".widget")].map(
+            (w) => w.id
+          );
+          const isCollapsed = widgetSection.classList.contains("collapsed");
+
           // Capture current state
           const state = {
             timestamp: new Date().toLocaleString(),
@@ -1359,7 +1347,11 @@ class Terminal {
             user: this.username,
             theme: this.currentTheme,
             matrixEnabled: this.settings.matrixEnabled,
-            // Capture Widget HTML content
+            widgetLayout: {
+              collapsed: isCollapsed,
+              order: widgetOrder,
+            },
+            // Capture Widget HTML content (Backup)
             weatherWidget: document.getElementById("weather-display")
               ? document.getElementById("weather-display").innerHTML
               : "",
@@ -1409,6 +1401,36 @@ class Terminal {
               this.currentTheme = s.theme;
             } catch (e) {
               console.error("Failed to restore theme:", e);
+            }
+          }
+
+          if (s.widgetLayout) {
+            // Update Global Settings (Persistence ke liye)
+            this.settings.widgetsCollapsed = s.widgetLayout.collapsed;
+            this.settings.widgetOrder = s.widgetLayout.order;
+            this.saveSettings();
+
+            // Apply Visuals Immediately
+            const sidebar = document.querySelector(".widgets-section");
+            const container = document.querySelector(".container");
+
+            if (s.widgetLayout.collapsed) {
+              sidebar.classList.add("collapsed");
+              container.classList.add("sidebar-closed");
+            } else {
+              sidebar.classList.remove("collapsed");
+              container.classList.remove("sidebar-closed");
+            }
+
+            // Re-order DOM
+            if (s.widgetLayout.order) {
+              const widgetMap = {};
+              [...sidebar.querySelectorAll(".widget")].forEach(
+                (w) => (widgetMap[w.id] = w)
+              );
+              s.widgetLayout.order.forEach((id) => {
+                if (widgetMap[id]) sidebar.appendChild(widgetMap[id]);
+              });
             }
           }
 
@@ -3149,45 +3171,6 @@ class Terminal {
               showToast("Password copied to clipboard!");
           })
           .catch(() => {});
-      }
-    },
-
-    zen: function (args) {
-      if (args.length === 0) {
-        this.addOutput("Usage: zen <on|off>", "warning");
-        this.addOutput(
-          "Description: Hides widgets for focused terminal usage.",
-          "info"
-        );
-        return;
-      }
-
-      if (args[0] === "on") {
-        // 1. Update State
-        this.settings.zenEnabled = true;
-
-        // 2. Save to Storage (Persistent)
-        this.saveSettings();
-
-        // 3. Apply Visuals
-        this.applySettings();
-
-        this.addOutput("🧘 Zen mode enabled. Distractions hidden.", "success");
-        if (typeof showToast === "function") showToast("Zen Mode ON");
-      } else if (args[0] === "off") {
-        // 1. Update State
-        this.settings.zenEnabled = false;
-
-        // 2. Save to Storage
-        this.saveSettings();
-
-        // 3. Apply Visuals
-        this.applySettings();
-
-        this.addOutput("Zen mode disabled.", "info");
-        if (typeof showToast === "function") showToast("Zen Mode OFF");
-      } else {
-        this.addOutput("Usage: zen <on|off>", "warning");
       }
     },
 

@@ -372,12 +372,6 @@
     "man": "NAME\n\tpassgen - secure password generator\n\nSYNOPSIS\n\tpassgen [LENGTH]\n\nDESCRIPTION\n\tGenerates a random, secure password of the specified length (default 12). Automatically copies to clipboard.",
     "examples": ["passgen", "passgen 24"]
   },
-  "zen": {
-    "desc": "Toggle Focus/Zen mode",
-    "usage": "zen <on|off>",
-    "man": "NAME\n\tzen - toggle focus mode\n\nSYNOPSIS\n\tzen [on|off]\n\nDESCRIPTION\n\tHides all widgets and centers the terminal for a distraction-free coding environment. State is persistent.",
-    "examples": ["zen on", "zen off"]
-  },
   "alias": {
     "desc": "Create custom command shortcuts",
     "usage": "alias <action> [name] [command]",

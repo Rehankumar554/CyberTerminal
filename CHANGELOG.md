@@ -68,7 +68,6 @@ Added `tabs` command suite to control browser tabs via CLI without a mouse.
 
 - **Calculator (`calc`)**: Added a safe, in-terminal mathematical expression evaluator.
 - **Password Generator (`passgen`)**: Generate secure, random passwords with custom lengths.
-- **Zen Mode (`zen`)**: Toggle focus mode by hiding widgets and centering the terminal.
 
 #### Web & Navigation
 
@@ -86,8 +85,6 @@ Added `tabs` command suite to control browser tabs via CLI without a mouse.
 - **Security**: Prevented spaces in usernames during setup.
 - **Math**: Fixed regex issues in the calculator to support spaces and standard operators.
 - **URL Handling**: Improved URL normalization for bookmarks to prevent duplicates.
-- **Responsiveness**: Made Zen Mode responsive (percentage-based width) instead of fixed pixels.
-- **Persistence**: Saved Zen Mode state across sessions.
 
 ---
 
