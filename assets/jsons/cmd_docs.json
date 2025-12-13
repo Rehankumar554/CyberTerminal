@@ -395,5 +395,40 @@
       "tabs mute all",
       "tabs dedup"
     ]
+  },
+  "fetch": {
+    "desc": "Fetch resources from the network",
+    "usage": "fetch <url>",
+    "man": "NAME\n\tfetch - fetch resources\n\nSYNOPSIS\n\tfetch URL\n\nDESCRIPTION\n\tFetch displays the content of a URL. Automatically formats JSON output.",
+    "examples": [
+      "fetch https://api.github.com/users/github",
+      "fetch google.com"
+    ]
+  },
+  "history.browser": {
+    "desc": "Manage browser history",
+    "usage": "history.browser <action> [args]",
+    "man": "NAME\n\thistory.browser - manage browser history\n\nSYNOPSIS\n\thistory.browser [list|search|open|rm|stats|clear]\n\nDESCRIPTION\n\tInteract with Chrome's history API to list, search, or delete history items.",
+    "examples": [
+      "history.browser list",
+      "history.browser search google",
+      "history.browser stats"
+    ]
+  },
+  "download": {
+    "desc": "Manage downloads",
+    "usage": "download <action> [args]",
+    "man": "NAME\n\tdownload - manage downloads\n\nSYNOPSIS\n\tdownload [url|list|pause|resume|cancel|clear]\n\nDESCRIPTION\n\tStart file downloads or manage existing ones with a live progress bar.",
+    "examples": [
+      "download https://example.com/file.zip",
+      "download list",
+      "download pause 1"
+    ]
+  },
+  "tip": {
+    "desc": "Show a random tip",
+    "usage": "tip",
+    "man": "NAME\n\ttip - show a random tip\n\nSYNOPSIS\n\ttip\n\nDESCRIPTION\n\tDisplays a helpful tip about using the terminal commands and shortcuts.",
+    "examples": ["tip"]
   }
 }

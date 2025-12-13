@@ -53,7 +53,8 @@
     {
       "cmd": "tabs <action> [args]",
       "desc": "Manage browser tabs (list, switch, close, new)"
-    }
+    },
+    { "cmd": "fetch <url>", "desc": "Fetch URL content (JSON/HTML)" }
   ],
 
   "BROWSER_CONTROL": [
@@ -63,7 +64,9 @@
     { "cmd": "tabs close <args>", "desc": "Close specific or all tabs" },
     { "cmd": "tabs dedup", "desc": "Close duplicate tabs" },
     { "cmd": "tabs discard <args>", "desc": "Suspend tabs to save RAM" },
-    { "cmd": "tabs mute/pin <args>", "desc": "Mute or Pin tabs" }
+    { "cmd": "tabs mute/pin <args>", "desc": "Mute or Pin tabs" },
+    { "cmd": "history.browser <act>", "desc": "Manage browser history" },
+    { "cmd": "download <act>", "desc": "Manage file downloads" }
   ],
 
   "SYSTEM_UTILITIES": [

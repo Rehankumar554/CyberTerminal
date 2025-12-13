@@ -968,88 +968,97 @@ class Terminal {
         return;
       }
       const helpText = `
-Available Commands:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-FILE SYSTEM:
-  ls [path]              List directory contents
-  cd <path>              Change directory
-  pwd                    Print working directory
-  cat <file>             Display file contents
-  touch <file>           Create new file
-  rm <file>              Remove file
-  mkdir <dir>            Create directory
-  rmdir <dir>            Remove directory
-  cp <src> <dest>        Copy file (-r for recursive)
-  mv <src> <dest>        Move/rename file or directory
-  head <file>            Show first 10 lines (-n for custom)
-  tail <file>            Show last 10 lines (-n for custom)
-  wc <file>              Count lines, words, characters
-
-SEARCH & FILTER:
-  find <pattern>         Find files by name/pattern
-  grep "pattern" <file>  Search text in file (-r for dir)
-  ls | grep ".txt"       Filter command output
-
-PRODUCTIVITY:
-  todo add <task>        Add item to Todo list
-  todo list              Show Todo list
-  todo done <num>        Mark task as completed
-  note <text>            Save a quick note
-  notes list             View saved notes
-  timer <time>           Set timer (e.g., 10s, 5m, 1h)
-  alarm <HH:MM>          Set alarm (24h format)
-
-WEB & SEARCH:
-  google <query>         Search Google
-  youtube <query>        Search YouTube
-  github <query>         Search GitHub
-  stackoverflow <query>  Search StackOverflow
-  wiki <query>           Search Wikipedia
-  map <location>         Open Google Maps
-  translate <text>       Translate text (Google)
-  open <service>         Open site (gmail, chatgpt, etc.)
-  quicklink              List all available quick links
-  weather <gps>          Get Weather (use 'gps' for local)
-  news                   Fetch latest news
-  crypto <symbol>        Get crypto prices (BTC, ETH)
-
-SYSTEM & UTILITIES:
-  clear                  Clear terminal screen
-  history                Show command history
-  neofetch               Show system info (ASCII art)
-  date / time            Show current date or time
-  whoami                 Display current user
-  sudo <command>         Execute as superuser (simulation)
-  sys.info               Display hardware/software info
-  sys.log                Show system logs
-  dev.mode.enable        Enable developer debug mode
-
-SETTINGS & SESSION:
-  session save <name>    Save current session state
-  session load <name>    Load a saved session
-  theme set <name>       Change theme (matrix, kali, neon-purple)
-  set fontSize <px>      Adjust font size
-  set opacity <0-1>      Adjust transparency
-  shortcut list          View custom keyboard shortcuts
-
-HELP & FUN:
-  help [cmd]             Show help menu or specific command info
-  man <cmd>              Read detailed manual page
-  examples <cmd>         Show usage examples
-  tutorial               Start interactive tutorial
-  tip                    Get a random terminal tip
-  matrix                 Toggle Matrix screen effect
-  cowsay <text>          Make the cow speak
-
-CHAINING:
-  cmd1 ; cmd2            Execute sequentially
-  cmd1 && cmd2           Execute if first succeeds
-  cmd1 | cmd2            Pipe output (e.g., ls | grep js)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
-`;
+      Available Commands:
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      FILE SYSTEM:
+        ls [path]              List directory contents
+        cd <path>              Change directory
+        pwd                    Print working directory
+        cat <file>             Display file contents
+        touch <file>           Create new file
+        rm <file>              Remove file
+        mkdir <dir>            Create directory
+        rmdir <dir>            Remove directory
+        cp <src> <dest>        Copy file (-r for recursive)
+        mv <src> <dest>        Move/rename file or directory
+        head <file>            Show first 10 lines (-n for custom)
+        tail <file>            Show last 10 lines (-n for custom)
+        wc <file>              Count lines, words, characters
+      
+      SEARCH & FILTER:
+        find <pattern>         Find files by name/pattern
+        grep "pattern" <file>  Search text in file (-r for dir)
+        ls | grep ".txt"       Filter command output
+      
+      PRODUCTIVITY:
+        todo <action>          Manage Todo list (add, list, done, clear)
+        note <text>            Save a quick note
+        notes list             View saved notes
+        timer <time>           Set timer (e.g., 10s, 5m, 1h)
+        alarm <HH:MM>          Set alarm (24h format)
+        calc <expr>            Evaluate math expression
+        passgen [len]          Generate secure password
+      
+      WEB & SEARCH:
+        google <query>         Search Google
+        youtube <query>        Search YouTube
+        github <query>         Search GitHub
+        stackoverflow <query>  Search StackOverflow
+        wiki <query>           Search Wikipedia
+        map <location>         Open Google Maps
+        translate <text>       Translate text (Google)
+        open <service>         Open site (gmail, chatgpt, etc.)
+        bookmark <action>      Manage custom bookmarks
+        quicklink              List all available quick links
+        weather <gps>          Get Weather (use 'gps' for local)
+        news                   Fetch latest news
+        crypto <symbol>        Get crypto prices (BTC, ETH)
+        fetch <url>            Fetch URL content (JSON/HTML)
+      
+      BROWSER CONTROL:
+        tabs <action>          Manage tabs (list, switch, close, new, dedup)
+        history.browser        Manage browser history (list, search, open)
+        download <action>      Manage downloads (list, pause, resume)
+      
+      SYSTEM & UTILITIES:
+        clear                  Clear terminal screen
+        history                Show command history
+        neofetch               Show system info (ASCII art)
+        date / time            Show current date or time
+        whoami                 Display current user
+        sudo <command>         Execute as superuser (simulation)
+        sys.info               Display hardware/software info
+        sys.log                Show system logs
+        dev.mode.enable        Enable developer debug mode
+      
+      SETTINGS & SESSION:
+        session <action>       Manage sessions (save, load, list)
+        theme set <name>       Change theme (matrix, kali, neon-purple)
+        set <prop> <val>       Set fontSize, opacity, prompt
+        settings <action>      Import/Export/Reset settings
+        refresh                Refresh the terminal
+        zen <on|off>           Toggle Zen/Focus mode
+        alias <action>         Manage command shortcuts
+        shortcut list          View custom keyboard shortcuts
+      
+      HELP & FUN:
+        help [cmd]             Show help menu or specific command info
+        man <cmd>              Read detailed manual page
+        examples <cmd>         Show usage examples
+        tutorial               Start interactive tutorial
+        tip                    Get a random terminal tip
+        matrix                 Toggle Matrix screen effect
+        cowsay <text>          Make the cow speak
+      
+      CHAINING:
+        cmd1 ; cmd2            Execute sequentially
+        cmd1 && cmd2           Execute if first succeeds
+        cmd1 | cmd2            Pipe output (e.g., ls | grep js)
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
+      `;
       this.addOutput(helpText, "info");
     },
     // --- SESSION MANAGEMENT ---
