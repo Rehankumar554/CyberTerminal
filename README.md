@@ -184,34 +184,59 @@ theme set hacker-amber  # Amber hacker theme
 | `crypto <symbol>`       | Get crypto prices (BTC, ETH)      | `crypto BTC`                 |
 | `bookmark`              | Manage custom bookmarks           | `bookmark add mysite url`    |
 
-### 🌐 Browser Tab Manager
+### ⬇️ Ultimate Download Manager
 
-| Command               | Description                           | Example             |
-| --------------------- | ------------------------------------- | ------------------- |
-| `tabs list [query]`   | List tabs (with optional search)      | `tabs list google`  |
-| `tabs switch <sn>`    | Switch to tab number <sn>             | `tabs switch 2`     |
-| `tabs new [n] [url]`  | Open n new tabs with optional URL     | `tabs new 2 github` |
-| `tabs close <sn...>`  | Close specific tabs (space separated) | `tabs close 1 3 5`  |
-| `tabs close all`      | Close all tabs in the window          | `tabs close all`    |
-| `tabs reload <args>`  | Reload specific or all tabs           | `tabs reload 2`     |
-| `tabs mute/unmute`    | Mute/Unmute audio                     | `tabs mute all`     |
-| `tabs pin/unpin`      | Pin/Unpin tabs                        | `tabs pin 1`        |
-| `tabs discard <args>` | Suspend tabs to free RAM              | `tabs discard all`  |
-| `tabs dedup`          | Remove duplicate open tabs            | `tabs dedup`        |
+| Command                | Description                                                  |
+| :--------------------- | :----------------------------------------------------------- |
+| `download <url>`       | Start downloading a file with **Live Speed & Progress Bar**. |
+| `download list`        | Show all recent downloads with status.                       |
+| `download progress`    | **Recall/Show** live progress bars for all active downloads. |
+| `download pause <id>`  | Pause a download (Supports ranges: `1-5`, `all`).            |
+| `download resume <id>` | Resume a download (Supports ranges).                         |
+| `download cancel <id>` | Cancel a download.                                           |
+| `download open <id>`   | Open the downloaded file.                                    |
+| `download clear`       | Clear finished/failed items from the log.                    |
+
+**✨ Pro Tip:** You can use ranges!
+
+- `download pause 1-3` (Pauses downloads #1, #2, #3)
+- `download cancel all`
+
+### 📑 Advanced Tabs Manager
+
+| Command                | Description                                                |
+| :--------------------- | :--------------------------------------------------------- |
+| `tabs list`            | List all open tabs with SN, Status, and Memory usage.      |
+| `tabs new <n> <url>`   | Open `n` copies of a URL (e.g., `tabs new 5 google.com`).  |
+| `tabs switch <sn>`     | Switch to a specific tab number.                           |
+| `tabs close <range>`   | Close tabs using ranges (e.g., `tabs close 1-5` or `1,3`). |
+| `tabs dedup`           | Automatically close duplicate tabs to save RAM.            |
+| `tabs discard <range>` | Put tabs to sleep (discard) to free up memory.             |
+
+### 🕒 Smart History
+
+| Command                        | Description                                               |
+| :----------------------------- | :-------------------------------------------------------- |
+| `history.browser list`         | Show last 20 visited sites (Auto-fetches if cache empty). |
+| `history.browser search <txt>` | Search history for specific keywords.                     |
+| `history.browser open <range>` | Re-open sites (e.g., `history.browser open 1-3`).         |
+| `history.browser stats`        | View analytics of your **Top 10 Most Visited Sites**.     |
+| `history.browser rm <range>`   | Delete specific items from history.                       |
 
 ### 🛠️ System Utilities
 
-| Command           | Description                       | Example             |
-| ----------------- | --------------------------------- | ------------------- |
-| `clear`           | Clear terminal screen             | `clear` or `Ctrl+L` |
-| `history`         | Show command history              | `history`           |
-| `neofetch`        | Show system info (ASCII art)      | `neofetch`          |
-| `date / time`     | Show current date or time         | `date`, `time`      |
-| `whoami`          | Display current user              | `whoami`            |
-| `sudo <command>`  | Execute as superuser (simulation) | `sudo ls`           |
-| `sys.info`        | Display hardware/software info    | `sys.info`          |
-| `sys.log`         | Show system logs                  | `sys.log`           |
-| `dev.mode.enable` | Enable developer debug mode       | `dev.mode.enable`   |
+| Command           | Description                                            | Example             |
+| ----------------- | ------------------------------------------------------ | ------------------- |
+| `clear`           | Clear terminal screen                                  | `clear` or `Ctrl+L` |
+| `history`         | Show command history                                   | `history`           |
+| `neofetch`        | Show system info (ASCII art)                           | `neofetch`          |
+| `date / time`     | Show current date or time                              | `date`, `time`      |
+| `whoami`          | Display current user                                   | `whoami`            |
+| `sudo <command>`  | Execute as superuser (simulation)                      | `sudo ls`           |
+| `sys.info`        | Display hardware/software info                         | `sys.info`          |
+| `sys.log`         | Show system logs                                       | `sys.log`           |
+| `dev.mode.enable` | Enable developer debug mode                            | `dev.mode.enable`   |
+| `fetch <url>`     | Fetch HTML or JSON. Automatically formats JSON output. |                     |
 
 ### ⚙️ Settings & Session
 

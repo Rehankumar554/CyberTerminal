@@ -2988,6 +2988,49 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
     },
 
+    fetch: function (args) {
+      if (args.length === 0) {
+        this.addOutput("Usage: fetch <url> [-m method]", "warning");
+        return;
+      }
+
+      let url = args[0];
+      if (!url.startsWith("http")) url = "https://" + url;
+
+      this.addOutput(`Fetching ${url}...`, "info");
+
+      fetch(url)
+        .then(async (response) => {
+          const statusColor = response.ok ? "success" : "error";
+          this.addOutput(
+            `Status: ${response.status} ${response.statusText}`,
+            statusColor
+          );
+
+          const contentType = response.headers.get("content-type");
+
+          if (contentType && contentType.includes("application/json")) {
+            const jsonData = await response.json();
+            // Format JSON nicely
+            const lines = JSON.stringify(jsonData, null, 2).split("\n");
+            lines.forEach((line) => {
+              // Replace spaces with non-breaking spaces for indentation
+              this.addOutput(line.replace(/ /g, "\u00a0"), "info");
+            });
+          } else {
+            const textData = await response.text();
+            // Show only first 500 chars to avoid flooding terminal
+            this.addOutput(
+              textData.substring(0, 500) + (textData.length > 500 ? "..." : ""),
+              "info"
+            );
+          }
+        })
+        .catch((error) => {
+          this.addOutput(`Error: ${error.message}`, "error");
+        });
+    },
+
     tabs: function (args) {
       // 1. Chrome API Check
       if (typeof chrome === "undefined" || !chrome.tabs) {
@@ -3018,13 +3061,12 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             );
             return;
           }
-          // Cache IDs for SN mapping
           this.tabListCache = tabs.map((t) => t.id);
           callback(tabs);
         });
       };
 
-      // --- HELPER: Process Target Arguments (Supports "all" & "1 3 5") ---
+      // --- HELPER: Process Target Arguments (Supports "all", "1 3 5", "1-5") ---
       const getTargets = (tabs, argList) => {
         if (argList.length === 0)
           return { valid: [], invalid: [], isAll: false };
@@ -3037,19 +3079,42 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         const invalid = [];
 
         argList.forEach((arg) => {
-          const sn = parseInt(arg);
-          if (isNaN(sn) || sn < 1 || sn > tabs.length) {
-            invalid.push(arg);
-          } else {
-            valid.push(tabs[sn - 1]);
+          // 1. Check for Range (e.g., "1-5")
+          if (arg.includes("-")) {
+            const parts = arg.split("-").map((n) => parseInt(n));
+            const start = Math.min(parts[0], parts[1]);
+            const end = Math.max(parts[0], parts[1]);
+
+            if (!isNaN(start) && !isNaN(end)) {
+              for (let i = start; i <= end; i++) {
+                if (i >= 1 && i <= tabs.length) {
+                  valid.push(tabs[i - 1]);
+                } else {
+                  invalid.push(i.toString());
+                }
+              }
+            } else {
+              invalid.push(arg); // Invalid range format
+            }
+          }
+          // 2. Check for Single Number (e.g., "1")
+          else {
+            const sn = parseInt(arg);
+            if (isNaN(sn) || sn < 1 || sn > tabs.length) {
+              invalid.push(arg);
+            } else {
+              valid.push(tabs[sn - 1]);
+            }
           }
         });
 
-        return { valid, invalid, isAll: false };
+        // Remove duplicates from valid list (in case of overlap like "1-3 2")
+        const uniqueValid = [...new Set(valid)];
+        return { valid: uniqueValid, invalid, isAll: false };
       };
 
       // ===========================
-      // 1. LIST TABS (With Search/Filter)
+      // 1. LIST TABS
       // ===========================
       if (action === "list") {
         const query = targetArgs.join(" ").toLowerCase();
@@ -3060,7 +3125,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
             return;
           }
 
-          // Filter Logic
           const displayTabs = query
             ? tabs.filter(
                 (t) =>
@@ -3087,14 +3151,11 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           );
 
           displayTabs.forEach((tab) => {
-            // Calculate original SN based on full list
             const originalIndex = tabs.findIndex((t) => t.id === tab.id);
             const sn = (originalIndex + 1).toString().padEnd(3);
-
             const statusIcon = tab.active ? "🟢" : "⚪";
             const pinIcon = tab.pinned ? "📌" : "  ";
-            const memIcon = tab.discarded ? "💤" : "⚡"; // Sleep vs Active
-
+            const memIcon = tab.discarded ? "💤" : "⚡";
             let rawTitle = tab.title || "Untitled Tab";
             const title =
               rawTitle.length > 40
@@ -3114,7 +3175,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
 
       // ===========================
-      // 2. NEW TAB (Smart Bulk Open)
+      // 2. NEW TAB
       // ===========================
       else if (action === "new") {
         if (targetArgs.length === 0) {
@@ -3125,16 +3186,12 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
 
         const tasks = [];
         let i = 0;
-
-        // Parser Logic for pairs like "2 google" or singles
         while (i < targetArgs.length) {
           const current = targetArgs[i];
           const next = targetArgs[i + 1];
 
-          // Is current a number?
           if (!isNaN(parseInt(current)) && !current.includes(".")) {
             const count = parseInt(current);
-            // Is next a URL?
             if (next && (isNaN(parseInt(next)) || next.includes("."))) {
               tasks.push({ count: count, url: next });
               i += 2;
@@ -3143,7 +3200,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
               i += 1;
             }
           } else {
-            // Current is URL, assume count 1
             tasks.push({ count: 1, url: current });
             i += 1;
           }
@@ -3152,8 +3208,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         let totalCreated = 0;
         tasks.forEach((task) => {
           let finalUrl = task.url;
-
-          // Resolve Service Name or URL
           if (finalUrl) {
             const lowerKey = finalUrl.toLowerCase();
             if (this.services && this.services[lowerKey]) {
@@ -3162,7 +3216,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
               finalUrl = "https://" + finalUrl;
             }
           }
-
           for (let k = 0; k < task.count; k++) {
             chrome.tabs.create({ url: finalUrl, active: false });
             totalCreated++;
@@ -3190,7 +3243,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
 
       // ===========================
-      // 4. DEDUP (Remove Duplicates)
+      // 4. DEDUP
       // ===========================
       else if (action === "dedup" || action === "cleanup") {
         withTabs((tabs) => {
@@ -3207,8 +3260,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
                 `🧹 Closed ${duplicates.length} duplicate tab(s).`,
                 "success"
               );
-              if (typeof showToast === "function")
-                showToast("Duplicates Cleaned");
             });
           } else {
             this.addOutput("✨ No duplicate tabs found.", "success");
@@ -3217,7 +3268,7 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
       }
 
       // ===========================
-      // 5. BULK ACTIONS (Close, Reload, Pin, Mute, Discard)
+      // 5. BULK ACTIONS (Supports Ranges)
       // ===========================
       else if (
         [
@@ -3231,14 +3282,13 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
         ].includes(action)
       ) {
         if (targetArgs.length === 0) {
-          this.addOutput(`Usage: tabs ${action} <sn... | all>`, "warning");
+          this.addOutput(`Usage: tabs ${action} <sn | 1-5 | all>`, "warning");
           return;
         }
 
         withTabs((tabs) => {
           const { valid, isAll, invalid } = getTargets(tabs, targetArgs);
 
-          // --- ACTION HANDLERS ---
           if (action === "close") {
             if (isAll) {
               this.addOutput(
@@ -3256,8 +3306,6 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
                     `🗑️ Closed ${valid.length} tab(s).`,
                     "success"
                   );
-                  if (typeof showToast === "function")
-                    showToast(`${valid.length} Tabs Closed`);
                 }
               );
             }
@@ -3286,12 +3334,10 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
                 count++;
               }
             });
-            if (count > 0)
-              this.addOutput(
-                `💤 Discarded ${count} tabs to save RAM.`,
-                "success"
-              );
-            else this.addOutput("No eligible tabs to discard.", "warning");
+            this.addOutput(
+              `💤 Discarded ${count} tabs to save RAM.`,
+              count > 0 ? "success" : "warning"
+            );
           }
 
           if (invalid.length) {
@@ -3307,6 +3353,490 @@ Use ↑↓ arrows for history | Tab for autocomplete | Ctrl+L to clear
           "error"
         );
       }
+    },
+
+    "history.browser": function (args) {
+      if (typeof chrome === "undefined" || !chrome.history) {
+        this.addOutput("Error: History API access denied.", "error");
+        return;
+      }
+
+      const action = args[0] ? args[0].toLowerCase() : "list";
+      const params = args.slice(1); // Grab all params to support ranges
+
+      // --- HELPER: Ensure History Cache & Auto-Fetch ---
+      const withHistory = (callback) => {
+        if (this.historyCache && this.historyCache.length > 0) {
+          callback(this.historyCache);
+        } else {
+          chrome.history.search({ text: "", maxResults: 20 }, (results) => {
+            this.historyCache = results;
+            callback(results);
+          });
+        }
+      };
+
+      // --- HELPER: Resolve Ranges for History (e.g. 1-5, 2) ---
+      const resolveHistoryTargets = (inputs, cache) => {
+        let targets = [];
+        inputs.forEach((arg) => {
+          if (arg.includes("-")) {
+            const [start, end] = arg.split("-").map((n) => parseInt(n));
+            const low = Math.min(start, end);
+            const high = Math.max(start, end);
+            for (let i = low; i <= high; i++) {
+              if (cache[i - 1]) targets.push(cache[i - 1]);
+            }
+          } else {
+            const sn = parseInt(arg);
+            if (!isNaN(sn) && cache[sn - 1]) targets.push(cache[sn - 1]);
+          }
+        });
+        return [...new Set(targets)]; // Remove duplicates
+      };
+
+      // --- ACTION: CLEAR ALL ---
+      if (action === "clear") {
+        this.addOutput("Clearing ALL browser history...", "warning");
+        chrome.history.deleteAll(() => {
+          this.addOutput("✔ Browser history wiped clean.", "success");
+          this.historyCache = [];
+        });
+        return;
+      }
+
+      // --- ACTION: STATS ---
+      if (action === "stats") {
+        this.addOutput("Analyzing browsing habits...", "info");
+        chrome.history.search({ text: "", maxResults: 1000 }, (results) => {
+          const domainCounts = {};
+          results.forEach((item) => {
+            try {
+              const url = new URL(item.url);
+              const domain = url.hostname.replace("www.", "");
+              domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+            } catch (e) {}
+          });
+          const sorted = Object.entries(domainCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+          this.addOutput("\n📊 TOP 10 VISITED SITES:", "info");
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+          sorted.forEach(([domain, count], index) => {
+            this.addOutput(
+              `${(index + 1).toString().padEnd(2)} | ${domain.padEnd(
+                20
+              )} | ${count} visits`,
+              "success"
+            );
+          });
+          this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        });
+        return;
+      }
+
+      // --- ACTION: OPEN (With Range Support) ---
+      if (action === "open" || action === "goto") {
+        if (params.length === 0) {
+          this.addOutput("Usage: history.browser open <sn | 1-5>", "warning");
+          return;
+        }
+
+        withHistory((items) => {
+          const targets = resolveHistoryTargets(params, items);
+          if (targets.length === 0) {
+            this.addOutput("Error: Invalid SN(s). Run list first.", "error");
+            return;
+          }
+
+          this.addOutput(`Opening ${targets.length} items...`, "success");
+          targets.forEach((item) => {
+            chrome.tabs.create({ url: item.url, active: false });
+          });
+        });
+        return;
+      }
+
+      // --- ACTION: REMOVE (With Range Support) ---
+      if (action === "rm" || action === "delete") {
+        if (params.length === 0) {
+          this.addOutput("Usage: history.browser rm <sn | 1-5>", "warning");
+          return;
+        }
+
+        withHistory((items) => {
+          const targets = resolveHistoryTargets(params, items);
+          if (targets.length === 0) {
+            this.addOutput("Error: Invalid SN(s).", "error");
+            return;
+          }
+
+          let count = 0;
+          targets.forEach((item) => {
+            chrome.history.deleteUrl({ url: item.url });
+            count++;
+          });
+          this.addOutput(`🗑 Removed ${count} items from history.`, "success");
+        });
+        return;
+      }
+
+      // --- ACTION: LIST / SEARCH ---
+      let query = "";
+      let limit = 20;
+
+      if (action === "search") {
+        query = args.slice(1).join(" ");
+      } else if (action === "list") {
+        if (params[0] && !isNaN(parseInt(params[0])))
+          limit = parseInt(params[0]);
+      } else {
+        this.addOutput(
+          "Usage: history.browser [list <n> | search <txt> | open <range> | rm <range> | stats]",
+          "warning"
+        );
+        return;
+      }
+
+      this.addOutput(
+        query ? `Searching: "${query}"...` : `Fetching last ${limit} items...`,
+        "info"
+      );
+
+      chrome.history.search({ text: query, maxResults: limit }, (results) => {
+        if (!results || results.length === 0) {
+          this.addOutput("No history found.", "warning");
+          return;
+        }
+
+        this.historyCache = results;
+
+        this.addOutput("\n🕒 BROWSER HISTORY:", "info");
+        this.addOutput(
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        );
+        this.addOutput("SN. | DATE       | TIME  | TITLE");
+        this.addOutput(
+          "────┼────────────┼───────┼────────────────────────────────────────────"
+        );
+
+        const todayDate = new Date().toLocaleDateString();
+
+        results.forEach((item, index) => {
+          const sn = (index + 1).toString().padEnd(3);
+          const dateObj = new Date(item.lastVisitTime);
+          let displayDate =
+            dateObj.toLocaleDateString() === todayDate
+              ? "Today"
+              : dateObj.toLocaleDateString();
+          displayDate = displayDate.padEnd(10);
+          const timeStr = dateObj.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          let title = item.title || item.url || "Unknown";
+          if (title.length > 50) title = title.substring(0, 47) + "...";
+          this.addOutput(
+            `${sn} | ${displayDate} | ${timeStr} | ${title}`,
+            "warning"
+          );
+        });
+        this.addOutput(
+          "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        );
+      });
+    },
+
+    download: function (args) {
+      if (typeof chrome === "undefined" || !chrome.downloads) {
+        this.addOutput("Error: Downloads API access denied.", "error");
+        return;
+      }
+
+      const action = args[0] ? args[0].toLowerCase() : "list";
+
+      const formatBytes = (bytes, decimals = 2) => {
+        if (bytes === 0) return "0 B";
+        const k = 1024;
+        const sizes = ["B", "KB", "MB", "GB", "TB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) +
+          " " +
+          sizes[i]
+        );
+      };
+
+      // --- HELPER: Monitor Logic (The Re-usable Display) ---
+      const monitorDownload = (id) => {
+        // 1. Unique Token Print karein
+        const uniqueToken = `>> DL_MONITOR_ID:${id}-${Date.now()} <<`;
+        this.addOutput(uniqueToken, "info");
+
+        // 2. Element Hijack
+        setTimeout(() => {
+          const terminal =
+            document.getElementById("terminal") ||
+            document.querySelector(".output") ||
+            document.body;
+
+          // Find the element containing our token
+          const allLines = terminal.querySelectorAll("*");
+          let targetElement = null;
+
+          // Search backwards for efficiency
+          for (let i = allLines.length - 1; i >= 0; i--) {
+            if (
+              allLines[i].innerText &&
+              allLines[i].innerText.includes(uniqueToken)
+            ) {
+              targetElement = allLines[i];
+              break;
+            }
+          }
+
+          if (!targetElement) return;
+
+          // 3. Live Update Loop
+          let lastBytes = 0;
+          let lastTime = Date.now();
+
+          const interval = setInterval(() => {
+            // Check if element still exists (handled 'clear')
+            if (!document.body.contains(targetElement)) {
+              clearInterval(interval);
+              return;
+            }
+
+            chrome.downloads.search({ id: id }, (results) => {
+              const item = results[0];
+
+              if (!item || item.state !== "in_progress") {
+                clearInterval(interval);
+                if (item && item.state === "complete") {
+                  targetElement.innerHTML = `<span class="success">✔ Done: ${item.filename
+                    .split(/[/\\]/)
+                    .pop()} (${formatBytes(item.totalBytes)})</span>`;
+                } else if (item && item.state === "interrupted") {
+                  targetElement.innerHTML = `<span class="error">✘ Failed/Cancelled</span>`;
+                }
+                return;
+              }
+
+              // Speed Calc
+              const now = Date.now();
+              const timeDiff = (now - lastTime) / 1000;
+              let speed = "0 B/s";
+
+              if (timeDiff > 0.8) {
+                const bytesDiff = item.bytesReceived - lastBytes;
+                const speedBytes = bytesDiff / timeDiff;
+                speed = formatBytes(speedBytes) + "/s";
+                lastBytes = item.bytesReceived;
+                lastTime = now;
+              }
+
+              const percent =
+                item.totalBytes > 0
+                  ? Math.round((item.bytesReceived / item.totalBytes) * 100)
+                  : 0;
+              const received = formatBytes(item.bytesReceived);
+              const total =
+                item.totalBytes > 0 ? formatBytes(item.totalBytes) : "?";
+
+              let filename = item.filename.split(/[/\\]/).pop();
+              if (filename.length > 20)
+                filename = filename.substring(0, 18) + "...";
+
+              const barLen = 15;
+              const filled = Math.round((barLen * percent) / 100);
+              const bar = "█".repeat(filled) + "░".repeat(barLen - filled);
+
+              // Update HTML
+              targetElement.innerHTML = `
+                        <span class="info">${filename}</span> 
+                        <span class="warning">[${bar}] ${percent}%</span> 
+                        <span style="color:#888;">| ${received}/${total} @ ${speed}</span>
+                      `;
+            });
+          }, 1000);
+        }, 50);
+      };
+
+      // --- HELPER: Resolve Targets ---
+      const resolveTargets = (inputs, cache, callback) => {
+        let targets = [];
+        if (inputs.includes("all")) {
+          targets = cache.map((item) => item.id);
+        } else {
+          inputs.forEach((arg) => {
+            if (arg.includes("-")) {
+              const parts = arg.split("-").map((n) => parseInt(n));
+              const start = Math.min(parts[0], parts[1]);
+              const end = Math.max(parts[0], parts[1]);
+              for (let i = start; i <= end; i++) {
+                if (cache[i - 1]) targets.push(cache[i - 1].id);
+              }
+            } else {
+              const parts = arg.split(",").map((n) => parseInt(n));
+              parts.forEach((p) => {
+                if (!isNaN(p) && cache[p - 1]) targets.push(cache[p - 1].id);
+              });
+            }
+          });
+        }
+        callback([...new Set(targets)]);
+      };
+
+      // ===========================
+      // 🚀 ACTION HANDLERS
+      // ===========================
+
+      // 1. START DOWNLOAD
+      if (action.includes(".") || action.startsWith("http")) {
+        const url = action.startsWith("http") ? action : "https://" + action;
+        chrome.downloads.download({ url: url }, (id) => {
+          if (chrome.runtime.lastError) {
+            this.addOutput(
+              `Error: ${chrome.runtime.lastError.message}`,
+              "error"
+            );
+          } else {
+            monitorDownload(id);
+          }
+        });
+        return;
+      }
+
+      // 2. SHOW ACTIVE PROGRESS (NEW FEATURE)
+      if (action === "progress") {
+        chrome.downloads.search({ state: "in_progress" }, (items) => {
+          if (items.length === 0) {
+            this.addOutput("No active downloads currently running.", "warning");
+            return;
+          }
+          this.addOutput(
+            `Tracking ${items.length} active download(s)...`,
+            "success"
+          );
+          items.forEach((item) => {
+            // Har active download ke liye naya monitor attach karein
+            monitorDownload(item.id);
+          });
+        });
+        return;
+      }
+
+      // 3. LIST ALL
+      if (action === "list") {
+        chrome.downloads.search(
+          { limit: 20, orderBy: ["-startTime"] },
+          (items) => {
+            this.downloadCache = items;
+            if (items.length === 0) {
+              this.addOutput("No downloads found.", "warning");
+              return;
+            }
+            this.addOutput("\n⬇️ DOWNLOAD LIST:", "info");
+            this.addOutput(
+              "SN | STATUS    | PROGRESS      | SIZE      | FILENAME"
+            );
+            this.addOutput(
+              "───┼───────────┼───────────────┼───────────┼────────────────────────"
+            );
+            items.forEach((item, index) => {
+              const sn = (index + 1).toString().padEnd(2);
+              let status =
+                item.state === "in_progress"
+                  ? item.paused
+                    ? "Paused"
+                    : "Active"
+                  : item.state === "interrupted"
+                  ? "Failed"
+                  : "Done";
+              let color =
+                status === "Done"
+                  ? "success"
+                  : status === "Failed"
+                  ? "error"
+                  : "info";
+              const percent =
+                item.totalBytes > 0
+                  ? Math.round((item.bytesReceived / item.totalBytes) * 100)
+                  : 0;
+              const bar =
+                "█".repeat(Math.round(percent / 10)) +
+                "░".repeat(10 - Math.round(percent / 10));
+              let name = item.filename.split(/[/\\]/).pop();
+              if (name.length > 25) name = name.substring(0, 22) + "...";
+              this.addOutput(
+                `${sn} | ${status.padEnd(
+                  9
+                )} | ${bar} ${percent}% | ${formatBytes(item.totalBytes).padEnd(
+                  9
+                )} | ${name}`,
+                color
+              );
+            });
+            this.addOutput(
+              "────────────────────────────────────────────────────────────────"
+            );
+          }
+        );
+        return;
+      }
+
+      // 4. CLEAR LOGS
+      if (action === "clear") {
+        chrome.downloads.erase({ state: "complete" }, () => {
+          this.addOutput("✔ Download log cleaned.", "success");
+          this.downloadCache = [];
+        });
+        return;
+      }
+
+      // 5. BULK OPS
+      const bulkOps = ["pause", "resume", "cancel", "open", "show"];
+      if (bulkOps.includes(action)) {
+        const inputs = args.slice(1);
+        if (inputs.length === 0) {
+          this.addOutput(
+            `Usage: download ${action} <id | range | all>`,
+            "warning"
+          );
+          return;
+        }
+        chrome.downloads.search(
+          { limit: 20, orderBy: ["-startTime"] },
+          (items) => {
+            this.downloadCache = items;
+            resolveTargets(inputs, items, (ids) => {
+              let count = 0;
+              ids.forEach((id) => {
+                if (action === "pause") chrome.downloads.pause(id);
+                if (action === "resume") chrome.downloads.resume(id);
+                if (action === "cancel") chrome.downloads.cancel(id);
+                if (action === "show") chrome.downloads.show(id);
+                if (action === "open")
+                  chrome.downloads
+                    .open(id)
+                    .catch(() => chrome.downloads.show(id));
+                count++;
+              });
+              this.addOutput(
+                `Executed '${action}' on ${count} files.`,
+                "success"
+              );
+            });
+          }
+        );
+        return;
+      }
+
+      this.addOutput(
+        "Usage: download <url> | progress | list | pause <id>",
+        "warning"
+      );
     },
   };
 

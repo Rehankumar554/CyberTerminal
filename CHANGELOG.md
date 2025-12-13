@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+# Changelog
+
+## [v1.3.0] - 2025-12-13
+
+### 🚀 Added
+
+- **Download Manager:**
+  - Implemented `monitorDownload` with direct DOM manipulation for sticky progress bars.
+  - Added `download progress` command to restore live bars after clearing screen.
+  - Live speed calculation (MB/s) and visual ASCII progress bars.
+- **Range Support Engine:**
+  - Added helper `resolveTargets` to support inputs like `1-5`, `1,3`, and `all`.
+  - Applied to `tabs`, `history.browser`, and `download` commands.
+- **Fetch Command:**
+  - Added native `fetch` with auto HTTPS and JSON pretty-printing.
+
+### 🛠 Changed
+
+- **Tabs Command:** Added `dedup` (deduplication) and `discard` (memory saver) features.
+- **History Command:** Added `stats` mode for domain analytics.
+- **Manifest:** Added `downloads`, `downloads.open`, and `history` permissions.
+
+### 🗑 Removed
+
+- **Edit Command:** Removed `edit` and `nano` functionality to keep the terminal lightweight.
+- **Hybrid FS:** Removed complex local-storage file wrappers (`cp`, `touch` for virtual files) in favor of standard system commands.
+
 ## [1.2.0] - 2025-12-14
 
 ### 🌟 New Major Feature: Browser Tab Manager
