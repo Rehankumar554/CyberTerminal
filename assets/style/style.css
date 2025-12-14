@@ -22,6 +22,7 @@ body {
   overflow: hidden;
   height: 100vh;
   position: relative;
+  cursor: text;
 }
 
 #matrix-canvas {
@@ -1607,4 +1608,24 @@ input[type="range"]:hover::-moz-range-thumb {
 }
 .success-btn:hover {
   box-shadow: 0 0 15px var(--text-primary);
+}
+
+/* --- Storage Bar Styling --- */
+.storage-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5); /* Dark background */
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.storage-fill {
+  height: 100%;
+  background: var(--text-primary); /* Theme color */
+  width: 0%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px var(--shadow-color);
 }

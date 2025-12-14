@@ -33,12 +33,12 @@ class VirtualFileSystem {
                   "welcome.txt": {
                     type: "file",
                     content:
-                      "Welcome to CyberTerm!\n\nThis is a fully functional virtual filesystem.\nYou can create, read, and delete files and directories.\n\nTry the following commands:\n- ls\n- cat welcome.txt\n- touch newfile.txt\n- mkdir newfolder",
+                      "Welcome to CyberTerm!\n\nThis is a fully functional virtual filesystem.\n\n[NEW FEATURES]\n- 💾 Storage Monitor: Check usage in Settings\n- 🌀 Wormhole: Secure Cross-Device Chat\n- 🛠️ Inspect Mode: Debug your terminal\n\nTry commands:\n- ls\n- help\n- storage\n- wormhole",
                   },
                   "readme.md": {
                     type: "file",
                     content:
-                      "# CyberTerm README\n\nVersion: 1.0.0\n\n## Features\n- Full terminal emulation\n- Virtual filesystem\n- Multiple themes\n- Real-time widgets\n- API integrations",
+                      "# CyberTerm README\n\nVersion: Loading...\n\n## Features\n- Linux Shell Emulation\n- Virtual File System\n- Real-time Widgets\n- Encrypted Chat (Wormhole)\n- Storage Management",
                   },
                   ".bashrc": {
                     type: "file",

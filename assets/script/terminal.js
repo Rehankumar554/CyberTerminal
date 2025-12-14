@@ -59,6 +59,7 @@ class Terminal {
 
     this.loadSettings(); // 1. Settings load karein
     this.applySettings(); // 2. Visuals apply karein (font/opacity)
+    this.updateSystemFiles();
     this.loadHistory();
     this.loadUsername();
     this.updatePrompt();
@@ -165,6 +166,30 @@ class Terminal {
     } catch (error) {
       console.error("Documentation Load Error:", error);
       this.cmdDocs = {}; // Fallback empty object
+    }
+  }
+
+  // Dynamic System Files Update (Version from Config)
+  updateSystemFiles() {
+    try {
+      const conf = this.assets.config || {};
+      const version = conf.version || "1.0.0";
+      const sysName = conf.systemName || "CyberTerm Linux";
+
+      // 1. Update README.md
+      const readmeContent = `# ${sysName} README\n\nVersion: ${version}\n\n## 🚀 Status: ONLINE\n\n## ✨ New Features in v${version}\n- 💾 Storage Monitor (Settings & CMD)\n- 🌀 Wormhole Protocol (Chat)\n- 🛠️ Inspect Element Integration\n\n## 📚 Quick Links\n- Type 'help' for commands\n- Type 'tutorial' to learn\n- Type 'storage' to check disk`;
+
+      // File System me write karein (Overwrite)
+      fileSystem.writeFile("/home/user", "readme.md", readmeContent);
+
+      // 2. Update welcome.txt (Optional: agar dynamic info chahiye)
+      const welcomeContent = `Welcome to ${sysName} v${version}!\n\n[SYSTEM READY]\n\n- 💾 Storage: Active\n- 🌐 Network: ${
+        navigator.onLine ? "Online" : "Offline"
+      }\n- 🛡️ Security: High\n\nType 'help' to view available commands.`;
+
+      fileSystem.writeFile("/home/user", "welcome.txt", welcomeContent);
+    } catch (e) {
+      console.error("Failed to update system files:", e);
     }
   }
 
@@ -686,6 +711,18 @@ class Terminal {
     });
   }
 
+  // Helper to calculate LocalStorage size
+  getStorageUsage() {
+    let total = 0;
+    for (let x in localStorage) {
+      if (localStorage.hasOwnProperty(x)) {
+        // Approx: 2 bytes per char (UTF-16)
+        total += (localStorage[x].length + x.length) * 2;
+      }
+    }
+    return total; // Bytes mein return karega
+  }
+
   initSettingsUI() {
     const modal = document.getElementById("settings-modal");
     const btn = document.getElementById("settings-btn");
@@ -711,6 +748,28 @@ class Terminal {
         opacityDisplay.textContent = this.settings.opacity;
         matrixCheck.checked = this.settings.matrixEnabled;
         particlesCheck.checked = this.settings.particlesEnabled;
+
+        const used = this.getStorageUsage();
+        const limit = 5242880; // 5MB
+        let percent = (used / limit) * 100;
+        if (percent > 100) percent = 100;
+
+        const storageBar = document.getElementById("storage-bar");
+        const storageVal = document.getElementById("storage-val");
+
+        if (storageBar && storageVal) {
+          storageBar.style.width = `${percent.toFixed(1)}%`;
+          storageVal.textContent = `${percent.toFixed(1)}%`;
+
+          // Agar storage 90% se zyada hai to Red color karein
+          if (percent > 90) {
+            storageBar.style.backgroundColor = "#ff4444";
+            storageBar.style.boxShadow = "0 0 10px #ff4444";
+          } else {
+            storageBar.style.backgroundColor = ""; // Reset to theme color
+            storageBar.style.boxShadow = "";
+          }
+        }
 
         modal.classList.remove("modal-hidden");
       });
@@ -4590,6 +4649,29 @@ class Terminal {
     // Is format ko use karein:
     remind: function (args) {
       this.setReminder(args);
+    },
+
+    storage: function () {
+      const usedBytes = this.getStorageUsage();
+      const limitBytes = 5242880; // ~5MB Standard Limit
+
+      const usedKB = (usedBytes / 1024).toFixed(2);
+      const percent = Math.min(100, (usedBytes / limitBytes) * 100).toFixed(2);
+
+      this.addOutput("💾 SYSTEM STORAGE STATUS", "info");
+      this.addOutput("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      this.addOutput(`Used Space : ${usedKB} KB`);
+      this.addOutput(`Free Space : ${(5120 - usedKB).toFixed(2)} KB`);
+      this.addOutput(`Usage      : ${percent}%`);
+
+      // Visual Bar
+      const barLen = 20;
+      const filled = Math.round((barLen * percent) / 100);
+      const empty = barLen - filled;
+      const color = percent > 80 ? "error" : "success";
+
+      const bar = "█".repeat(filled) + "░".repeat(empty);
+      this.addOutput(`[${bar}]`, color);
     },
   };
 
