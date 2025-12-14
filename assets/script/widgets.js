@@ -176,104 +176,39 @@ class WidgetManager {
     setInterval(updateClock, 1000);
   }
 
+  // --- UPDATED WEATHER LOGIC (Uses APIManager) ---
   initWeather() {
-    // OLD: const API_KEY = "hardcoded...";
-    // NEW: Use APIManager's config logic or fetch config directly.
-    // Behtar hai hum APIManager ke through hi data lein.
-
-    // Refresh weather every 30 minutes
+    // Initial fetch
     this.refreshWeatherData();
+    // Refresh weather every 30 minutes
     setInterval(() => {
       this.refreshWeatherData();
     }, 1800000);
   }
 
   async refreshWeatherData() {
-    document.getElementById("weather-display").innerHTML =
-      '<div style="text-align:center;padding:20px;">Getting data...</div>';
+    const display = document.getElementById("weather-display");
+    if (display)
+      display.innerHTML =
+        '<div style="text-align:center;padding:20px;">Getting data...</div>';
 
-    // apiManager se data maange (wo internally config use karega)
+    // Call API Manager (Safe call, handles Config & Keys)
     const data = await apiManager.getWeather();
 
-    if (data) {
+    if (data && display) {
       const html = `
-           <div id="weather-temp">${data.temp}°C</div>
-           <div id="weather-desc">${data.description}</div>
-           <div id="weather-humidity">Humidity: ${data.humidity}%</div>
-           <div id="weather-location">${data.city}, ${data.country}</div>
-         `;
-      document.getElementById("weather-display").innerHTML = html;
-      systemMonitor.addLog(`Weather updated: ${data.city}`);
-    } else {
-      document.getElementById("weather-display").innerHTML =
+         <div id="weather-temp">${data.temp}°C</div>
+         <div id="weather-desc">${data.description}</div>
+         <div id="weather-humidity">Humidity: ${data.humidity}%</div>
+         <div id="weather-location">${data.city}, ${data.country}</div>
+       `;
+      display.innerHTML = html;
+      if (typeof systemMonitor !== "undefined")
+        systemMonitor.addLog(`Weather updated: ${data.city}`);
+    } else if (display) {
+      display.innerHTML =
         '<div style="text-align:center;color:#ff6600;">Weather Unavailable</div>';
     }
-  }
-
-  getGPSLocation(apiKey) {
-    document.getElementById("weather-display").innerHTML =
-      '<div style="text-align:center;padding:20px;">Getting location...</div>';
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          this.fetchWeatherByCoords(apiKey, lat, lon);
-          systemMonitor.addLog(`GPS: ${lat.toFixed(2)}, ${lon.toFixed(2)}`);
-        },
-        (error) => {
-          console.error("GPS error:", error);
-          document.getElementById("weather-display").innerHTML =
-            '<div style="text-align:center;color:#ff6600;">GPS Denied</div>';
-          systemMonitor.addLog("GPS location denied");
-          showToast("GPS location denied");
-        }
-      );
-    } else {
-      document.getElementById("weather-display").innerHTML =
-        '<div style="text-align:center;color:#ff6600;">GPS Not Available</div>';
-      systemMonitor.addLog("GPS not supported");
-      showToast("GPS not supported");
-    }
-  }
-
-  fetchWeatherByCoords(apiKey, lat, lon) {
-    fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}&aqi=no`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.current) {
-          const html = `
-            <div id="weather-temp">${Math.round(data.current.temp_c)}°C</div>
-            <div id="weather-desc">${data.current.condition.text}</div>
-            <div id="weather-humidity">Humidity: ${data.current.humidity}%</div>
-            <div id="weather-location">${data.location.name}, ${
-            data.location.country
-          }</div>
-          `;
-          document.getElementById("weather-display").innerHTML = html;
-
-          localStorage.setItem("weatherCity", data.location.name);
-          localStorage.setItem("weatherLat", lat);
-          localStorage.setItem("weatherLon", lon);
-          systemMonitor.addLog(`Weather: ${data.location.name}`);
-        } else {
-          document.getElementById("weather-display").innerHTML =
-            '<div style="text-align:center;color:#ff6600;">API Error</div>';
-          systemMonitor.addLog(
-            `Weather API error: ${data.error?.message || "Unknown"}`
-          );
-        }
-      })
-      .catch((err) => {
-        console.error("Weather fetch error:", err);
-        document.getElementById("weather-display").innerHTML =
-          '<div style="text-align:center;color:#ff6600;">Fetch Failed</div>';
-        systemMonitor.addLog("Weather fetch failed");
-        showToast("Weather fetch failed");
-      });
   }
 
   async initQuote() {

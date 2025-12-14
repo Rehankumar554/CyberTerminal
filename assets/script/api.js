@@ -2,7 +2,8 @@ class APIManager {
   constructor() {
     this.config = null;
     this.mockData = null;
-    this.init();
+    // Initialization process ko ek Promise mein store karein
+    this.initPromise = this.init();
   }
 
   async init() {
@@ -22,9 +23,16 @@ class APIManager {
 
   // Helper to ensure config is loaded before making calls
   async waitForConfig() {
+    // Agar config pehle se loaded hai to return karein
     if (this.config) return;
-    // Wait slightly if called immediately on load
-    return new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Agar load nahi hua hai, to init process ke khatam hone ka wait karein
+    await this.initPromise;
+
+    // Safety check: Agar wait karne ke baad bhi config null hai (e.g., fetch error)
+    if (!this.config) {
+      console.warn("Warning: Config could not be loaded.");
+    }
   }
 
   async getWeather() {
@@ -51,6 +59,7 @@ class APIManager {
         async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
+          // Config se API key lein, agar config fail hua to empty string
           const apiKey = this.config?.apiKeys?.weather || "";
 
           try {
@@ -114,8 +123,6 @@ class APIManager {
 
   async getCryptoPrice(symbol = "BTC") {
     // API Call logic same as before...
-    // Fallback logic ab removed hai ya simplified rakh sakte hain
-    // For brevity, keeping simulated logic if API fails
     try {
       const response = await fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${this.getCoinId(

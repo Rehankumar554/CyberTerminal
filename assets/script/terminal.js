@@ -32,6 +32,8 @@ class Terminal {
     this.activeTimer = null; // Timer track karne ke liye
     this.activeAlarm = null; // Alarm track karne ke liye
 
+    this.downloadIntervals = [];
+
     this.settings = {
       fontSize: 14,
       opacity: 0.95,
@@ -287,6 +289,10 @@ class Terminal {
     const warningScreen = document.getElementById("wormhole-warning-screen");
     const chatScreen = document.getElementById("wormhole-chat-screen");
 
+    // FIX 1: Update Title to reflect reality (Not "Secure")
+    const titleEl = document.querySelector(".wormhole-title");
+    if (titleEl) titleEl.textContent = "⚡ WORMHOLE RELAY (PUBLIC) ⚡";
+
     // UI Reset (Show Scanner, Hide Warning & Chat)
     modal.style.display = "flex";
     scanScreen.style.display = "flex";
@@ -294,19 +300,25 @@ class Terminal {
     chatScreen.style.display = "none";
 
     document.getElementById("wormhole-status").textContent =
-      "Initializing Channel...";
+      "Initializing Public Channel...";
 
-    // Clean History
+    // FIX 2: Honest System Messages
     document.getElementById("chat-history").innerHTML = `
-      <div class="chat-msg system">Encrypted channel established.</div>
-      <div class="chat-msg system">Type "disconnect" to end session.</div>
-  `;
+    <div class="chat-msg system">📡 Public Relay Channel Open.</div>
+    <div class="chat-msg system" style="color:#ffaa00">⚠️ Traffic is NOT end-to-end encrypted.</div>
+    <div class="chat-msg system">Type "disconnect" to end session.</div>
+`;
 
     // Generate ID & Connect
-    this.wormholeId = "cyberterm_" + Math.random().toString(36).substr(2, 9);
+    // Added Date.now() for better uniqueness
+    this.wormholeId =
+      "cyberterm_" +
+      Math.random().toString(36).substr(2, 9) +
+      "_" +
+      Date.now().toString(36);
     const channelUrl = `https://ntfy.sh/${this.wormholeId}`;
 
-    // QR & Link Code (Same as before)
+    // QR & Link Code
     document.getElementById(
       "qr-container"
     ).innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
@@ -320,7 +332,7 @@ class Terminal {
     this.wormholeEventSource.onopen = () => {
       const statusEl = document.getElementById("wormhole-status");
       if (statusEl) {
-        statusEl.textContent = "● Online. Waiting for user to join...";
+        statusEl.textContent = "● Online. Waiting for remote peer...";
         statusEl.classList.add("status-active");
       }
     };
@@ -329,26 +341,26 @@ class Terminal {
       try {
         const data = JSON.parse(event.data);
 
-        // Sirf 'message' events ko process karein
         if (data.event === "message") {
-          // === FIX: TAG CHECKING LOGIC ===
-          // Check karein ki kya ye message humne hi bheja hai (Tag: self_sent)
+          // Ignore self-sent messages
           if (data.tags && data.tags.includes("self_sent")) {
-            console.log("Ignoring self-sent message"); // Debugging ke liye
             return;
           }
 
           const msg = data.message;
 
-          // ... (Aapka purana logic: Scanner check, Warning check etc.) ...
-
-          // 1. Scanner Check
-          // 1. Scanner Check
+          // 1. Scanner Check -> Go to Warning
           if (scanScreen.style.display !== "none") {
             scanScreen.style.display = "none";
+
+            // Update Warning Screen Text dynamically if needed
+            const warningTitle = warningScreen.querySelector(".wormhole-title");
+            if (warningTitle)
+              warningTitle.textContent = "⚠️ PUBLIC CHANNEL WARNING";
+
             warningScreen.style.display = "flex";
 
-            // ⭐ FIRST MESSAGE SAVE KARO
+            // First message save karo
             this.pendingFirstMessage = msg;
 
             if (this.playKeySound) this.playKeySound("error");
@@ -3297,87 +3309,68 @@ class Terminal {
       );
     },
 
-    weather: function (args) {
+    weather: async function (args) {
+      // Case 1: GPS based weather (Explicit)
       if (args[0] === "gps") {
         this.addOutput("Getting GPS location...", "info");
-        showToast("Getting GPS location...");
+        if (typeof showToast === "function")
+          showToast("Getting GPS location...");
 
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+        try {
+          // Fix: Use APIManager directly (Waits for config & uses Key from config.json)
+          const data = await apiManager.getWeatherByGPS();
+
+          if (data) {
             this.addOutput(
-              `GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)}`,
+              `GPS: ${data.lat.toFixed(4)}, ${data.lon.toFixed(4)}`,
               "success"
             );
-            this.addOutput("Fetching weather data...", "info");
-            showToast("Fetching weather data...");
+            this.addOutput(`Temperature: ${data.temp}°C`);
+            this.addOutput(`Conditions: ${data.description}`);
+            this.addOutput(`Humidity: ${data.humidity}%`);
+            this.addOutput(`Wind: ${data.windSpeed} km/h`);
+            this.addOutput(
+              `Location: ${data.city}, ${data.country}`,
+              "success"
+            );
 
-            const apiKey = "794f3ea37db442de8f642856250712";
-
-            fetch(
-              `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}&aqi=no`
-            )
-              .then((res) => res.json())
-              .then((data) => {
-                if (data.current) {
-                  this.addOutput(
-                    `Temperature: ${Math.round(data.current.temp_c)}°C`
-                  );
-                  this.addOutput(`Conditions: ${data.current.condition.text}`);
-                  this.addOutput(`Humidity: ${data.current.humidity}%`);
-                  this.addOutput(`Wind: ${data.current.wind_kph} km/h`);
-                  this.addOutput(
-                    `Location: ${data.location.name}, ${data.location.country}`,
-                    "success"
-                  );
-
-                  // Update widget
-                  const html = `
-                    <div id="weather-temp">${Math.round(
-                      data.current.temp_c
-                    )}°C</div>
-                    <div id="weather-desc">${data.current.condition.text}</div>
-                    <div id="weather-humidity">Humidity: ${
-                      data.current.humidity
-                    }%</div>
-                    <div id="weather-location">${data.location.name}, ${
-                    data.location.country
-                  }</div>
-                  `;
-                  document.getElementById("weather-display").innerHTML = html;
-                } else {
-                  this.addOutput("Failed to fetch weather data", "error");
-                }
-              })
-              .catch((err) => {
-                this.addOutput("Failed to fetch weather data", "error");
-              });
-          },
-          (error) => {
-            this.addOutput("GPS location denied or unavailable", "error");
+            // Optional: Widget update sync
+            const html = `
+               <div id="weather-temp">${data.temp}°C</div>
+               <div id="weather-desc">${data.description}</div>
+               <div id="weather-humidity">Humidity: ${data.humidity}%</div>
+               <div id="weather-location">${data.city}, ${data.country}</div>
+             `;
+            const widget = document.getElementById("weather-display");
+            if (widget) widget.innerHTML = html;
           }
-        );
-
+        } catch (error) {
+          this.addOutput("Failed to fetch weather data.", "error");
+          this.addOutput(`Error: ${error.message}`, "error");
+        }
         return;
       }
 
-      this.addOutput("Fetching weather data from GPS...", "info");
-      showToast("Fetching weather data from GPS...");
-      apiManager.getWeather().then((data) => {
-        if (data) {
-          this.addOutput(`Temperature: ${data.temp}°C`);
-          this.addOutput(`Conditions: ${data.description}`);
-          this.addOutput(`Humidity: ${data.humidity}%`);
-          this.addOutput(`Wind: ${data.windSpeed} km/h`);
-          this.addOutput(`Location: ${data.city}, ${data.country}`, "success");
-        } else {
-          this.addOutput(
-            "Weather data not available. Enable GPS permissions.",
-            "error"
-          );
-        }
-      });
+      // Case 2: Default Weather (Stored location or GPS fallback)
+      this.addOutput("Fetching weather data...", "info");
+      if (typeof showToast === "function")
+        showToast("Fetching weather data...");
+
+      // Fix: Use apiManager.getWeather() which handles keys logic
+      const data = await apiManager.getWeather();
+
+      if (data) {
+        this.addOutput(`Temperature: ${data.temp}°C`);
+        this.addOutput(`Conditions: ${data.description}`);
+        this.addOutput(`Humidity: ${data.humidity}%`);
+        this.addOutput(`Wind: ${data.windSpeed} km/h`);
+        this.addOutput(`Location: ${data.city}, ${data.country}`, "success");
+      } else {
+        this.addOutput(
+          "Weather data not available. Try 'weather gps'.",
+          "error"
+        );
+      }
     },
 
     crypto: function (args) {
@@ -3559,11 +3552,16 @@ class Terminal {
         };
         // -------------------------------------
 
-        const result = safeEval(expression);
+        let result = safeEval(expression);
 
         if (result === undefined || isNaN(result) || !isFinite(result)) {
           throw new Error("Calculation failed");
         }
+
+        // --- FIX: Precision Error Handling ---
+        // Result ko max 10 decimal places tak fix karein aur wapas number banayein
+        // Isse 0.300000000004 wapas 0.3 ban jayega
+        result = parseFloat(result.toFixed(10));
 
         this.addOutput(`${args.join(" ")} = ${result}`, "success");
       } catch (e) {
@@ -4366,7 +4364,7 @@ class Terminal {
         );
       };
 
-      // --- HELPER: Monitor Logic (The Re-usable Display) ---
+      // --- HELPER: Monitor Logic (Updated with Cleanup Tracking) ---
       const monitorDownload = (id) => {
         // 1. Unique Token Print karein
         const uniqueToken = `>> DL_MONITOR_ID:${id}-${Date.now()} <<`;
@@ -4459,6 +4457,9 @@ class Terminal {
                       `;
             });
           }, 1000);
+
+          // --- FIX: Store Interval ID ---
+          this.downloadIntervals.push(interval);
         }, 50);
       };
 
@@ -4684,6 +4685,14 @@ class Terminal {
 
   clearScreen() {
     this.output.innerHTML = "";
+
+    // --- FIX: Cleanup Active Download Monitors ---
+    if (this.downloadIntervals && this.downloadIntervals.length > 0) {
+      this.downloadIntervals.forEach((id) => clearInterval(id));
+      this.downloadIntervals = [];
+      // Optional: User ko bata sakte hain (Debugging ke liye)
+      // console.log("Stopped background download monitors.");
+    }
   }
 
   scrollToBottom() {

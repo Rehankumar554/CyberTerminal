@@ -14,8 +14,22 @@ class MatrixRain {
 
   init() {
     this.resizeCanvas();
-    window.addEventListener("resize", () => this.resizeCanvas());
+
+    // Fix: Resize event par Debounce lagaya hai (300ms delay)
+    // Ab browser hang nahi hoga resize karte waqt
+    const debouncedResize = this.debounce(() => this.resizeCanvas(), 300);
+    window.addEventListener("resize", debouncedResize);
+
     this.animate();
+  }
+
+  // --- NEW HELPER METHOD: DEBOUNCE ---
+  debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
   }
 
   resizeCanvas() {
@@ -65,7 +79,6 @@ class BootSequence {
     this.overlay = document.getElementById("boot-sequence");
     this.textElement = document.getElementById("boot-text");
 
-    // --- NEW LOGIC START ---
     // Check settings from LocalStorage
     const savedSettings = localStorage.getItem("terminalSettings");
     const settings = savedSettings ? JSON.parse(savedSettings) : {};
@@ -73,14 +86,13 @@ class BootSequence {
     // Agar setting me skipBoot true hai, to overlay chupao aur return kar jao
     if (settings.skipBoot) {
       if (this.overlay) {
-        this.overlay.style.display = "none"; // Hide immediately
+        this.overlay.style.display = "none";
         this.overlay.style.opacity = "0";
         this.overlay.style.pointerEvents = "none";
       }
       document.dispatchEvent(new Event("boot-finished"));
-      return; // Stop execution here
+      return;
     }
-    // --- NEW LOGIC END ---
 
     this.messages = [
       "[ OK ] Starting CyberTerm Boot Sequence...",
@@ -109,7 +121,6 @@ class BootSequence {
     this.start();
   }
 
-  // Baaki methods (start, showNextMessage) same rahenge...
   start() {
     this.showNextMessage();
   }
@@ -120,7 +131,6 @@ class BootSequence {
       this.currentIndex++;
       setTimeout(() => this.showNextMessage(), 150);
     } else {
-      // <--- YE ELSE BLOCK ADD KAREIN --->
       // Animation complete signal
       setTimeout(() => {
         document.dispatchEvent(new Event("boot-finished"));
