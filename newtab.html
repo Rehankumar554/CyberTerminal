@@ -253,91 +253,87 @@
       </div>
     </div>
 
-    <div id="wormhole-modal" class="wormhole-modal">
-      <div id="wormhole-scan-screen" class="wormhole-content">
-        <h2 class="wormhole-title">⚡ SECURE CHAT UPLINK ⚡</h2>
-        <p class="wormhole-hint">Scan QR or Click Link to Connect</p>
-
-        <div id="qr-container">
-          <div class="qr-loading">Generating Frequency...</div>
+    <div id="wh-window" class="wh-window-container" style="display: none">
+      <div id="wh-header" class="wh-header-bar">
+        <div class="wh-title-box">
+          <span class="wh-icon">⚡</span>
+          <span class="wh-title-text">ENCRYPTED UPLINK</span>
         </div>
-
-        <div class="wormhole-link-box">
-          <span>Link: </span
-          ><a id="wormhole-link" href="#" target="_blank">Generating...</a>
+        <div class="wh-control-group">
+          <button id="wh-btn-minimize" class="wh-ctrl-btn" title="Minimize">
+            _
+          </button>
+          <button
+            id="wh-btn-close"
+            class="wh-ctrl-btn wh-btn-close"
+            title="Close"
+          >
+            ✕
+          </button>
         </div>
-
-        <div class="wormhole-status" id="wormhole-status">
-          Waiting for user...
-        </div>
-        <button id="close-wormhole-btn">[ CANCEL ]</button>
       </div>
 
-      <div
-        id="wormhole-warning-screen"
-        class="wormhole-content"
-        style="display: none; border-color: #ff3333"
-      >
-        <h2 class="wormhole-title" style="color: #ff3333">⚠️ SECURITY ALERT</h2>
+      <div id="wh-body" class="wh-body-content">
+        <div id="wh-screen-scan" class="wh-view-section">
+          <div class="wh-scan-header">SCAN TO CONNECT</div>
 
-        <div class="warning-body" style="text-align: left; margin: 15px 0">
-          <p style="color: var(--text-primary); margin-bottom: 10px">
-            End-to-End Encryption is
-            <span style="color: #ff3333">NOT</span> guaranteed.
-          </p>
-          <ul
-            style="
-              font-size: 13px;
-              color: var(--text-secondary);
-              padding-left: 20px;
-              line-height: 1.6;
-            "
+          <div class="wh-qr-frame">
+            <div class="qr-corner tl"></div>
+            <div class="qr-corner tr"></div>
+            <div class="qr-corner bl"></div>
+            <div class="qr-corner br"></div>
+
+            <div id="wh-qr-target"></div>
+          </div>
+
+          <div class="wh-link-container">
+            <span class="wh-link-label">LINK:</span>
+            <span id="wh-link-text" class="wh-link-url" title="Click to Copy"
+              >Waiting...</span
+            >
+          </div>
+          <div
+            id="wh-copy-feedback"
+            style="opacity: 0; color: #00ff41; font-size: 12px; margin-top: 5px"
           >
-            <li>Do NOT share Passwords or API Keys.</li>
-            <li>Do NOT share Bank Details or OTPs.</li>
-            <li>Do NOT share Personal Photos.</li>
-          </ul>
-          <p style="margin-top: 15px; font-size: 12px; color: #ffcc00">
-            This channel is public. Proceed only for general text transfer.
-          </p>
+            COPIED TO CLIPBOARD
+          </div>
         </div>
 
         <div
-          class="warning-buttons"
-          style="display: flex; gap: 15px; width: 100%"
+          id="wh-screen-warning"
+          class="wh-view-section"
+          style="display: none"
         >
-          <button id="warning-deny-btn" class="danger-btn">
-            NO (DISCONNECT)
-          </button>
-          <button id="warning-accept-btn" class="success-btn">
-            YES (I UNDERSTAND)
-          </button>
-        </div>
-      </div>
-
-      <div
-        id="wormhole-chat-screen"
-        class="wormhole-chat-interface"
-        style="display: none"
-      >
-        <div class="chat-header">
-          <span class="chat-title">🟢 LIVE CONNECTION</span>
-          <button id="chat-minimize-btn">_</button>
+          <h2 class="wh-alert-title">⚠️ INCOMING SIGNAL</h2>
+          <p class="wh-alert-desc">Remote device requesting access.</p>
+          <div class="wh-action-group">
+            <button id="wh-btn-accept" class="wh-action-btn wh-accept">
+              ESTABLISH
+            </button>
+            <button id="wh-btn-deny" class="wh-action-btn wh-deny">
+              REJECT
+            </button>
+          </div>
         </div>
 
-        <div id="chat-history" class="chat-history">
-          <div class="chat-msg system">Encrypted channel established.</div>
-          <div class="chat-msg system">Type "disconnect" to end session.</div>
-        </div>
+        <div
+          id="wh-screen-chat"
+          class="wh-view-section wh-chat-layout"
+          style="display: none"
+        >
+          <div id="wh-chat-history" class="wh-history-box"></div>
 
-        <div class="chat-input-wrapper">
-          <input
-            type="text"
-            id="chat-input"
-            placeholder="Type a message..."
-            autocomplete="off"
-          />
-          <button id="chat-send-btn">SEND</button>
+          <div class="wh-input-bar">
+            <input
+              type="text"
+              id="wh-input-field"
+              class="wh-input"
+              placeholder="Transmit data..."
+              autocomplete="off"
+            />
+            <button id="wh-btn-send" class="wh-send-btn">SEND</button>
+          </div>
         </div>
       </div>
     </div>
@@ -349,6 +345,9 @@
     <script src="assets/script/themes.js"></script>
     <script src="assets/script/widgets.js"></script>
     <script src="assets/script/matrix.js"></script>
+    <script src="assets/script/windowManager.js"></script>
+    <script src="assets/script/qrcode.min.js"></script>
+    <script src="assets/script/wormhole.js"></script>
     <script src="assets/script/terminal.js"></script>
     \
   </body>

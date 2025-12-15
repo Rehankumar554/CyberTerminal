@@ -52,6 +52,8 @@ class Terminal {
     this.tips = [];
 
     this.docs = {};
+    this.wormholeManager = new WormholeManager(this);
+
 
     this.init();
   }
@@ -74,7 +76,7 @@ class Terminal {
     this.initContextMenu();
     this.initParticles();
     this.loadDocumentation();
-    this.initWormhole();
+    this.wormholeManager.init();
 
     if (this.settings.startupCmd) {
       setTimeout(() => {
@@ -235,231 +237,6 @@ class Terminal {
     this.addOutput("Tip: Type 'man <command>' for manual.");
   }
   // --- UPDATED LOGIC WITH SECURITY WARNING ---
-
-  initWormhole() {
-    // 1. Existing Listeners
-    document
-      .getElementById("close-wormhole-btn")
-      .addEventListener("click", () => this.endChatSession());
-    document
-      .getElementById("chat-minimize-btn")
-      .addEventListener("click", () => this.endChatSession());
-
-    // 2. New Warning Button Listeners
-    document
-      .getElementById("warning-deny-btn")
-      .addEventListener("click", () => {
-        this.addOutput("[SYSTEM] Connection rejected by user.", "error");
-        this.endChatSession(); // Turant Disconnect & Close
-      });
-
-    document
-      .getElementById("warning-accept-btn")
-      .addEventListener("click", () => {
-        this.proceedToChat(); // Warning Hatao -> Chat Dikhao
-      });
-
-    // Chat Send Logic (Same as before)
-    const sendBtn = document.getElementById("chat-send-btn");
-    const input = document.getElementById("chat-input");
-
-    const sendMessage = () => {
-      const text = input.value.trim();
-      if (!text) return;
-      this.sendToWormhole(text);
-      this.addChatMessage(text, "sent");
-      input.value = "";
-      if (text.toLowerCase() === "disconnect") {
-        setTimeout(() => this.endChatSession(), 1000);
-      }
-    };
-
-    sendBtn.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-  }
-
-  // --- MAIN START FUNCTION ---
-  async startWormhole() {
-    if (this.wormholeEventSource) this.wormholeEventSource.close();
-
-    const modal = document.getElementById("wormhole-modal");
-    const scanScreen = document.getElementById("wormhole-scan-screen");
-    const warningScreen = document.getElementById("wormhole-warning-screen");
-    const chatScreen = document.getElementById("wormhole-chat-screen");
-
-    // FIX 1: Update Title to reflect reality (Not "Secure")
-    const titleEl = document.querySelector(".wormhole-title");
-    if (titleEl) titleEl.textContent = "⚡ WORMHOLE RELAY (PUBLIC) ⚡";
-
-    // UI Reset (Show Scanner, Hide Warning & Chat)
-    modal.style.display = "flex";
-    scanScreen.style.display = "flex";
-    warningScreen.style.display = "none";
-    chatScreen.style.display = "none";
-
-    document.getElementById("wormhole-status").textContent =
-      "Initializing Public Channel...";
-
-    // FIX 2: Honest System Messages
-    document.getElementById("chat-history").innerHTML = `
-    <div class="chat-msg system">📡 Public Relay Channel Open.</div>
-    <div class="chat-msg system" style="color:#ffaa00">⚠️ Traffic is NOT end-to-end encrypted.</div>
-    <div class="chat-msg system">Type "disconnect" to end session.</div>
-`;
-
-    // Generate ID & Connect
-    // Added Date.now() for better uniqueness
-    this.wormholeId =
-      "cyberterm_" +
-      Math.random().toString(36).substr(2, 9) +
-      "_" +
-      Date.now().toString(36);
-    const channelUrl = `https://ntfy.sh/${this.wormholeId}`;
-
-    // QR & Link Code
-    document.getElementById(
-      "qr-container"
-    ).innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-      channelUrl
-    )}" class="qr-image">`;
-    document.getElementById("wormhole-link").href = channelUrl;
-    document.getElementById("wormhole-link").textContent = channelUrl;
-
-    this.wormholeEventSource = new EventSource(`${channelUrl}/sse`);
-
-    this.wormholeEventSource.onopen = () => {
-      const statusEl = document.getElementById("wormhole-status");
-      if (statusEl) {
-        statusEl.textContent = "● Online. Waiting for remote peer...";
-        statusEl.classList.add("status-active");
-      }
-    };
-
-    this.wormholeEventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        if (data.event === "message") {
-          // Ignore self-sent messages
-          if (data.tags && data.tags.includes("self_sent")) {
-            return;
-          }
-
-          const msg = data.message;
-
-          // 1. Scanner Check -> Go to Warning
-          if (scanScreen.style.display !== "none") {
-            scanScreen.style.display = "none";
-
-            // Update Warning Screen Text dynamically if needed
-            const warningTitle = warningScreen.querySelector(".wormhole-title");
-            if (warningTitle)
-              warningTitle.textContent = "⚠️ PUBLIC CHANNEL WARNING";
-
-            warningScreen.style.display = "flex";
-
-            // First message save karo
-            this.pendingFirstMessage = msg;
-
-            if (this.playKeySound) this.playKeySound("error");
-            return;
-          }
-
-          // 2. Warning Check
-          if (warningScreen.style.display !== "none") {
-            return;
-          }
-
-          // 3. Disconnect Logic
-          if (msg.trim().toLowerCase() === "disconnect") {
-            this.addChatMessage("Remote user disconnected.", "system");
-            setTimeout(() => this.endChatSession(), 1500);
-            return;
-          }
-
-          // 4. Show Message
-          this.addChatMessage(msg, "received");
-          if (this.playKeySound) this.playKeySound("key");
-        }
-      } catch (e) {
-        console.error("Wormhole Error:", e);
-      }
-    };
-  }
-
-  proceedToChat() {
-    document.getElementById("wormhole-warning-screen").style.display = "none";
-    document.getElementById("wormhole-chat-screen").style.display = "flex";
-
-    // ⭐ RESTORE FIRST MESSAGE
-    if (this.pendingFirstMessage) {
-      this.addChatMessage(this.pendingFirstMessage, "received");
-      this.pendingFirstMessage = null;
-    }
-
-    document.getElementById("chat-input").focus();
-
-    if (typeof showToast === "function")
-      showToast("Secure Handshake Complete 🟢");
-
-    const chatHeaderTitle = document.querySelector(".chat-title");
-    if (chatHeaderTitle) chatHeaderTitle.innerHTML = "🟢 LIVE CONNECTION";
-  }
-
-  sendToWormhole(text) {
-    if (!this.wormholeId) return;
-
-    fetch(`https://ntfy.sh/${this.wormholeId}`, {
-      method: "POST",
-      body: text,
-      headers: {
-        Tags: "self_sent", // ⭐ MOST IMPORTANT
-        Title: "CyberTerminal", // Optional
-      },
-    }).catch((err) => console.error("Send failed", err));
-  }
-
-  addChatMessage(text, type) {
-    const history = document.getElementById("chat-history");
-    const div = document.createElement("div");
-    div.className = `chat-msg ${type}`;
-
-    // 1. Get Current Time (HH:MM AM/PM)
-    const now = new Date();
-    const timeString = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
-    // 2. HTML Structure (Msg + Time)
-    div.innerHTML = `
-    <div class="msg-content">${text}</div>
-    <div class="msg-time">${timeString}</div>
-  `;
-
-    history.appendChild(div);
-    history.scrollTop = history.scrollHeight; // Auto scroll
-  }
-
-  endChatSession() {
-    const modal = document.getElementById("wormhole-modal");
-    modal.style.display = "none";
-
-    // Update Chat Header Status (Red/Offline)
-    const chatHeaderTitle = document.querySelector(".chat-title");
-    if (chatHeaderTitle) chatHeaderTitle.innerHTML = "🔴 DISCONNECTED";
-
-    if (this.wormholeEventSource) {
-      this.wormholeEventSource.close();
-      this.wormholeEventSource = null;
-    }
-
-    this.addOutput("[SYSTEM] Chat session ended.", "warning");
-    if (typeof showToast === "function") showToast("Disconnected 🔌");
-    this.input.focus();
-  }
 
   initParticles() {
     this.particleCanvas = document.getElementById("particle-canvas");
@@ -4641,9 +4418,9 @@ class Terminal {
 
     wormhole: function (args) {
       if (args && args[0] === "disconnect") {
-        this.manualDisconnectWormhole();
+        this.wormholeManager.endSession("manual");
       } else {
-        this.startWormhole();
+        this.wormholeManager.start();
       }
     },
 
