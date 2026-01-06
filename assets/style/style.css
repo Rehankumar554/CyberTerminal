@@ -1299,13 +1299,13 @@ input[type="range"]:hover::-moz-range-thumb {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* JS will overwrite this on drag */
+  transform: translate(-50%, -50%);
   width: 360px;
   height: 520px;
   background-color: var(--wh-bg);
   border: 1px solid var(--wh-border);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 255, 65, 0.2);
-  z-index: 9000; /* Context menu se kam, desktop se zyada */
+  z-index: 9000;
   display: flex;
   flex-direction: column;
   font-family: "Share Tech Mono", monospace;
@@ -1313,16 +1313,70 @@ input[type="range"]:hover::-moz-range-thumb {
   overflow: hidden;
   backdrop-filter: blur(8px);
   border-radius: 2px;
+
+  /* --- FIX: Sirf Size aur Radius animate karein, Position nahi --- */
+  transition: width 0.3s, height 0.3s, border-radius 0.3s, opacity 0.3s;
+  /* Top aur Left hata diya gaya hai taaki dragging smooth ho */
 }
 
-/* Minimized State */
-#wh-window.wh-minimized {
-  height: auto !important;
-  min-height: 0 !important;
-  resize: none !important;
+/* Minimize hone par Buttons Swap karein */
+#wh-window.wh-minimized #wh-btn-minimize {
+  display: none; /* Minimize button chupao */
 }
-#wh-window.wh-minimized #wh-body {
+
+#wh-window.wh-minimized #wh-btn-maximize {
+  display: block !important; /* Maximize button dikhao */
+}
+
+#wh-window.wh-minimized {
+  width: 60px !important; /* Thoda bada kiya taaki pakadne me aasani ho */
+  height: 60px !important;
+  border-radius: 50% !important;
+
+  top: 20px !important;
+  left: 20px !important;
+  transform: none !important;
+
+  background: rgba(0, 20, 0, 0.95);
+  border: 1px solid var(--wh-text);
+  box-shadow: 0 0 15px var(--wh-text);
+
+  /* Dragging ke liye jaruri */
+  user-select: none;
+  z-index: 10000;
+  overflow: hidden; /* Header bahar na nikle */
+}
+
+/* Hide Extra Content in Bubble Mode */
+#wh-window.wh-minimized .wh-body-content,
+#wh-window.wh-minimized .wh-control-group,
+#wh-window.wh-minimized .wh-title-text {
   display: none !important;
+}
+
+#wh-window.wh-minimized .wh-header-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: transparent; /* Transparent taaki icon dikhe */
+  border: none;
+  cursor: move; /* Move cursor dikhao */
+
+  /* Icon ko center karne ke liye */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5; /* Content ke upar */
+}
+
+#wh-window.wh-minimized .wh-icon {
+  font-size: 24px;
+  margin: 0;
+  animation: pulse 1.5s infinite; /* Icon blink karega */
 }
 
 /* --- Header --- */
@@ -1338,11 +1392,42 @@ input[type="range"]:hover::-moz-range-thumb {
   flex-shrink: 0;
 }
 
+#wh-window.wh-maximized {
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  border: none;
+  background: rgba(5, 8, 5, 0.98); /* Thoda solid background */
+}
+
+/* Maximize hone par 'Body' full height lega */
+#wh-window.wh-maximized .wh-body-content {
+  height: calc(100% - 40px); /* Header height minus karke */
+}
+
 .wh-title-box {
   display: flex;
   gap: 8px;
   align-items: center;
   font-weight: bold;
+}
+
+#wh-window.wh-minimized .wh-title-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#wh-window.wh-minimized .wh-icon {
+  font-size: 28px; /* Icon thoda bada */
+  margin: 0;
+  animation: pulse 1.5s infinite;
+  pointer-events: none; /* Click aar-paar jaye taaki Header drag pakad sake */
 }
 .wh-title-text {
   font-size: 14px;
@@ -1582,7 +1667,83 @@ input[type="range"]:hover::-moz-range-thumb {
   transform: scale(0.95);
 }
 
-/* Messages */
+/* =========================================
+   WORMHOLE CHAT STYLES (MATCHING MOBILE)
+   ========================================= */
+
+/* Message Container */
+.msg-row {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  margin-bottom: 12px; /* Thoda gap messages ke beech */
+  animation: fadeIn 0.3s ease;
+}
+
+/* Alignments */
+.msg-row.rec {
+  align-self: flex-start;
+}
+.msg-row.sent {
+  align-self: flex-end;
+  align-items: flex-end; /* Timestamp right align karne ke liye */
+}
+
+/* Bubble Styling */
+.bubble {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Received Bubble (Incoming) */
+.msg-row.rec .bubble {
+  background: rgba(0, 255, 65, 0.05); /* Glass effect */
+  border-left: 3px solid var(--wh-text); /* Green Accent */
+  border-top: 1px solid rgba(0, 255, 65, 0.2);
+  border-right: 1px solid rgba(0, 255, 65, 0.1);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  color: #fff;
+}
+
+/* Sent Bubble (Outgoing) */
+.msg-row.sent .bubble {
+  background: rgba(0, 255, 65, 0.1);
+  border-right: 3px solid var(--wh-dim); /* Darker Green Accent */
+  border-top: 1px solid rgba(0, 143, 17, 0.2);
+  border-left: 1px solid rgba(0, 143, 17, 0.1);
+  border-bottom: 1px solid rgba(0, 143, 17, 0.1);
+  color: var(--wh-text);
+  text-align: right;
+}
+
+/* Sender Name Label */
+.sender-label {
+  font-size: 10px;
+  margin-bottom: 2px;
+  margin-left: 2px;
+  font-weight: bold;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+/* Timestamp Styling */
+.timestamp {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--wh-text);
+}
+
+/* Update Existing or Add at bottom of style.css */
+
 .chat-msg {
   max-width: 85%;
   padding: 6px 10px;
@@ -1590,17 +1751,7 @@ input[type="range"]:hover::-moz-range-thumb {
   line-height: 1.4;
   word-wrap: break-word;
 }
-.chat-msg.received {
-  align-self: flex-start;
-  border-left: 2px solid var(--wh-border);
-  background: rgba(0, 255, 65, 0.05);
-}
-.chat-msg.sent {
-  align-self: flex-end;
-  border-right: 2px solid var(--wh-dim);
-  background: rgba(0, 255, 65, 0.02);
-  text-align: right;
-}
+
 .chat-msg.system {
   align-self: center;
   font-size: 11px;
@@ -1609,10 +1760,20 @@ input[type="range"]:hover::-moz-range-thumb {
   text-align: center;
   border-bottom: 1px dashed #333;
 }
+
 .chat-msg.error {
   align-self: center;
   color: var(--wh-alert);
   border: 1px solid var(--wh-alert);
+}
+
+.msg-row.system .bubble {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed #333;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  padding: 5px;
 }
 
 .msg-time {
@@ -1691,4 +1852,9 @@ input[type="range"]:hover::-moz-range-thumb {
   50% {
     opacity: 0.5;
   }
+}
+
+#wh-window.wh-minimized .resizer {
+  display: none !important;
+  pointer-events: none !important; /* Click bhi na ho sake */
 }

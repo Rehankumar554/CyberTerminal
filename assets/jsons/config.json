@@ -3,7 +3,7 @@
   "systemName": "CyberTerm Linux",
   "kernel": "5.15.0-cyber",
   "apiKeys": {
-    "weather": "API"
+    "weather": "794f3ea37db442de8f642856250712"
   },
   "defaults": {
     "fontSize": 14,

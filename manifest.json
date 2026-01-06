@@ -23,5 +23,15 @@
 
   "chrome_url_overrides": {
     "newtab": "newtab.html"
-  }
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+
+  "host_permissions": [
+    "https://rks-dev-22651-default-rtdb.firebaseio.com/*",
+    "https://cybertermchatsystem.netlify.app/*",
+    "https://api.qrserver.com/*"
+  ]
 }

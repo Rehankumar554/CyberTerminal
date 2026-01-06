@@ -12,6 +12,10 @@
       href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <canvas id="particle-canvas"></canvas>
@@ -257,12 +261,23 @@
       <div id="wh-header" class="wh-header-bar">
         <div class="wh-title-box">
           <span class="wh-icon">⚡</span>
-          <span class="wh-title-text">ENCRYPTED UPLINK</span>
+          <span class="wh-title-text"
+            >ENCRYPTED UPLINK <span id="wh-title-passkey"></span
+          ></span>
         </div>
         <div class="wh-control-group">
           <button id="wh-btn-minimize" class="wh-ctrl-btn" title="Minimize">
             _
           </button>
+
+          <button
+            id="wh-btn-maximize"
+            class="wh-ctrl-btn"
+            title="Maximize"
+          >
+            □
+          </button>
+
           <button
             id="wh-btn-close"
             class="wh-ctrl-btn wh-btn-close"
@@ -286,8 +301,33 @@
             <div id="wh-qr-target"></div>
           </div>
 
-          <div class="wh-link-container">
-            <span class="wh-link-label">LINK:</span>
+          <div
+            class="wh-link-container"
+            style="margin-top: 10px; border-color: var(--wh-text)"
+          >
+            <span class="wh-link-label" style="color: var(--wh-text)"
+              >PASSKEY:</span
+            >
+            <span
+              id="wh-passkey-display"
+              class="wh-link-url"
+              style="
+                font-size: 18px;
+                letter-spacing: 3px;
+                font-weight: bold;
+                text-align: center;
+              "
+              >...</span
+            >
+          </div>
+
+          <div
+            class="wh-link-container"
+            style="margin-top: 10px; border-color: var(--wh-text)"
+          >
+            <span class="wh-link-label" style="color: var(--wh-text)"
+              >LINK:</span
+            >
             <span id="wh-link-text" class="wh-link-url" title="Click to Copy"
               >Waiting...</span
             >

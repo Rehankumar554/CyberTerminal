@@ -278,13 +278,13 @@ class WidgetManager {
     const timeSinceSec = (timeSinceLast / 1000).toFixed(0);
 
     // --- 1. INITIAL LOAD CHECK (Refresh Logic) ---
-    console.log(`🔍 [Crypto Init] Checking status...`);
+    // console.log(`🔍 [Crypto Init] Checking status...`);
 
     if (lastUpdate > 0 && timeSinceLast < this.CRYPTO_INTERVAL_MS) {
       // 2 Minute nahi hue -> Cache Use karo
-      console.log(
-        `♻️ [Refresh Detected] Last update was only ${timeSinceSec}s ago (< 120s). Using LocalStorage Cache.`
-      );
+      // console.log(
+      //   `♻️ [Refresh Detected] Last update was only ${timeSinceSec}s ago (< 120s). Using LocalStorage Cache.`
+      // );
       this.restoreCachedCrypto();
     } else {
       // Time poora ho gaya ya first load hai -> Fetch karo
@@ -292,20 +292,20 @@ class WidgetManager {
         lastUpdate === 0
           ? "First Load"
           : `Time Expired (${timeSinceSec}s > 120s)`;
-      console.log(`🚀 [Fresh Load] Fetching new data. Reason: ${reason}`);
+      // console.log(`🚀 [Fresh Load] Fetching new data. Reason: ${reason}`);
       this.fetchCrypto();
     }
 
     // --- 2. INTERVAL TIMER (Auto-Update Logic) ---
     setInterval(() => {
       if (document.hidden) {
-        console.log(
-          "💤 [Auto-Update] Interval triggered but Tab is HIDDEN. Skipping API call."
-        );
+        // console.log(
+        //   "💤 [Auto-Update] Interval triggered but Tab is HIDDEN. Skipping API call."
+        // );
       } else {
-        console.log(
-          "⏰ [Auto-Update] Interval triggered and Tab is VISIBLE. Fetching data..."
-        );
+        // console.log(
+        //   "⏰ [Auto-Update] Interval triggered and Tab is VISIBLE. Fetching data..."
+        // );
         this.fetchCrypto();
       }
     }, this.CRYPTO_INTERVAL_MS);
@@ -322,14 +322,14 @@ class WidgetManager {
         const diffSec = (diff / 1000).toFixed(0);
 
         if (diff >= this.CRYPTO_INTERVAL_MS) {
-          console.log(
-            `👋 [User Returned] Stale data detected (Age: ${diffSec}s). Updating immediately...`
-          );
+          // console.log(
+          //   `👋 [User Returned] Stale data detected (Age: ${diffSec}s). Updating immediately...`
+          // );
           this.fetchCrypto();
         } else {
-          console.log(
-            `👋 [User Returned] Data is still fresh (Age: ${diffSec}s). No update needed.`
-          );
+          // console.log(
+          //   `👋 [User Returned] Data is still fresh (Age: ${diffSec}s). No update needed.`
+          // );
         }
       }
     });
@@ -341,7 +341,7 @@ class WidgetManager {
       return;
     }
 
-    console.log("📡 [API] Sending request to fetch crypto prices...");
+    // console.log("📡 [API] Sending request to fetch crypto prices...");
 
     // 1. Fetch BTC
     apiManager.getCryptoPrice("BTC").then((price) => {
@@ -370,7 +370,7 @@ class WidgetManager {
   }
 
   restoreCachedCrypto() {
-    console.log("💾 [Cache] Restoring prices from LocalStorage...");
+    // console.log("💾 [Cache] Restoring prices from LocalStorage...");
     const btc = localStorage.getItem("cached_btc");
     const eth = localStorage.getItem("cached_eth");
 
